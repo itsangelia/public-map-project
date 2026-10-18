@@ -1,42 +1,37 @@
 html, body { margin: 0; padding: 0; background: #FFF8F1; }
 main { position: relative; width: fit-content; }
 canvas { display: block; }
-/* Adjustable prototype size and bottom gap for the portrait phone view. */
-:root { --joystick-size: clamp(104px, 28vw, 132px); --joystick-bottom: 4vh; }
+/* Fixed to the visible phone viewport, including browser toolbar changes. */
+:root { --joystick-size: clamp(116px, 30vw, 136px); --joystick-bottom: 24px; }
 #movement-controls {
-  position: fixed; left: 50%;
-  bottom: max(var(--joystick-bottom), calc(env(safe-area-inset-bottom, 0px) + 18px));
+  appearance: none; -webkit-appearance: none;
+  position: fixed; z-index: 30; left: var(--control-center, 50%);
+  top: calc(var(--visible-bottom, 100dvh) - var(--joystick-size) - var(--joystick-bottom) - env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%); width: var(--joystick-size); height: var(--joystick-size);
-  padding: 0; border: 2px solid #303A68; border-radius: 50%;
-  background: rgba(255, 248, 241, 0.9); color: #303A68;
-  touch-action: none; user-select: none; -webkit-user-select: none;
+  box-sizing: border-box; padding: 0; border: 1px solid rgba(48,58,104,.2); border-radius: 50%;
+  background: radial-gradient(circle, #eee9e0 0 45%, #fffcf5 46% 63%, #e8e0d2 64% 66%, #fff8ed 67%);
+  box-shadow: 0 6px 18px rgba(48,58,104,.16), inset 0 2px 1px #fff;
+  color: #303A68; touch-action: none; user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent; cursor: grab;
 }
 #movement-controls[hidden], #light-action[hidden] { display: none; }
 #movement-controls:focus-visible { outline: 3px solid #7C89D9; outline-offset: 4px; }
+#movement-controls.is-dragging { cursor: grabbing; }
 .joystick-thumb {
-  position: absolute; left: 50%; top: 50%; width: 42%; height: 42%;
-  border: 2px solid #303A68; border-radius: 50%; background: #A8D8C5;
+  position: absolute; z-index: 2; left: 50%; top: 50%; width: 43%; height: 43%;
+  box-sizing: border-box; border: 1px solid #719e92; border-radius: 50%;
+  background: radial-gradient(circle at 36% 26%, #d1eee1, #a8d8c5 55%, #89baa9);
+  box-shadow: 0 5px 0 #719e92, 0 8px 10px rgba(48,58,104,.24), inset 0 2px 2px #e6f7ee;
   transform: translate(-50%, -50%); pointer-events: none;
 }
-.joystick-hint {
-  position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
-  white-space: nowrap; font: 12px Arial; pointer-events: none;
-}
-#light-action {
-  border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1;
-  color: #303A68; font-weight: bold; touch-action: manipulation;
-}
-#light-action {
-  border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1;
-  color: #303A68; font-size: 24px; font-weight: bold; touch-action: none;
-  user-select: none; -webkit-user-select: none;
-}
-#movement-controls button:active { background: #A8D8C5; }
-#movement-controls .up { grid-column: 2; }
-#movement-controls .left { grid-column: 1; grid-row: 2; }
-#movement-controls .down { grid-column: 2; grid-row: 2; }
-#movement-controls .right { grid-column: 3; grid-row: 2; }
-#light-action { position: absolute; bottom: 20%; left: 25%; width: 50%; font-size: 16px; min-height: 44px; }
+#movement-controls.is-dragging .joystick-thumb { box-shadow: 0 3px 0 #719e92, 0 5px 8px rgba(48,58,104,.24), inset 0 2px 2px #e6f7ee; }
+.joystick-directions { position: absolute; inset: 0; pointer-events: none; }
+.joystick-direction { position: absolute; width: 6px; height: 6px; border-top: 2px solid #8b8c92; border-left: 2px solid #8b8c92; }
+.joystick-direction.up { top: 11px; left: calc(50% - 4px); transform: rotate(45deg); }
+.joystick-direction.right { right: 11px; top: calc(50% - 4px); transform: rotate(135deg); }
+.joystick-direction.down { bottom: 11px; left: calc(50% - 4px); transform: rotate(225deg); }
+.joystick-direction.left { left: 11px; top: calc(50% - 4px); transform: rotate(-45deg); }
+#light-action { position: absolute; bottom: 20%; left: 25%; width: 50%; font-size: 16px; min-height: 44px; border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1; color: #303A68; font-weight: bold; touch-action: manipulation; }
 
 #connection-status { position: fixed; left: 8px; bottom: 4px; background: #FFF8F1; color: #303A68; font: 12px Arial; padding: 4px 8px; border-radius: 6px; z-index: 5; }
 #join-qr { position: fixed; right: 16px; top: 16px; background: white; border-radius: 12px; padding: 12px; color: #303A68; text-align: center; font: 16px Arial; max-width: 190px; }
