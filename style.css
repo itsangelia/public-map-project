@@ -2,16 +2,16 @@ html, body { margin: 0; padding: 0; background: #FFF8F1; }
 main { position: relative; width: fit-content; }
 canvas { display: block; }
 /* Fixed to the visible phone viewport, including browser toolbar changes. */
-:root { --joystick-size: clamp(116px, 30vw, 136px); --joystick-bottom: 24px; --joystick-opacity: .72; }
+:root { --joystick-size: clamp(116px, 30vw, 136px); --joystick-bottom: 24px; }
 #movement-controls {
   appearance: none; -webkit-appearance: none;
-  opacity: var(--joystick-opacity);
+
   position: fixed; z-index: 30; left: var(--control-center, 50%);
   top: calc(var(--visible-bottom, 100dvh) - var(--joystick-size) - var(--joystick-bottom) - env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%); width: var(--joystick-size); height: var(--joystick-size);
   box-sizing: border-box; padding: 0; border: 1px solid rgba(48,58,104,.2); border-radius: 50%;
-  background: radial-gradient(circle, #eee9e0 0 45%, #fffcf5 46% 63%, #e8e0d2 64% 66%, #fff8ed 67%);
-  box-shadow: 0 6px 18px rgba(48,58,104,.16), inset 0 2px 1px #fff;
+  background: rgba(255, 248, 241, .55);
+  box-shadow: none;
   color: #303A68; touch-action: none; user-select: none; -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent; cursor: grab;
 }
@@ -21,11 +21,11 @@ canvas { display: block; }
 .joystick-thumb {
   position: absolute; z-index: 2; left: 50%; top: 50%; width: 43%; height: 43%;
   box-sizing: border-box; border: 1px solid #85888d; border-radius: 50%;
-  background: radial-gradient(circle at 36% 26%, #eeeeef, #bfc2c6 55%, #9da1a7);
-  box-shadow: 0 5px 0 #85888d, 0 8px 10px rgba(48,58,104,.24), inset 0 2px 2px #fafafa;
+  background: #bfc2c6;
+  box-shadow: none;
   transform: translate(-50%, -50%); pointer-events: none;
 }
-#movement-controls.is-dragging .joystick-thumb { box-shadow: 0 3px 0 #85888d, 0 5px 8px rgba(48,58,104,.24), inset 0 2px 2px #fafafa; }
+#movement-controls.is-dragging .joystick-thumb { box-shadow: none; }
 .joystick-directions { position: absolute; inset: 0; pointer-events: none; }
 .joystick-direction { position: absolute; width: 6px; height: 6px; border-top: 2px solid #8b8c92; border-left: 2px solid #8b8c92; }
 .joystick-direction.up { top: 11px; left: calc(50% - 4px); transform: rotate(45deg); }
