@@ -19448,6 +19448,9 @@
   var lastSent;
   var connectionMessage = "Connecting";
   var connectionError = "";
+  var lastChatSent = -Infinity;
+  var chatSending = false;
+  var serverTimeOffset = 0;
   var connectionId = crypto.randomUUID();
   var message = (text) => {
     connectionMessage = text;
@@ -19480,6 +19483,22 @@
       lastWrite = performance.now();
       lastSent = { x, y };
       update(ownRef, { x, y, updatedAt: serverTimestamp() }).catch(fail);
+    },
+    now: () => Date.now() + serverTimeOffset,
+    async sendChat(value) {
+      const text = String(value).trim();
+      if (!text || text.length > 80) throw new Error("Use 1\u201380 characters.");
+      if (!state.connected || !state.joined || !ownRef) throw new Error("Connect to the map before sending.");
+      if (chatSending || performance.now() - lastChatSent < 1500) throw new Error("Please wait a moment before sending again.");
+      chatSending = true;
+      try {
+        await update(ownRef, { speech: { id: crypto.randomUUID(), text, sentAt: serverTimestamp() }, updatedAt: serverTimestamp() });
+        lastChatSent = performance.now();
+      } catch (error2) {
+        throw new Error(error2.code === "PERMISSION_DENIED" || error2.code === "permission-denied" ? "Chat is unavailable. Please ask the host to publish the chat database rules." : "Message could not be sent. Check your connection.");
+      } finally {
+        chatSending = false;
+      }
     },
     ownKey: null
   };
@@ -19514,7 +19533,7 @@
     qrPanel.id = "join-qr";
     if (params.get("mode") === "display") {
       const url = new URL(config?.publicBaseUrl || location.href);
-      url.search = new URLSearchParams({ room, v: "sync-check-1" }).toString();
+      url.search = new URLSearchParams({ room, v: "chat-1" }).toString();
       url.hash = "";
       if (url.protocol !== "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) {
         qrPanel.textContent = "Deploy to HTTPS to enable phone joining";
@@ -19537,6 +19556,9 @@
       await setPersistence(auth, browserSessionPersistence);
       user = (await signInAnonymously(auth)).user;
       database = getDatabase(app);
+      onValue(ref(database, ".info/serverTimeOffset"), (snapshot) => {
+        serverTimeOffset = snapshot.val() || 0;
+      });
       onValue(ref(database, `rooms/${room}/players`), (snapshot) => {
         const players = {};
         for (const [uid, connections] of Object.entries(snapshot.val() || {})) {
@@ -19548,6 +19570,7 @@
         }
         state.players = players;
         refreshStatus();
+        window.dispatchEvent(new CustomEvent("map-players-updated"));
       }, fail);
       onValue(ref(database, ".info/connected"), async (snapshot) => {
         state.connected = snapshot.val() === true;

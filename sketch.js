@@ -434,6 +434,7 @@ function setupKeyboardControls() {
     "keydown",
 
     function(event) {
+      if (event.isComposing || event.target.closest?.('#chat-panel')) return;
 
 
       // =================================================
@@ -1510,6 +1511,8 @@ function drawMapPage() {
 
   drawRemotePlayers();
   drawMapPlayer();
+  const localSpeech = window.mapNetwork?.state.players[window.mapNetwork.ownKey]?.speech;
+  drawSpeechBubble(playerX - cameraX, playerY - cameraY, localSpeech);
 
 
   // ===================================================
@@ -2705,6 +2708,7 @@ function syncControlViewport() {
   const top = viewport ? viewport.offsetTop : 0;
   document.documentElement.style.setProperty('--control-center', `${left + width / 2}px`);
   document.documentElement.style.setProperty('--visible-bottom', `${top + height}px`);
+  document.documentElement.style.setProperty('--chat-height', `${Math.min(370, height * .82)}px`);
 }
 
 function fitCanvasToScreen() {
@@ -2824,6 +2828,7 @@ function setupTouchControls() {
 
 function updateTouchControls() {
   if (touchPanel) touchPanel.hidden = page !== 'map';
+  if (window.mapChat) window.mapChat.setVisible(page === 'map');
   if (page !== 'map' && joystickInput.pointerId !== null) resetJoystick();
   if (lightAction) lightAction.hidden = page !== 'map' || !nearLightGame;
 }
@@ -2848,6 +2853,7 @@ function drawRemotePlayers() {
     textSize(13);
     fill(COLORS.navy);
     text(String(player.nickname || 'Guest'), position.x - cameraX, position.y - cameraY - 50);
+    drawSpeechBubble(position.x - cameraX, position.y - cameraY, player.speech);
     pop();
   }
 }
@@ -2864,5 +2870,37 @@ function drawPublicDisplay() {
   cameraY = 0;
   drawLightGameSpot();
   drawRemotePlayers();
+  pop();
+}
+
+
+// Shared speech is short-lived; persistent chat history is intentionally not stored.
+function drawSpeechBubble(x, y, speech) {
+  if (!speech || typeof speech.text !== 'string' || !Number.isFinite(speech.sentAt)) return;
+  const age = (window.mapNetwork?.now() || Date.now()) - speech.sentAt;
+  if (age < -1000 || age > 6000) return;
+  push();
+  textSize(15);
+  textStyle(NORMAL);
+  textAlign(LEFT, TOP);
+  const maxLineWidth = 190;
+  const lines = [];
+  let line = '';
+  for (const character of speech.text.slice(0, 80)) {
+    if (character === '\n' || textWidth(line + character) > maxLineWidth) {
+      lines.push(line); line = character === '\n' ? '' : character;
+    } else line += character;
+  }
+  lines.push(line);
+  const bubbleWidth = Math.max(44, Math.min(maxLineWidth, Math.max(...lines.map(item => textWidth(item)))) + 24);
+  const bubbleHeight = lines.length * 20 + 18;
+  // Keep phone bubbles inside its camera viewport; on the display use world bounds.
+  const left = constrain(x - bubbleWidth / 2, 4, Math.max(4, (displayMode ? mapWorldWidth : width) - bubbleWidth - 4));
+  const top = Math.max(4, y - 94 - bubbleHeight);
+  noStroke(); fill(255, 252, 245, 245);
+  rectMode(CORNER); rect(left, top, bubbleWidth, bubbleHeight, 12);
+  triangle(x - 5, top + bubbleHeight - 1, x + 5, top + bubbleHeight - 1, x, top + bubbleHeight + 7);
+  fill(COLORS.navy);
+  lines.forEach((item, index) => text(item, left + 12, top + 9 + index * 20));
   pop();
 }
