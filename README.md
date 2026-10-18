@@ -72,3 +72,24 @@ interpolation. Each connection gets a distinct record; disconnect cleanup is eve
 so a brief stale avatar can remain while Firebase detects a network loss. Refresh
 starts at spawn. No permanent account, chat, pairing or cooperative game is implemented.
 Monitor Firebase usage and close the demo when it is not in use.
+
+## Room chat
+
+The phone's bottom-right speech icon opens room chat with an 80-character input
+and four quick emoji reactions. The public display shows speech bubbles only;
+there are no chat controls on the display. Bubbles expire after six seconds.
+The phone retains up to 30 messages in memory for its current page session.
+Firebase stores only the latest speech per player connection, not a room archive.
+
+Publish the complete updated `database.rules.json` using Firebase Console >
+Realtime Database > Rules > Publish before testing chat. Previous movement-only
+rules intentionally reject the new `speech` field. Existing movement rules are
+preserved. Message fields are validated, and successive speech timestamps for a
+connection must be at least 1.5 seconds apart. These prototype limits are per
+connection and are not a full moderation or abuse-prevention system.
+
+Validate with two phones and a separate display: send text and reactions in both
+directions, confirm the correct avatar has the bubble, wait for bubble expiry,
+and confirm joystick/keyboard control still works. Message input must not trigger
+movement or streetlight shortcuts. Check Chinese IME input on a real iPhone and
+Android phone. User text is displayed as text, never HTML.
