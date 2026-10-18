@@ -19446,10 +19446,19 @@
   var avatar;
   var latestPosition;
   var lastSent;
+  var connectionMessage = "Connecting";
+  var connectionError = "";
   var connectionId = crypto.randomUUID();
   var message = (text) => {
-    status.textContent = text;
+    connectionMessage = text;
+    refreshStatus();
   };
+  function refreshStatus() {
+    const names = Object.values(state.players).map((player) => player.nickname || "Guest");
+    status.textContent = `${connectionError || connectionMessage} \xB7 players: ${names.length}`;
+    status.title = names.join(", ");
+    if (params.get("debug") === "1") status.textContent += ` \xB7 ${names.join(", ") || "no players received"}`;
+  }
   window.mapNetwork = {
     state,
     async join(name5, character, x, y) {
@@ -19458,6 +19467,7 @@
       x = Math.round(x * 1e3) / 1e3;
       y = Math.round(y * 1e3) / 1e3;
       latestPosition = { x, y };
+      connectionError = "";
       if (!database || !state.connected || !user) return;
       await publishJoin();
     },
@@ -19474,7 +19484,8 @@
     ownKey: null
   };
   function fail(error2) {
-    message(`Connection error: ${error2.code || error2.message}`);
+    connectionError = `Connection error: ${error2.code || error2.message}`;
+    refreshStatus();
   }
   async function publishJoin() {
     if (joining || !latestPosition || !state.connected) return;
@@ -19503,7 +19514,7 @@
     qrPanel.id = "join-qr";
     if (params.get("mode") === "display") {
       const url = new URL(config?.publicBaseUrl || location.href);
-      url.search = new URLSearchParams({ room }).toString();
+      url.search = new URLSearchParams({ room, v: "sync-check-1" }).toString();
       url.hash = "";
       if (url.protocol !== "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) {
         qrPanel.textContent = "Deploy to HTTPS to enable phone joining";
@@ -19536,6 +19547,7 @@
           }
         }
         state.players = players;
+        refreshStatus();
       }, fail);
       onValue(ref(database, ".info/connected"), async (snapshot) => {
         state.connected = snapshot.val() === true;
