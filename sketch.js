@@ -1770,7 +1770,7 @@ function drawMapPlayer() {
 
   rect(
     screenX,
-    screenY - 82,
+    screenY - 64,
     labelWidth,
     28,
     14
@@ -1785,7 +1785,7 @@ function drawMapPlayer() {
   text(
     nickname,
     screenX,
-    screenY - 78
+    screenY - 60
   );
 
 
@@ -2847,7 +2847,7 @@ function drawRemotePlayers() {
     textAlign(CENTER);
     textSize(13);
     fill(COLORS.navy);
-    text(String(player.nickname || 'Guest'), position.x - cameraX, position.y - cameraY - 82);
+    text(String(player.nickname || 'Guest'), position.x - cameraX, position.y - cameraY - 50);
     pop();
   }
 }
