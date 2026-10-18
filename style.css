@@ -2,9 +2,10 @@ html, body { margin: 0; padding: 0; background: #FFF8F1; }
 main { position: relative; width: fit-content; }
 canvas { display: block; }
 /* Fixed to the visible phone viewport, including browser toolbar changes. */
-:root { --joystick-size: clamp(116px, 30vw, 136px); --joystick-bottom: 24px; }
+:root { --joystick-size: clamp(116px, 30vw, 136px); --joystick-bottom: 24px; --joystick-opacity: .72; }
 #movement-controls {
   appearance: none; -webkit-appearance: none;
+  opacity: var(--joystick-opacity);
   position: fixed; z-index: 30; left: var(--control-center, 50%);
   top: calc(var(--visible-bottom, 100dvh) - var(--joystick-size) - var(--joystick-bottom) - env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%); width: var(--joystick-size); height: var(--joystick-size);
@@ -19,12 +20,12 @@ canvas { display: block; }
 #movement-controls.is-dragging { cursor: grabbing; }
 .joystick-thumb {
   position: absolute; z-index: 2; left: 50%; top: 50%; width: 43%; height: 43%;
-  box-sizing: border-box; border: 1px solid #719e92; border-radius: 50%;
-  background: radial-gradient(circle at 36% 26%, #d1eee1, #a8d8c5 55%, #89baa9);
-  box-shadow: 0 5px 0 #719e92, 0 8px 10px rgba(48,58,104,.24), inset 0 2px 2px #e6f7ee;
+  box-sizing: border-box; border: 1px solid #85888d; border-radius: 50%;
+  background: radial-gradient(circle at 36% 26%, #eeeeef, #bfc2c6 55%, #9da1a7);
+  box-shadow: 0 5px 0 #85888d, 0 8px 10px rgba(48,58,104,.24), inset 0 2px 2px #fafafa;
   transform: translate(-50%, -50%); pointer-events: none;
 }
-#movement-controls.is-dragging .joystick-thumb { box-shadow: 0 3px 0 #719e92, 0 5px 8px rgba(48,58,104,.24), inset 0 2px 2px #e6f7ee; }
+#movement-controls.is-dragging .joystick-thumb { box-shadow: 0 3px 0 #85888d, 0 5px 8px rgba(48,58,104,.24), inset 0 2px 2px #fafafa; }
 .joystick-directions { position: absolute; inset: 0; pointer-events: none; }
 .joystick-direction { position: absolute; width: 6px; height: 6px; border-top: 2px solid #8b8c92; border-left: 2px solid #8b8c92; }
 .joystick-direction.up { top: 11px; left: calc(50% - 4px); transform: rotate(45deg); }
