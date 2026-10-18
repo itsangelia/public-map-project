@@ -10,8 +10,8 @@ canvas { display: block; }
   top: calc(var(--visible-bottom, 100dvh) - var(--joystick-size) - var(--joystick-bottom) - env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%); width: var(--joystick-size); height: var(--joystick-size);
   box-sizing: border-box; padding: 0; border: 1px solid rgba(48,58,104,.2); border-radius: 50%;
-  background: rgba(255, 248, 241, .55);
-  box-shadow: none;
+  background: radial-gradient(circle, rgba(238,233,224,.72) 0 45%, rgba(255,252,245,.72) 46% 63%, rgba(232,224,210,.72) 64% 66%, rgba(255,248,237,.72) 67%);
+  box-shadow: 0 6px 18px rgba(48,58,104,.12), inset 0 2px 1px rgba(255,255,255,.72);
   color: #303A68; touch-action: none; user-select: none; -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent; cursor: grab;
 }
@@ -21,7 +21,7 @@ canvas { display: block; }
 .joystick-thumb {
   position: absolute; z-index: 2; left: 50%; top: 50%; width: 43%; height: 43%;
   box-sizing: border-box; border: 1px solid #85888d; border-radius: 50%;
-  background: #bfc2c6;
+  background: radial-gradient(circle at 36% 26%, #eeeeef, #bfc2c6 55%, #9da1a7);
   box-shadow: none;
   transform: translate(-50%, -50%); pointer-events: none;
 }
