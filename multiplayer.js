@@ -13,8 +13,19 @@ document.body.appendChild(status);
 const state = { players: {}, connected: false, joined: false };
 let ownRef, database, user, lastWrite = 0, joining = false;
 let nickname, avatar, latestPosition, lastSent;
+let connectionMessage = 'Connecting';
+let connectionError = '';
 const connectionId = crypto.randomUUID();
-const message = text => { status.textContent = text; };
+const message = text => {
+  connectionMessage = text;
+  refreshStatus();
+};
+function refreshStatus() {
+  const names = Object.values(state.players).map(player => player.nickname || 'Guest');
+  status.textContent = `${connectionError || connectionMessage} · players: ${names.length}`;
+  status.title = names.join(', ');
+  if (params.get('debug') === '1') status.textContent += ` · ${names.join(', ') || 'no players received'}`;
+}
 window.mapNetwork = {
   state,
   async join(name, character, x, y) {
@@ -23,6 +34,7 @@ window.mapNetwork = {
     x = Math.round(x * 1000) / 1000;
     y = Math.round(y * 1000) / 1000;
     latestPosition = { x, y };
+    connectionError = '';
     if (!database || !state.connected || !user) return;
     await publishJoin();
   },
@@ -38,7 +50,7 @@ window.mapNetwork = {
   },
   ownKey: null
 };
-function fail(error) { message(`Connection error: ${error.code || error.message}`); }
+function fail(error) { connectionError = `Connection error: ${error.code || error.message}`; refreshStatus(); }
 async function publishJoin() {
   if (joining || !latestPosition || !state.connected) return;
   joining = true;
@@ -59,7 +71,7 @@ async function init() {
   qrPanel.id = 'join-qr';
   if (params.get('mode') === 'display') {
     const url = new URL(config?.publicBaseUrl || location.href);
-    url.search = new URLSearchParams({ room }).toString();
+    url.search = new URLSearchParams({ room, v: 'sync-check-1' }).toString();
     url.hash = '';
     if (url.protocol !== 'https:' || ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) {
       qrPanel.textContent = 'Deploy to HTTPS to enable phone joining';
@@ -89,6 +101,7 @@ async function init() {
         }
       }
       state.players = players;
+      refreshStatus();
     }, fail);
     onValue(ref(database, '.info/connected'), async snapshot => {
       state.connected = snapshot.val() === true;
