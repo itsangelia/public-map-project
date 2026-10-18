@@ -1606,7 +1606,7 @@ function drawMapHeader() {
 
 
   text(
-    "Drag the joystick or use arrow keys to explore",
+    "",
     42,
     76
   );
@@ -2697,7 +2697,18 @@ function drawStreetlightGame() {
 }
 
 // Responsive presentation keeps the original 600 x 900 artwork coordinates.
+function syncControlViewport() {
+  const viewport = window.visualViewport;
+  const width = viewport ? viewport.width : document.documentElement.clientWidth;
+  const height = viewport ? viewport.height : document.documentElement.clientHeight;
+  const left = viewport ? viewport.offsetLeft : 0;
+  const top = viewport ? viewport.offsetTop : 0;
+  document.documentElement.style.setProperty('--control-center', `${left + width / 2}px`);
+  document.documentElement.style.setProperty('--visible-bottom', `${top + height}px`);
+}
+
 function fitCanvasToScreen() {
+  syncControlViewport();
   if (displayMode) {
     const canvas = document.querySelector('canvas');
     if (canvas) { canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; }
@@ -2738,6 +2749,7 @@ function resetJoystick() {
   joystickInput.y = 0;
   joystickInput.pointerId = null;
   if (joystickThumb) joystickThumb.style.transform = 'translate(-50%, -50%)';
+  if (touchPanel) touchPanel.classList.remove('is-dragging');
   if (touchPanel && pointerId !== null && touchPanel.hasPointerCapture(pointerId)) {
     touchPanel.releasePointerCapture(pointerId);
   }
@@ -2748,13 +2760,18 @@ function setupTouchControls() {
   touchPanel.type = 'button';
   touchPanel.id = 'movement-controls';
   touchPanel.setAttribute('aria-label', 'Drag joystick to move; arrow keys also supported');
-  const hint = document.createElement('span');
-  hint.className = 'joystick-hint';
-  hint.textContent = 'Drag to move';
+  const directions = document.createElement('span');
+  directions.className = 'joystick-directions';
+  directions.setAttribute('aria-hidden', 'true');
+  for (const direction of ['up', 'right', 'down', 'left']) {
+    const marker = document.createElement('span');
+    marker.className = `joystick-direction ${direction}`;
+    directions.appendChild(marker);
+  }
   joystickThumb = document.createElement('span');
   joystickThumb.className = 'joystick-thumb';
   joystickThumb.setAttribute('aria-hidden', 'true');
-  touchPanel.append(joystickThumb, hint);
+  touchPanel.append(directions, joystickThumb);
 
   const drag = (event) => {
     if (event.pointerId !== joystickInput.pointerId) return;
@@ -2774,6 +2791,7 @@ function setupTouchControls() {
   };
   touchPanel.addEventListener('pointerdown', (event) => {
     if (page !== 'map' || joystickInput.pointerId !== null || event.button !== 0) return;
+    touchPanel.classList.add('is-dragging');
     joystickInput.pointerId = event.pointerId;
     touchPanel.setPointerCapture(event.pointerId);
     drag(event);
@@ -2795,6 +2813,10 @@ function setupTouchControls() {
   document.querySelector('main').appendChild(lightAction);
   const reset = () => stopMovement();
   window.addEventListener('blur', reset);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncControlViewport);
+    window.visualViewport.addEventListener('scroll', syncControlViewport);
+  }
   document.addEventListener('visibilitychange', () => { if (document.hidden) reset(); });
   fitCanvasToScreen();
   updateTouchControls();
