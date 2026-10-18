@@ -1,0 +1,25 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$room": {
+        "players": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          "$uid": {
+            "$connection": {
+              ".write": "auth != null && auth.uid === $uid && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+              ".validate": "newData.hasChildren(['nickname', 'avatar', 'x', 'y', 'updatedAt'])",
+              "nickname": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 18" },
+              "avatar": { ".validate": "newData.isNumber() && (newData.val() === 0 || newData.val() === 1 || newData.val() === 2)" },
+              "x": { ".validate": "newData.isNumber() && newData.val() >= 45 && newData.val() <= 2271.8" },
+              "y": { ".validate": "newData.isNumber() && newData.val() >= 80 && newData.val() <= 1677.6" },
+              "updatedAt": { ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 60000" },
+              "$other": { ".validate": false }
+            }
+          }
+        }
+      }
+    }
+  }
+}

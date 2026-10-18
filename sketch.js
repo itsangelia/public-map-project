@@ -9,6 +9,7 @@
 // BASIC STATE
 // =====================================================
 
+const displayMode = new URLSearchParams(location.search).get('mode') === 'display';
 let page = "login";
 
 let characterImages = [];
@@ -187,6 +188,7 @@ const characters = [
 async function setup() {
 
   createCanvas(600, 900);
+  fitCanvasToScreen();
 
   textFont("Arial");
 
@@ -256,6 +258,13 @@ async function setup() {
   createNicknameInput();
 
   setupKeyboardControls();
+  setupTouchControls();
+  if (displayMode) {
+    page = 'display';
+    nameInput.hide();
+    resizeCanvas(windowWidth, windowHeight);
+    fitCanvasToScreen();
+  }
 }
 
 
@@ -264,6 +273,11 @@ async function setup() {
 // =====================================================
 
 function draw() {
+  updateTouchControls();
+  if (page === 'display') {
+    drawPublicDisplay();
+    return;
+  }
 
   // LOGIN
   if (page === "login") {
@@ -282,6 +296,7 @@ function draw() {
 
     checkLightGameDistance();
 
+    if (window.mapNetwork) window.mapNetwork.move(playerX, playerY);
     drawMapPage();
 
   }
@@ -391,29 +406,7 @@ function createNicknameInput() {
 
     function(event) {
 
-      if (event.key === "ArrowLeft") {
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-        selectPreviousCharacter();
-
-      }
-
-
-      else if (event.key === "ArrowRight") {
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-        selectNextCharacter();
-
-      }
-
-
-      else if (event.key === "Enter") {
+      if (event.key === "Enter") {
 
         event.preventDefault();
 
@@ -1349,6 +1342,12 @@ function mousePressed() {
 
   // CHARACTER
 
+  hoverCharacter = characters.findIndex((_, i) =>
+    mouseX > [150, 300, 450][i] - 65 &&
+    mouseX < [150, 300, 450][i] + 65 &&
+    mouseY > 365 && mouseY < 595
+  );
+
   if (
     hoverCharacter !== -1
   ) {
@@ -1440,6 +1439,7 @@ function enterMap() {
 
 
   stopMovement();
+  if (window.mapNetwork) window.mapNetwork.join(nameInput.value(), selectedCharacter, playerX, playerY);
 
   updateCamera();
 
@@ -1451,6 +1451,7 @@ function enterMap() {
 // =====================================================
 
 function stopMovement() {
+  resetJoystick();
 
   keysDown.left = false;
 
@@ -1507,6 +1508,7 @@ function drawMapPage() {
   // PLAYER
   // ===================================================
 
+  drawRemotePlayers();
   drawMapPlayer();
 
 
@@ -1516,7 +1518,7 @@ function drawMapPage() {
 
   drawMapHeader();
 
-  drawMapControls();
+  // The fixed joystick supplies touch input; keyboard controls remain available.
 
 
   // ===================================================
@@ -1604,7 +1606,7 @@ function drawMapHeader() {
 
 
   text(
-    "Use ↑ ↓ ← → to explore",
+    "Drag the joystick or use arrow keys to explore",
     42,
     76
   );
@@ -1859,29 +1861,26 @@ function movePlayer() {
   }
 
 
-  // Prevent diagonal movement being faster.
-
-  if (
-    dx !== 0 &&
-    dy !== 0
-  ) {
-
-    dx *=
-      0.707;
-
-
-    dy *=
-      0.707;
-
+  // Both keyboard and joystick use the same fixed movement speed.
+  if (joystickInput.x || joystickInput.y) {
+    dx = joystickInput.x * playerSpeed;
+    dy = joystickInput.y * playerSpeed;
+  } else {
+    const length = Math.hypot(dx, dy);
+    if (length) {
+      dx = dx / length * playerSpeed;
+      dy = dy / length * playerSpeed;
+    }
   }
 
+  const frameScale = Math.min(deltaTime, 50) / (1000 / 60);
 
   playerX +=
-    dx;
+    dx * frameScale;
 
 
   playerY +=
-    dy;
+    dy * frameScale;
 
 
   // MAP LIMITS
@@ -2695,4 +2694,153 @@ function drawStreetlightGame() {
     855
   );
 
+}
+
+// Responsive presentation keeps the original 600 x 900 artwork coordinates.
+function fitCanvasToScreen() {
+  if (displayMode) {
+    const canvas = document.querySelector('canvas');
+    if (canvas) { canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; }
+    return;
+  }
+  const scale = Math.min(
+    document.documentElement.clientWidth / 600,
+    document.documentElement.clientHeight / 900
+  );
+  document.documentElement.style.setProperty('--game-scale', scale);
+  const canvas = document.querySelector('canvas');
+  if (canvas) {
+    canvas.style.width = `${600 * scale}px`;
+    canvas.style.height = `${900 * scale}px`;
+  }
+  if (nameInput) {
+    nameInput.position(100 * scale, 230 * scale);
+    nameInput.size(400 * scale, 62 * scale);
+    nameInput.style('font-size', `${18 * scale}px`);
+  }
+}
+
+function windowResized() {
+  if (displayMode) resizeCanvas(windowWidth, windowHeight);
+  fitCanvasToScreen();
+}
+
+// Temporary tuning defaults; independent of character size and camera zoom.
+const JOYSTICK_SETTINGS = { deadZone: 0.15, thumbTravel: 0.32 };
+const joystickInput = { x: 0, y: 0, pointerId: null };
+let touchPanel;
+let joystickThumb;
+let lightAction;
+
+function resetJoystick() {
+  const pointerId = joystickInput.pointerId;
+  joystickInput.x = 0;
+  joystickInput.y = 0;
+  joystickInput.pointerId = null;
+  if (joystickThumb) joystickThumb.style.transform = 'translate(-50%, -50%)';
+  if (touchPanel && pointerId !== null && touchPanel.hasPointerCapture(pointerId)) {
+    touchPanel.releasePointerCapture(pointerId);
+  }
+}
+
+function setupTouchControls() {
+  touchPanel = document.createElement('button');
+  touchPanel.type = 'button';
+  touchPanel.id = 'movement-controls';
+  touchPanel.setAttribute('aria-label', 'Drag joystick to move; arrow keys also supported');
+  const hint = document.createElement('span');
+  hint.className = 'joystick-hint';
+  hint.textContent = 'Drag to move';
+  joystickThumb = document.createElement('span');
+  joystickThumb.className = 'joystick-thumb';
+  joystickThumb.setAttribute('aria-hidden', 'true');
+  touchPanel.append(joystickThumb, hint);
+
+  const drag = (event) => {
+    if (event.pointerId !== joystickInput.pointerId) return;
+    event.preventDefault();
+    const bounds = touchPanel.getBoundingClientRect();
+    const dx = event.clientX - (bounds.left + bounds.width / 2);
+    const dy = event.clientY - (bounds.top + bounds.height / 2);
+    const distance = Math.hypot(dx, dy);
+    const radius = bounds.width * JOYSTICK_SETTINGS.thumbTravel;
+    const travel = Math.min(distance, radius);
+    const nx = distance ? dx / distance : 0;
+    const ny = distance ? dy / distance : 0;
+    const active = distance > radius * JOYSTICK_SETTINGS.deadZone;
+    joystickInput.x = active ? nx : 0;
+    joystickInput.y = active ? ny : 0;
+    joystickThumb.style.transform = `translate(calc(-50% + ${nx * travel}px), calc(-50% + ${ny * travel}px))`;
+  };
+  touchPanel.addEventListener('pointerdown', (event) => {
+    if (page !== 'map' || joystickInput.pointerId !== null || event.button !== 0) return;
+    joystickInput.pointerId = event.pointerId;
+    touchPanel.setPointerCapture(event.pointerId);
+    drag(event);
+  });
+  touchPanel.addEventListener('pointermove', drag);
+  const release = (event) => {
+    if (event.pointerId === joystickInput.pointerId) resetJoystick();
+  };
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    touchPanel.addEventListener(type, release);
+  }
+  document.querySelector('main').appendChild(touchPanel);
+  lightAction = document.createElement('button');
+  lightAction.id = 'light-action';
+  lightAction.textContent = 'Enter streetlight';
+  lightAction.addEventListener('click', () => {
+    if (page === 'map' && nearLightGame) enterStreetlightGame();
+  });
+  document.querySelector('main').appendChild(lightAction);
+  const reset = () => stopMovement();
+  window.addEventListener('blur', reset);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) reset(); });
+  fitCanvasToScreen();
+  updateTouchControls();
+}
+
+function updateTouchControls() {
+  if (touchPanel) touchPanel.hidden = page !== 'map';
+  if (page !== 'map' && joystickInput.pointerId !== null) resetJoystick();
+  if (lightAction) lightAction.hidden = page !== 'map' || !nearLightGame;
+}
+
+
+const remotePositions = new Map();
+function drawRemotePlayers() {
+  const network = window.mapNetwork;
+  if (!network) return;
+  const players = network.state.players;
+  for (const key of remotePositions.keys()) if (!players[key]) remotePositions.delete(key);
+  for (const [key, player] of Object.entries(players)) {
+    if (!displayMode && key === network.ownKey) continue;
+    const position = remotePositions.get(key) || { x: player.x, y: player.y };
+    const blend = 1 - Math.exp(-Math.min(deltaTime, 100) / 90);
+    position.x += (player.x - position.x) * blend;
+    position.y += (player.y - position.y) * blend;
+    remotePositions.set(key, position);
+    push();
+    drawCharacterImage(position.x - cameraX, position.y - cameraY, characters[player.avatar], 95, 135);
+    textAlign(CENTER);
+    textSize(13);
+    fill(COLORS.navy);
+    text(String(player.nickname || 'Guest'), position.x - cameraX, position.y - cameraY - 82);
+    pop();
+  }
+}
+
+function drawPublicDisplay() {
+  background(COLORS.background);
+  const fit = Math.min(width / mapWorldWidth, height / mapWorldHeight);
+  push();
+  translate((width - mapWorldWidth * fit) / 2, (height - mapWorldHeight * fit) / 2);
+  scale(fit);
+  imageMode(CORNER);
+  image(mapImage, 0, 0, mapWorldWidth, mapWorldHeight);
+  cameraX = 0;
+  cameraY = 0;
+  drawLightGameSpot();
+  drawRemotePlayers();
+  pop();
 }
