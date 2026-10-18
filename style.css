@@ -1,0 +1,42 @@
+html, body { margin: 0; padding: 0; background: #FFF8F1; }
+main { position: relative; width: fit-content; }
+canvas { display: block; }
+/* Adjustable prototype size and bottom gap for the portrait phone view. */
+:root { --joystick-size: clamp(104px, 28vw, 132px); --joystick-bottom: 4vh; }
+#movement-controls {
+  position: fixed; left: 50%;
+  bottom: max(var(--joystick-bottom), calc(env(safe-area-inset-bottom, 0px) + 18px));
+  transform: translateX(-50%); width: var(--joystick-size); height: var(--joystick-size);
+  padding: 0; border: 2px solid #303A68; border-radius: 50%;
+  background: rgba(255, 248, 241, 0.9); color: #303A68;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+#movement-controls[hidden], #light-action[hidden] { display: none; }
+#movement-controls:focus-visible { outline: 3px solid #7C89D9; outline-offset: 4px; }
+.joystick-thumb {
+  position: absolute; left: 50%; top: 50%; width: 42%; height: 42%;
+  border: 2px solid #303A68; border-radius: 50%; background: #A8D8C5;
+  transform: translate(-50%, -50%); pointer-events: none;
+}
+.joystick-hint {
+  position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+  white-space: nowrap; font: 12px Arial; pointer-events: none;
+}
+#light-action {
+  border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1;
+  color: #303A68; font-weight: bold; touch-action: manipulation;
+}
+#light-action {
+  border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1;
+  color: #303A68; font-size: 24px; font-weight: bold; touch-action: none;
+  user-select: none; -webkit-user-select: none;
+}
+#movement-controls button:active { background: #A8D8C5; }
+#movement-controls .up { grid-column: 2; }
+#movement-controls .left { grid-column: 1; grid-row: 2; }
+#movement-controls .down { grid-column: 2; grid-row: 2; }
+#movement-controls .right { grid-column: 3; grid-row: 2; }
+#light-action { position: absolute; bottom: 20%; left: 25%; width: 50%; font-size: 16px; min-height: 44px; }
+
+#connection-status { position: fixed; left: 8px; bottom: 4px; background: #FFF8F1; color: #303A68; font: 12px Arial; padding: 4px 8px; border-radius: 6px; z-index: 5; }
+#join-qr { position: fixed; right: 16px; top: 16px; background: white; border-radius: 12px; padding: 12px; color: #303A68; text-align: center; font: 16px Arial; max-width: 190px; }
