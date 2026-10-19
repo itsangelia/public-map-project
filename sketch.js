@@ -2878,7 +2878,7 @@ function drawPublicDisplay() {
 function drawSpeechBubble(x, y, speech) {
   if (!speech || typeof speech.text !== 'string' || !Number.isFinite(speech.sentAt)) return;
   const age = (window.mapNetwork?.now() || Date.now()) - speech.sentAt;
-  if (age < -1000 || age > 6000) return;
+  if (age < -1000 || age >= 5000) return;
   push();
   textSize(15);
   textStyle(NORMAL);

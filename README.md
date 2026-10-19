@@ -77,7 +77,7 @@ Monitor Firebase usage and close the demo when it is not in use.
 
 The phone's bottom-right speech icon opens room chat with an 80-character input
 and four quick emoji reactions. The public display shows speech bubbles only;
-there are no chat controls on the display. Bubbles expire after six seconds.
+there are no chat controls on the display. Bubbles expire after five seconds.
 The phone retains up to 30 messages in memory for its current page session.
 Firebase stores only the latest speech per player connection, not a room archive.
 
@@ -108,3 +108,18 @@ identity when session storage is unavailable, and supports phone browsers withou
 pending join cannot mark a new connection online. Permission errors remain visible
 and are not retried in an endless loop. Offline movement behavior is unchanged.
 These measures reduce known failure modes; real-device verification is still needed.
+
+## Core acceptance checks
+
+Keep this scope fixed until real-device acceptance passes:
+1. Scan the public display QR on two phones, join the same room, and verify both
+   phones and the public display receive the two distinct player records.
+2. Send text and emoji in both directions. Confirm the other phone receives the
+   message and the correct avatar has the speech bubble.
+3. Speech bubbles remain visible before 5 seconds and disappear at 5 seconds.
+4. Leave/rejoin and repeat, confirming only the departed connection is removed.
+
+`npm test` runs the real synchronization module with a deterministic transport
+fixture: two-client movement/messages, repeated reconnects, storage fallback,
+transient login failure, and restoration of a missing player record. This does
+not test deployed Firebase rules or replace the real-phone checks above.

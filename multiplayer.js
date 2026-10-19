@@ -167,6 +167,13 @@ async function init() {
         }
       }
       state.players = players;
+      // A late disconnect cleanup can remove an acknowledged connection record.
+      // Re-register rather than silently leaving the phone playable but invisible.
+      if (state.joined && window.mapNetwork.ownKey && !players[window.mapNetwork.ownKey]) {
+        state.joined = false;
+        message(`Rejoining · room ${room}`);
+        retryJoin();
+      }
       refreshStatus();
       window.dispatchEvent(new CustomEvent('map-players-updated'));
     }, fail);
