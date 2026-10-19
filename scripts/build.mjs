@@ -18,7 +18,14 @@ for (let index = 0; index < sources.length; index++) {
   html = html.replace(new RegExp(`${source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\?[^"\\s]*)?`), `releases/${release}/${name}`);
 }
 html = html.replace('<head>', `<head>\n    <script>window.PUBLIC_MAP_RELEASE="${release}";</script>`);
+// A release-specific entry bypasses cached older homepages. Its QR keeps
+// phones on the same confirmed release and the selected room.
+const entryName = `campus-${release}.html`;
+const configTag = `<script src="releases/${release}/firebase-config.js"></script>`;
+if (!html.includes(configTag)) throw new Error('Missing versioned Firebase configuration script');
+html = html.replace(configTag, configTag + `<script>window.PUBLIC_MAP_CONFIG.publicBaseUrl=new URL("${entryName}",document.baseURI).href;</script>`);
 await writeFile('generated/site/index.html', html);
+await writeFile(`generated/site/${entryName}`, html);
 await writeFile('generated/site/.nojekyll', '');
 for (const file of ['p5.js', 'map draft.png', '男角色.png', '女角色.png', '购物袋.png', 'light icon.png']) {
   await copyFile(file, `generated/site/${file}`);
