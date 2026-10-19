@@ -1401,51 +1401,51 @@ function mousePressed() {
 // ENTER MAP
 // =====================================================
 
-function enterMap() {
-
-  let currentName =
-    nameInput
-      .value()
-      .trim();
-
-
-  if (
-    currentName === ""
-  ) {
-
-    nameInput.value(
-      "Guest"
-    );
-
+let enteringMap = false;
+let joinFeedback;
+function showJoinFeedback(text) {
+  if (!joinFeedback) {
+    joinFeedback = document.createElement('div');
+    joinFeedback.id = 'join-feedback';
+    joinFeedback.setAttribute('role', 'status');
+    document.body.appendChild(joinFeedback);
   }
+  joinFeedback.textContent = text;
+  joinFeedback.hidden = !text;
+}
 
-
-  page =
-    "map";
-
-  fitCanvasToScreen();
-
-
-  nameInput.hide();
-
-
-  // SPAWN
-
-  playerX =
-    mapWorldWidth *
-    SPAWN_X;
-
-
-  playerY =
-    mapWorldHeight *
-    SPAWN_Y;
-
-
+async function enterMap() {
+  if (enteringMap || page !== 'login') return;
+  enteringMap = true;
+  const currentName = nameInput.value().trim() || 'Guest';
+  const chosenCharacter = selectedCharacter;
+  nameInput.value(currentName);
+  const spawnX = mapWorldWidth * SPAWN_X;
+  const spawnY = mapWorldHeight * SPAWN_Y;
   stopMovement();
-  if (window.mapNetwork) window.mapNetwork.join(nameInput.value(), selectedCharacter, playerX, playerY);
-
-  updateCamera();
-
+  try {
+    if (window.PUBLIC_MAP_CONFIG?.firebase) {
+      showJoinFeedback('Connecting to shared map…');
+      if (!window.mapNetwork) throw new Error('Connection code did not load. Please reload this page.');
+      // Stay on the join screen until both write acknowledgement and shared read
+      // succeed. Local drawing must not masquerade as multiplayer membership.
+      window.mapNetwork.join(currentName, chosenCharacter, spawnX, spawnY).catch(error => showJoinFeedback(error.message));
+      await window.mapNetwork.waitForJoined();
+    }
+    nameInput.value(currentName);
+    selectedCharacter = chosenCharacter;
+    playerX = spawnX;
+    playerY = spawnY;
+    page = 'map';
+    fitCanvasToScreen();
+    nameInput.hide();
+    showJoinFeedback('');
+    updateCamera();
+  } catch (error) {
+    showJoinFeedback(error.message);
+  } finally {
+    enteringMap = false;
+  }
 }
 
 

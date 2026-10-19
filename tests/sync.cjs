@@ -13,11 +13,12 @@ async function source() {
     'firebase/app': 'export const initializeApp=()=>({});',
     'firebase/auth': `export const browserSessionPersistence='session',inMemoryPersistence='memory';
       export const getAuth=()=>({});
+      export const initializeAuth=(a,options)=>{harness.persist.push(options.persistence);return {}};
       export async function setPersistence(a,p){harness.persist.push(p);if(p==='session'&&harness.noStorage)throw Error('storage unavailable')}
       export async function signInAnonymously(){if(harness.authFailures-->0)throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});return {user:{uid:harness.uid}}}`,
     'firebase/database': `export const getDatabase=()=>({});export const ref=(d,path)=>path;
       export const serverTimestamp=()=>Date.now();
-      export const onValue=(path,fn)=>harness.subscribe(path,fn);
+      export const onValue=(path,fn,error)=>harness.subscribe(path,fn,error);
       export const onDisconnect=path=>({remove:async()=>{harness.disconnectPath=path}});
       export const set=(path,value)=>harness.write(path,value,false);
       export const update=(path,value)=>harness.write(path,value,true);`
@@ -39,7 +40,8 @@ function fixture() {
     const timers = new Set();
     const events = new EventTarget();
     const harness = {uid,callbacks:{},persist:[],clock:0,authFailures:0,...options,
-      subscribe(path,fn) {
+      subscribe(path,fn,error) {
+        if(this.denyRead && path==='rooms/campus/players') { error({code:'PERMISSION_DENIED'}); return; }
         this.callbacks[path]=fn;
         fn(snapshot(path==='.info/connected'?true:path==='.info/serverTimeOffset'?0:data));
       },
@@ -107,4 +109,27 @@ test('join during authentication failure recovers, including disconnect during p
 test('a missing own record is restored instead of leaving an invisible player',async()=>{
  const f=fixture();const a=await f.client('alice');
  try{await a.network.join('Alice',0,800,900);delete f.data.alice;f.broadcast();assert.equal(a.network.state.joined,false);await until(()=>a.network.state.joined);assert.equal(Object.keys(a.network.state.players).length,1)}finally{a.stop()}
+});
+
+
+test('joining requires a confirmed record and readable room, not merely a local map', async()=>{
+ const f=fixture();const a=await f.client('alice');
+ try{
+  a.harness.blockWrites=true;
+  const pending=a.network.join('Alice',0,800,900);
+  await until(()=>!!a.harness.release);
+  let ready=false;
+  const gate=a.network.waitForJoined().then(()=>{ready=true});
+  await new Promise(r=>setTimeout(r,150));
+  assert.equal(ready,false);
+  assert.equal(a.network.state.joined,false);
+  a.harness.blockWrites=false;a.harness.release();await pending;await gate;
+  assert.equal(ready,true);assert.equal(a.network.state.readReady,true);
+ }finally{a.stop()}
+});
+
+
+test('a successful write cannot hide room read permission failure',async()=>{
+ const f=fixture();const a=await f.client('alice',{denyRead:true});
+ try{await a.network.join('Alice',0,800,900);assert.equal(a.network.state.readReady,false);await assert.rejects(()=>a.network.waitForJoined(),/PERMISSION_DENIED/)}finally{a.stop()}
 });

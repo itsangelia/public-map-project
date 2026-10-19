@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, setPersistence, browserSessionPersistence, inMemoryPersistence, signInAnonymously } from 'firebase/auth';
+import { initializeAuth, inMemoryPersistence, signInAnonymously } from 'firebase/auth';
 import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp } from 'firebase/database';
 import QRCode from 'qrcode';
 
@@ -10,7 +10,12 @@ const status = document.createElement('div');
 status.id = 'connection-status';
 status.setAttribute('role', 'status');
 document.body.appendChild(status);
-const state = { players: {}, connected: false, joined: false };
+status.textContent = 'Connecting to shared map…';
+const state = { players: {}, connected: false, joined: false, readReady: false };
+let authInstance;
+let appInstance;
+let lastErrorCode = '';
+let roomReadError;
 let ownRef, database, user, lastWrite = 0, joining = false;
 let joinRequested = false;
 let connectionEpoch = 0;
@@ -41,6 +46,7 @@ function refreshStatus() {
   status.textContent = `${connectionError || connectionMessage} · players: ${names.length}`;
   status.title = names.join(', ');
   if (params.get('debug') === '1') status.textContent += ` · ${names.join(', ') || 'no players received'}`;
+  window.dispatchEvent(new CustomEvent('map-connection-updated'));
 }
 window.mapNetwork = {
   state,
@@ -69,6 +75,22 @@ window.mapNetwork = {
       fail(error);
     });
   },
+  async waitForJoined(timeoutMs = 15000) {
+    const started = performance.now();
+    return new Promise((resolve, reject) => {
+      const check = () => {
+        if (state.joined && state.readReady && state.players[window.mapNetwork.ownKey]) return resolve();
+        if (lastErrorCode && !['auth/network-request-failed', 'auth/timeout'].includes(lastErrorCode)) {
+          return reject(new Error(connectionError));
+        }
+        if (performance.now() - started >= timeoutMs) {
+          return reject(new Error('Unable to join yet. Check your connection and tap ENTER THE MAP to retry.'));
+        }
+        setTimeout(check, 100);
+      };
+      check();
+    });
+  },
   now: () => Date.now() + serverTimeOffset,
   async sendChat(value) {
     const text = String(value).trim();
@@ -87,7 +109,7 @@ window.mapNetwork = {
   },
   ownKey: null
 };
-function fail(error) { connectionError = `Connection error: ${error.code || error.message}`; refreshStatus(); }
+function fail(error) { lastErrorCode = error.code || ''; connectionError = `Connection error: ${error.code || error.message}`; refreshStatus(); }
 function retryJoin() {
   if (retryTimer || !state.connected || !joinRequested || state.joined) return;
   retryTimer = setTimeout(() => {
@@ -111,9 +133,14 @@ async function publishJoin() {
     if (epoch !== connectionEpoch || !state.connected) return;
     lastSent = sentPosition;
     state.joined = true;
-    connectionError = '';
     joinAttempts = 0;
-    message(`Online · room ${room}`);
+    if (roomReadError) {
+      fail(roomReadError);
+    } else {
+      connectionError = '';
+      lastErrorCode = '';
+      message(state.readReady ? `Online · room ${room}` : `Waiting for shared map · room ${room}`);
+    }
   } catch (error) {
     state.joined = false;
     retryable = !['PERMISSION_DENIED', 'permission-denied'].includes(error.code);
@@ -145,16 +172,32 @@ async function init() {
   }
   if (!config?.firebase) { message('Local preview · multiplayer not configured'); return; }
   try {
-    const app = initializeApp(config.firebase);
-    const auth = getAuth(app);
-    try {
-      await setPersistence(auth, browserSessionPersistence);
-    } catch {
-      // Some QR in-app browsers disable session storage; keep this session usable.
-      await setPersistence(auth, inMemoryPersistence);
+    if (!authInstance) {
+      // Firebase's optional heartbeat storage also probes IndexedDB, even for
+      // memory-only Auth. Some iOS webviews leave open() pending forever.
+      // Report storage as unavailable only during synchronous SDK startup;
+      // restore the browser API before yielding or making network requests.
+      const descriptor = Object.getOwnPropertyDescriptor(window, 'indexedDB');
+      let restored = false;
+      try {
+        try {
+          Object.defineProperty(window, 'indexedDB', { configurable: true, value: undefined });
+          restored = true;
+        } catch { /* Memory Auth still works where the browser forbids overriding this property. */ }
+        appInstance = initializeApp(config.firebase);
+        authInstance = initializeAuth(appInstance, { persistence: inMemoryPersistence });
+      } finally {
+        if (restored) {
+          if (descriptor) Object.defineProperty(window, 'indexedDB', descriptor);
+          else delete window.indexedDB;
+        }
+      }
     }
+    const app = appInstance;
+    const auth = authInstance;
     user = (await signInAnonymously(auth)).user;
     connectionError = '';
+    lastErrorCode = '';
     database = getDatabase(app);
     onValue(ref(database, '.info/serverTimeOffset'), snapshot => { serverTimeOffset = snapshot.val() || 0; });
     onValue(ref(database, `rooms/${room}/players`), snapshot => {
@@ -167,6 +210,8 @@ async function init() {
         }
       }
       state.players = players;
+      state.readReady = true;
+      roomReadError = null;
       // A late disconnect cleanup can remove an acknowledged connection record.
       // Re-register rather than silently leaving the phone playable but invisible.
       if (state.joined && window.mapNetwork.ownKey && !players[window.mapNetwork.ownKey]) {
@@ -176,7 +221,7 @@ async function init() {
       }
       refreshStatus();
       window.dispatchEvent(new CustomEvent('map-players-updated'));
-    }, fail);
+    }, error => { state.readReady = false; roomReadError = error; fail(error); });
     onValue(ref(database, '.info/connected'), async snapshot => {
       connectionEpoch++;
       clearTimeout(retryTimer);

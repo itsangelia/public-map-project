@@ -69,3 +69,6 @@ canvas { display: block; }
 #chat-panel form button { background: #303a68; color: white; font-size: 22px; }
 #chat-panel button:disabled { opacity: .45; cursor: default; }
 .chat-feedback { min-height: 14px; font-size: 12px; }
+
+#join-feedback { position: fixed; z-index: 60; left: 50%; top: 12px; transform: translateX(-50%); width: min(360px, calc(100vw - 32px)); box-sizing: border-box; padding: 14px 18px; border: 1px solid #d8d4cd; border-radius: 14px; background: #fffaf2; color: #303a68; font: 15px Arial, sans-serif; box-shadow: 0 4px 16px #303a6826; }
+#join-feedback[hidden] { display: none; }

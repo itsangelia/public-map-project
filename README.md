@@ -102,8 +102,8 @@ QR links include a fresh scan token to avoid reusing cached HTML. Deploy with
 `python3 scripts/deploy-pages.py` after checking the build. The deployment keeps
 older release directories so already-open clients can still load their files.
 
-The client retries transient authentication failures, falls back to in-memory
-identity when session storage is unavailable, and supports phone browsers without
+The client retries transient authentication failures, initializes temporary
+identity in memory without waiting for browser storage, and supports phone browsers without
 `crypto.randomUUID`. Join attempts are fenced by connection generation so an old
 pending join cannot mark a new connection online. Permission errors remain visible
 and are not retried in an endless loop. Offline movement behavior is unchanged.
@@ -123,3 +123,25 @@ Keep this scope fixed until real-device acceptance passes:
 fixture: two-client movement/messages, repeated reconnects, storage fallback,
 transient login failure, and restoration of a missing player record. This does
 not test deployed Firebase rules or replace the real-phone checks above.
+
+
+## First-join reliability regression
+
+An iOS/webview-style permanently pending IndexedDB open was reproduced with the
+real Firebase SDK: browser-backed auth initialization and optional SDK heartbeat
+storage could prevent any login request while the old interface still entered a
+local-only map. Auth now starts in memory; during synchronous SDK initialization
+only, IndexedDB availability is suppressed for optional heartbeat probing. The
+original browser property is restored immediately before network work or yielding.
+No vendored SDK code, database access rules or transport verification is changed.
+
+The join screen now waits for both a server-acknowledged player record and a
+readable shared room containing that record. Failed reads cannot be hidden by a
+successful write. A failed first join remains on the join screen with feedback;
+movement after an established session goes offline retains its previous behavior.
+
+After `npm run build`, `node scripts/check-sdk-storage.cjs` runs the real-SDK
+blocked-storage regression when Playwright and Chromium are available. Requests
+are intercepted with a test-only error response; no real Firebase users are
+created by that test. `npm test` covers shared records and join gating using the
+transport fixture. A real two-phone plus display acceptance check is still required.
