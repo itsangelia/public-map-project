@@ -14,8 +14,15 @@
 .wood-pin:after{content:'';position:absolute;top:2px;left:2px;bottom:2px;border-left:1px solid #d1a16f}
 .wood-pin.top-left{left:-5px;top:-8px;transform:rotate(-33deg)}.wood-pin.top-right{right:-5px;top:-8px;transform:rotate(33deg)}.wood-pin.bottom-left{left:-5px;bottom:-8px;transform:rotate(33deg)}.wood-pin.bottom-right{right:-5px;bottom:-8px;transform:rotate(-33deg)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* A quiet response action within the approved pinned reading card. */
+.blessing-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;padding-bottom:5px}
+#bless-wish{min-height:44px;padding:9px 13px;border:1px solid #a9b474;border-radius:12px;background:#fff9e8;color:#596343;font:700 13px Arial,sans-serif;touch-action:manipulation}
+#bless-wish:disabled{opacity:.6}#bless-wish.is-blessed{background:#edf1d4;opacity:1;color:#6d7650}
+#blessing-count{color:#8d6686;font:12px Arial,sans-serif;text-align:right;font-variant-numeric:tabular-nums}
+#blessing-error{margin:4px 0 6px;color:#a44242;font:12px/1.5 Arial,sans-serif;overflow-wrap:anywhere}#blessing-error:empty{display:none}
 </style></head><body><div class="app"><header class="heading"><a class="back" href="#" aria-label="Back to map">‹</a><div class="title"><h1>Wishing Tree</h1><p>A little hope, shared.</p></div><div class="count" id="wish-count"></div></header><main class="stage"><div class="scene"><img class="tree" src="wishing-tree.png" alt="Wishing Tree"><div class="notes" id="notes" aria-label="Wishes hanging on the tree"></div></div></main><div class="actions"><div class="pager"><button id="previous" aria-label="Previous wishes">‹</button><span class="page-label" id="page-label"></span><button id="next" aria-label="Next wishes">›</button></div><button class="primary" id="write"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-1 5 5-1L21 7l-4-4Z M14 6l4 4"/></svg>Write a wish</button></div><p class="preview-note"></p></div>
-<dialog id="read-paper" aria-labelledby="read-title"><span class="wood-pin top-left" aria-hidden="true"></span><span class="wood-pin top-right" aria-hidden="true"></span><span class="wood-pin bottom-left" aria-hidden="true"></span><span class="wood-pin bottom-right" aria-hidden="true"></span><h2 id="read-title" class="sr-only">Player wish</h2><header class="card-name"><strong id="wish-author"></strong><button class="close" data-close="read-paper" aria-label="Close wish">×</button></header><div class="card-message"><svg class="clover" viewBox="0 0 120 120" aria-hidden="true"><g fill="currentColor"><ellipse cx="47" cy="35" rx="15" ry="23" transform="rotate(-35 47 35)"/><ellipse cx="78" cy="38" rx="15" ry="23" transform="rotate(35 78 38)"/><ellipse cx="42" cy="69" rx="15" ry="23" transform="rotate(-130 42 69)"/><ellipse cx="77" cy="71" rx="15" ry="23" transform="rotate(130 77 71)"/></g><path d="M62 64q8 26-3 43" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg><p id="wish-text"></p></div><footer class="card-footer"><time id="wish-date"></time></footer></dialog>
+<dialog id="read-paper" aria-labelledby="read-title"><span class="wood-pin top-left" aria-hidden="true"></span><span class="wood-pin top-right" aria-hidden="true"></span><span class="wood-pin bottom-left" aria-hidden="true"></span><span class="wood-pin bottom-right" aria-hidden="true"></span><h2 id="read-title" class="sr-only">Player wish</h2><header class="card-name"><strong id="wish-author"></strong><button class="close" data-close="read-paper" aria-label="Close wish">×</button></header><div class="card-message"><svg class="clover" viewBox="0 0 120 120" aria-hidden="true"><g fill="currentColor"><ellipse cx="47" cy="35" rx="15" ry="23" transform="rotate(-35 47 35)"/><ellipse cx="78" cy="38" rx="15" ry="23" transform="rotate(35 78 38)"/><ellipse cx="42" cy="69" rx="15" ry="23" transform="rotate(-130 42 69)"/><ellipse cx="77" cy="71" rx="15" ry="23" transform="rotate(130 77 71)"/></g><path d="M62 64q8 26-3 43" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg><p id="wish-text"></p></div><footer class="card-footer"><time id="wish-date"></time><div class="blessing-actions"><button id="bless-wish" type="button" disabled>May it come true ✨</button><span id="blessing-count" role="status" aria-live="polite">…</span></div><p id="blessing-error" role="status"></p></footer></dialog>
 <dialog id="compose" aria-labelledby="compose-title"><form id="wish-form"><div class="dialog-header"><h2 id="compose-title">Make a wish</h2><button class="close" type="button" data-close="compose" aria-label="Close editor">×</button></div><label class="small-label" for="nickname">Nickname</label><input id="nickname" name="nickname" maxlength="18" readonly value="Guest" autocomplete="off"><label class="small-label" for="message">Your wish</label><textarea id="message" name="message" maxlength="160" required placeholder="I hope…"></textarea><p class="form-error" id="form-error" role="alert"></p><div class="editor-footer"><span class="remaining" id="remaining">0 / 160</span><button class="primary" type="submit">Hang wish<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18 18 5M7 5h11v11"/></svg></button></div></form></dialog><div id="announcement" role="status" aria-live="polite"></div>
 <script>
 // Shared backend access is owned by the parent map; no second login or connection.
@@ -41,9 +48,50 @@ const invitedWishIds=new Set();
 const slots=[{x:22,y:64,a:-6,t:'#fff0cb'},{x:39,y:48,a:5,t:'#f5dfd5'},{x:78,y:54,a:-4,t:'#e9ecd4'},{x:79,y:75,a:6,t:'#fff0cb'},{x:51,y:33,a:-3,t:'#e2e9ee'},{x:62,y:55,a:5,t:'#f5dfd5'}];
 let page=0,newId=null,toastTimer,pendingId=null,sending=false;
 const notes=document.getElementById('notes'),read=document.getElementById('read-paper'),compose=document.getElementById('compose'),message=document.getElementById('message'),nickname=document.getElementById('nickname');
+let selectedWishId=null,unsubscribeBlessings=null;
+let blessingState={count:0,blessed:false,ready:false,error:''};
+const pendingBlessings=new Set();
+const blessButton=document.getElementById('bless-wish');
+function renderBlessing(){
+ const pending=pendingBlessings.has(selectedWishId);
+ blessButton.disabled=!blessingState.ready||blessingState.blessed||pending||!network.state.connected||!network.state.joined;
+ blessButton.classList.toggle('is-blessed',blessingState.blessed&&!pending);
+ blessButton.textContent=pending?'Sending…':blessingState.blessed?'Blessing sent ✨':'May it come true ✨';
+ document.getElementById('blessing-count').textContent=blessingState.ready?blessingState.count+(blessingState.count===1?' blessing':' blessings'):'—';
+ document.getElementById('blessing-error').textContent=blessingState.error;
+}
+function stopReadingBlessings(){unsubscribeBlessings?.();unsubscribeBlessings=null;selectedWishId=null}
+function openWish(wish){
+ stopReadingBlessings();selectedWishId=wish.id;
+ blessingState={count:0,blessed:false,ready:false,error:''};renderBlessing();
+ document.getElementById('wish-text').textContent=wish.text;
+ document.getElementById('wish-author').textContent=wish.name;
+ document.getElementById('wish-date').textContent=wishDate(wish.createdAt||previewDate);
+ document.getElementById('wish-date').dateTime=new Date(wish.createdAt||previewDate).toISOString();
+ read.showModal();
+ try{
+  unsubscribeBlessings=network.subscribeBlessings(wish.id,value=>{
+   if(selectedWishId!==wish.id)return;
+   blessingState={...value,ready:true,error:''};renderBlessing();
+  },error=>{
+   if(selectedWishId!==wish.id)return;
+   blessingState={...blessingState,ready:false,error:error.message};renderBlessing();
+  });
+ }catch(error){blessingState.error=error.message;renderBlessing()}
+}
+read.addEventListener('close',()=>{if(!read.open)stopReadingBlessings()});
+blessButton.onclick=async()=>{
+ const id=selectedWishId;
+ if(blessButton.disabled||!id)return;
+ pendingBlessings.add(id);blessingState.error='';renderBlessing();
+ try{
+  await network.blessWish(id);
+ }catch(error){if(selectedWishId===id)blessingState.error=error.message}
+ finally{pendingBlessings.delete(id);if(selectedWishId===id)renderBlessing()}
+};
 function render(){
 const pages=Math.max(1,Math.ceil(wishes.length/slots.length));page=Math.min(page,pages-1);notes.replaceChildren();
-wishes.slice(page*slots.length,(page+1)*slots.length).forEach((wish,index)=>{const slot=slots[index],button=document.createElement('button');button.className='wish-note'+(wish.id===newId?' just-hung':!invitedWishIds.has(wish.id)?' inviting':'');invitedWishIds.add(wish.id);button.style.setProperty('--sway-delay',(index*.14)+'s');button.type='button';button.style.setProperty('--x',slot.x+'%');button.style.setProperty('--y',slot.y+'%');button.style.setProperty('--angle',slot.a+'deg');button.style.setProperty('--tint',slot.t);button.setAttribute('aria-label','Read wish by '+wish.name);const excerpt=document.createElement('span');excerpt.className='excerpt';excerpt.textContent=wishExcerpt(wish.text);const author=document.createElement('span');author.className='author';author.textContent=wish.name;button.append(excerpt,author);button.addEventListener('click',()=>{document.getElementById('wish-text').textContent=wish.text;document.getElementById('wish-author').textContent=wish.name;document.getElementById('wish-date').textContent=wishDate(wish.createdAt||previewDate);document.getElementById('wish-date').dateTime=new Date(wish.createdAt||previewDate).toISOString();read.showModal()});notes.append(button)});
+wishes.slice(page*slots.length,(page+1)*slots.length).forEach((wish,index)=>{const slot=slots[index],button=document.createElement('button');button.className='wish-note'+(wish.id===newId?' just-hung':!invitedWishIds.has(wish.id)?' inviting':'');invitedWishIds.add(wish.id);button.style.setProperty('--sway-delay',(index*.14)+'s');button.type='button';button.style.setProperty('--x',slot.x+'%');button.style.setProperty('--y',slot.y+'%');button.style.setProperty('--angle',slot.a+'deg');button.style.setProperty('--tint',slot.t);button.setAttribute('aria-label','Read wish by '+wish.name);const excerpt=document.createElement('span');excerpt.className='excerpt';excerpt.textContent=wishExcerpt(wish.text);const author=document.createElement('span');author.className='author';author.textContent=wish.name;button.append(excerpt,author);button.addEventListener('click',()=>openWish(wish));notes.append(button)});
 document.getElementById('wish-count').textContent=wishes.length+' wishes';document.getElementById('page-label').textContent=(page+1)+' / '+pages;document.getElementById('previous').disabled=page===0;document.getElementById('next').disabled=page===pages-1;newId=null;
 }
 document.getElementById('previous').onclick=()=>{page--;newId=null;render()};document.getElementById('next').onclick=()=>{page++;newId=null;render()};
@@ -53,12 +101,12 @@ message.addEventListener('input',()=>{document.getElementById('remaining').textC
 nickname.addEventListener('input',()=>document.getElementById('form-error').textContent='');
 document.querySelector('.back').onclick=event=>{event.preventDefault();window.parent.wishingTree.close()};
 const status=document.querySelector('.preview-note');
-function connectionStatus(){if(!network.state.connected){status.textContent=sending?'Reconnecting… Your wish is waiting to be saved.':'Reconnecting…';}else if(!status.dataset.error){status.textContent=wishes.length?'':'Be the first to hang a wish.'}}
+function connectionStatus(){renderBlessing();if(!network.state.connected){status.textContent=sending?'Reconnecting… Your wish is waiting to be saved.':'Reconnecting…';}else if(!status.dataset.error){status.textContent=wishes.length?'':'Be the first to hang a wish.'}}
 window.parent.addEventListener('map-connection-updated',connectionStatus);
 window.addEventListener('pagehide',()=>window.parent.removeEventListener('map-connection-updated',connectionStatus));
 try {
  const unsubscribe=network.subscribeWishes(values=>{wishes=values;delete status.dataset.error;render();connectionStatus()},error=>{status.dataset.error='true';status.textContent=error.message;document.getElementById('write').disabled=true});
- window.disposeWishingTree=()=>{unsubscribe?.();window.parent.removeEventListener('map-connection-updated',connectionStatus)};
+ window.disposeWishingTree=()=>{stopReadingBlessings();unsubscribe?.();window.parent.removeEventListener('map-connection-updated',connectionStatus)};
  window.addEventListener('pagehide',window.disposeWishingTree,{once:true});
 } catch(error){status.textContent=error.message;document.getElementById('write').disabled=true}
 document.getElementById('wish-form').addEventListener('submit',async event=>{

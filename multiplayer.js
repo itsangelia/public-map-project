@@ -27,6 +27,8 @@ let connectionError = '';
 let lastChatSent = -Infinity;
 let chatSending = false;
 let serverTimeOffset = 0;
+const blessingBusy = new Set();
+const blessedWishIds = new Set();
 function makeId() {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
   // Older phone webviews support secure random bytes but not randomUUID().
@@ -130,6 +132,33 @@ window.mapNetwork = {
         ? 'Wish could not be saved. Ask the host to check the wishing-tree rules.'
         : 'Wish could not be saved. Your draft is still here; check your connection.');
     }
+  },
+  subscribeBlessings(id, receive, reportError) {
+    if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('Invalid wish identifier.');
+    if (!database || !user || !state.joined) throw new Error('Join the map before reading blessings.');
+    // Subscribe only to the open paper. Errors never affect player presence.
+    return onValue(ref(database, `rooms/${room}/wishBlessings/${id}`), snapshot => {
+      const votes = snapshot.val() || {};
+      const blessed = votes[user.uid] === true;
+      if (blessed) blessedWishIds.add(id); else blessedWishIds.delete(id);
+      receive({ count: Object.values(votes).filter(value => value === true).length, blessed });
+    }, () => reportError(new Error('Blessings are unavailable. Please ask the host to publish the blessing rules.')));
+  },
+  async blessWish(id) {
+    if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('Invalid wish identifier.');
+    if (!database || !user || !state.connected || !state.joined || !state.readReady) throw new Error('Reconnect to the map before sending a blessing.');
+    if (blessedWishIds.has(id) || blessingBusy.has(id)) throw new Error('You have already sent this wish a blessing.');
+    blessingBusy.add(id);
+    try {
+      // One immutable record per anonymous player: simultaneous blessings from
+      // different players cannot overwrite or lose each other's contributions.
+      await set(ref(database, `rooms/${room}/wishBlessings/${id}/${user.uid}`), true);
+      blessedWishIds.add(id);
+    } catch (error) {
+      throw new Error(['PERMISSION_DENIED', 'permission-denied'].includes(error.code)
+        ? 'Blessing could not be saved. Please ask the host to check the blessing rules.'
+        : 'Blessing could not be saved. Check your connection and try again.');
+    } finally { blessingBusy.delete(id); }
   },
   createWishId: makeId,
   ownKey: null
