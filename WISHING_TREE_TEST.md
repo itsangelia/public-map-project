@@ -1,6 +1,15 @@
 # Wishing tree integration test
 
-Production remains at the stable deployment. This feature is developed on `feature/wishing-tree`; do not merge or publish the root site until the user approves real-device testing.
+The user approved the wishing-tree preview, proximity glow and promotion to production on 2026-10-19. The approved immutable release is `4409510c7e28c8f6`. Production and the isolated preview use the same release files; only their entry URL and room differ.
+
+## Production entry points
+
+- Display and matching QR: https://itsangelia.github.io/public-map-project/?mode=display&room=campus
+- Phone: https://itsangelia.github.io/public-map-project/?room=campus
+
+Production uses the `campus` room. Wishes from the isolated `wish-test` room stay in that room and are not copied into production. The previously published room-generic Firebase rules cover both rooms. Promotion does not alter Firebase data or republish rules.
+
+Backups before promotion: source `backup-before-wishing-tree-2026-10-19`, deployment `backup-site-before-wishing-tree-2026-10-19`. The previous stable tags are also retained.
 
 ## Test entry points
 
@@ -25,6 +34,6 @@ The editor inherits the active player's nickname. Wishes are immutable creates u
 
 After publishing rules, test with the display and two independent phones in `wish-test`: mutual visibility, chat and five-second bubbles; two wishes visible on both phones; literal markup/emoji/newlines; close/reopen and refresh persistence; author leaving while their wish remains; reconnect; mobile keyboard and scrolling. Do not claim these real-device checks passed from the local fixtures.
 
-## Isolated deployment
+## Future isolated deployment
 
-Run `npm run build`, then `python3 scripts/deploy-wishing-tree-preview.py`. It adds only the dedicated preview pages and immutable release directory, preserves production `index.html`, and checks that no other deployment paths change. Its QR points back to this exact preview entry and carries the same room. Do not run `scripts/deploy-pages.py` for this feature's test deployment.
+Run `npm run build`, then `python3 scripts/deploy-wishing-tree-preview.py`. It adds only the dedicated preview pages and immutable release directory, preserves production `index.html`, and checks that no other deployment paths change. Its QR points back to this exact preview entry and carries the same room. Do not run `scripts/deploy-pages.py` for a test deployment. For the approved production promotion, `npm run build` followed by `python3 scripts/deploy-pages.py` publishes the root entry and retains existing previews and older immutable releases.
