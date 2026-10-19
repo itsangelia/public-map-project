@@ -31,7 +31,7 @@ let nameInput;
 let playerX = 300;
 let playerY = 450;
 
-let playerSpeed = 4;
+let playerSpeed = 3.2;
 
 
 // =====================================================
@@ -1423,6 +1423,8 @@ function enterMap() {
   page =
     "map";
 
+  fitCanvasToScreen();
+
 
   nameInput.hide();
 
@@ -1519,7 +1521,11 @@ function drawMapPage() {
   // FIXED UI
   // ===================================================
 
+  // Keep the existing header size while the phone's world view is enlarged.
+  push();
+  scale(width / 600);
   drawMapHeader();
+  pop();
 
   // The fixed joystick supplies touch input; keyboard controls remain available.
 
@@ -1532,7 +1538,13 @@ function drawMapPage() {
     nearLightGame
   ) {
 
+    push();
+    const uiScale = width / 600;
+    translate(width / 2, height - 900 * uiScale);
+    scale(uiScale);
+    translate(-width / 2, 0);
     drawLightGamePrompt();
+    pop();
 
   }
 
@@ -2365,6 +2377,8 @@ function enterStreetlightGame() {
   page =
     "lightGame";
 
+  fitCanvasToScreen();
+
 
   console.log(
     "Entered Streetlight Game"
@@ -2384,6 +2398,8 @@ function exitStreetlightGame() {
 
   page =
     "map";
+
+  fitCanvasToScreen();
 
 
   updateCamera();
@@ -2718,12 +2734,29 @@ function fitCanvasToScreen() {
     if (canvas) { canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; }
     return;
   }
-  const scale = Math.min(
-    document.documentElement.clientWidth / 600,
-    document.documentElement.clientHeight / 900
-  );
-  document.documentElement.style.setProperty('--game-scale', scale);
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const phoneMap = page === 'map' && viewportWidth <= 900;
   const canvas = document.querySelector('canvas');
+  if (phoneMap) {
+    // A narrower world viewport gives the requested 35% phone zoom.
+    // Fill the phone viewport down behind the fixed joystick, with no bottom gap.
+    const mapViewWidth = 600 / 1.35;
+    const visibleHeight = Math.max(1, viewportHeight);
+    const mapViewHeight = mapViewWidth * visibleHeight / viewportWidth;
+    if (width !== mapViewWidth || Math.abs(height - mapViewHeight) > .5) {
+      resizeCanvas(mapViewWidth, mapViewHeight);
+    }
+    if (canvas) {
+      canvas.style.width = `${viewportWidth}px`;
+      canvas.style.height = `${visibleHeight}px`;
+    }
+    updateCamera();
+    return;
+  }
+  if (width !== 600 || height !== 900) resizeCanvas(600, 900);
+  const scale = Math.min(viewportWidth / 600, viewportHeight / 900);
+  document.documentElement.style.setProperty('--game-scale', scale);
   if (canvas) {
     canvas.style.width = `${600 * scale}px`;
     canvas.style.height = `${900 * scale}px`;
