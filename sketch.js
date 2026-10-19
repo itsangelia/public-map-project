@@ -2929,7 +2929,7 @@ function drawSpeechBubble(x, y, speech) {
   const bubbleHeight = lines.length * 20 + 18;
   // Keep phone bubbles inside its camera viewport; on the display use world bounds.
   const left = constrain(x - bubbleWidth / 2, 4, Math.max(4, (displayMode ? mapWorldWidth : width) - bubbleWidth - 4));
-  const top = Math.max(4, y - 94 - bubbleHeight);
+  const top = Math.max(4, y - 88 - bubbleHeight);
   noStroke(); fill(255, 252, 245, 245);
   rectMode(CORNER); rect(left, top, bubbleWidth, bubbleHeight, 12);
   triangle(x - 5, top + bubbleHeight - 1, x + 5, top + bubbleHeight - 1, x, top + bubbleHeight + 7);
