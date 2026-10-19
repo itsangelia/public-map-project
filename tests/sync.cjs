@@ -18,6 +18,7 @@ async function source() {
       export async function signInAnonymously(){if(harness.authFailures-->0)throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});return {user:{uid:harness.uid}}}`,
     'firebase/database': `export const getDatabase=()=>({});export const ref=(d,path)=>path;
       export const serverTimestamp=()=>Date.now();
+      export const query=(path,...constraints)=>path;export const orderByChild=key=>key;export const limitToLast=count=>count;
       export const onValue=(path,fn,error)=>harness.subscribe(path,fn,error);
       export const onDisconnect=path=>({remove:async()=>{harness.disconnectPath=path}});
       export const set=(path,value)=>harness.write(path,value,false);
@@ -33,20 +34,24 @@ async function source() {
 }
 function fixture() {
   const data = {};
+  const wishes = {};
   const clients = [];
   const snapshot = value => ({val:()=>structuredClone(value)});
-  const broadcast = () => clients.forEach(c=>c.callbacks['rooms/campus/players']?.(snapshot(data)));
+  const broadcast = () => clients.forEach(c=>{c.callbacks['rooms/campus/players']?.(snapshot(data));c.callbacks['rooms/campus/wishes']?.(snapshot(wishes))});
   async function client(uid, options={}) {
     const timers = new Set();
     const events = new EventTarget();
     const harness = {uid,callbacks:{},persist:[],clock:0,authFailures:0,...options,
       subscribe(path,fn,error) {
         if(this.denyRead && path==='rooms/campus/players') { error({code:'PERMISSION_DENIED'}); return; }
+        if(this.denyWishes && path==='rooms/campus/wishes'){error({code:'PERMISSION_DENIED'});return ()=>{}}
         this.callbacks[path]=fn;
-        fn(snapshot(path==='.info/connected'?true:path==='.info/serverTimeOffset'?0:data));
+        fn(snapshot(path==='.info/connected'?true:path==='.info/serverTimeOffset'?0:path.endsWith('/wishes')?wishes:data));
+        return ()=>{delete this.callbacks[path]};
       },
       async write(path,value,merge) {
         if(this.blockWrites)await new Promise(resolve=>this.release=resolve);
+        if(path.includes('/wishes/')){if(this.denyWishes)throw Object.assign(Error('denied'),{code:'PERMISSION_DENIED'});assert.equal(value.owner,uid);wishes[path.split('/').at(-1)]=value;broadcast();return}
         const [,,,owner,id]=path.split('/');
         assert.equal(owner,uid,'client must write only its own identity');
         data[owner]??={};
@@ -68,7 +73,7 @@ function fixture() {
     await new Promise(r=>setImmediate(r));
     return {network:context.mapNetwork,harness,stop:()=>timers.forEach(clearTimeout)};
   }
-  return {client,data,broadcast};
+  return {client,data,wishes,broadcast};
 }
 async function until(check,timeout=6000) {
   const end=Date.now()+timeout;
@@ -132,4 +137,50 @@ test('joining requires a confirmed record and readable room, not merely a local 
 test('a successful write cannot hide room read permission failure',async()=>{
  const f=fixture();const a=await f.client('alice',{denyRead:true});
  try{await a.network.join('Alice',0,800,900);assert.equal(a.network.state.readReady,false);await assert.rejects(()=>a.network.waitForJoined(),/PERMISSION_DENIED/)}finally{a.stop()}
+});
+
+
+test('wishes are shared, retain the real nickname and survive author departure',async()=>{
+ const f=fixture(),a=await f.client('alice'),b=await f.client('bob');
+ try{
+  await a.network.join('Alice',0,800,900);await b.network.join('Bob',1,1000,900);
+  let received=[];const unsubscribe=b.network.subscribeWishes(values=>received=values,()=>assert.fail('unexpected error'));
+  const id=a.network.createWishId();await a.network.sendWish('愿大家顺利毕业 🌿',id);
+  assert.equal(received.length,1);assert.equal(received[0].name,'Alice');assert.equal(received[0].text,'愿大家顺利毕业 🌿');
+  a.harness.connected(false);delete f.data.alice;f.broadcast();
+  assert.equal(received.length,1);assert.equal(Object.keys(b.network.state.players).length,1);
+  await assert.rejects(()=>a.network.sendWish('offline',a.network.createWishId()),/Reconnect/);
+  unsubscribe();assert.equal(b.harness.callbacks['rooms/campus/wishes'],undefined);
+ }finally{a.stop();b.stop()}
+});
+test('wish permission failures do not break presence or chat',async()=>{
+ const f=fixture(),a=await f.client('alice',{denyWishes:true}),b=await f.client('bob');
+ try{
+  await a.network.join('Alice',0,800,900);await b.network.join('Bob',1,1000,900);
+  let error;a.network.subscribeWishes(()=>assert.fail('read should be denied'),value=>error=value);
+  assert.match(error.message,/wishing-tree database rules/);
+  await assert.rejects(()=>a.network.sendWish('test',a.network.createWishId()),/rules/);
+  assert.equal(a.network.state.joined,true);assert.equal(a.network.state.readReady,true);
+  assert.equal(Object.keys(a.network.state.players).length,2);
+  await a.network.sendChat('Still here');assert.equal(b.network.state.players[a.network.ownKey].speech.text,'Still here');
+ }finally{a.stop();b.stop()}
+});
+test('wish inputs reject empty, oversized and invalid identifiers',async()=>{
+ const f=fixture(),a=await f.client('alice');try{await a.network.join('Alice',0,800,900);
+ await assert.rejects(()=>a.network.sendWish('   ',a.network.createWishId()),/1–160/);
+ await assert.rejects(()=>a.network.sendWish('a'.repeat(161),a.network.createWishId()),/1–160/);
+ await assert.rejects(()=>a.network.sendWish('valid','../../players'),/identifier/);
+ assert.equal(Object.keys(f.wishes).length,0);
+ }finally{a.stop()}
+});
+
+test('adding wishing rules preserves the stable player and chat permissions',()=>{
+ const {readFileSync}=require('node:fs'),{execFileSync}=require('node:child_process');
+ const stable=JSON.parse(execFileSync('git',['show','stable-2026-10-19-v1:database.rules.json'],{encoding:'utf8'}));
+ const current=JSON.parse(readFileSync('database.rules.json','utf8'));
+ assert.deepEqual(current.rules.rooms.$room.players,stable.rules.rooms.$room.players);
+ assert.equal(current.rules['.read'],false);assert.equal(current.rules['.write'],false);
+ const wishes=current.rules.rooms.$room.wishes;
+ assert.match(wishes['.read'],/query.limitToLast <= 100/);
+ assert.match(wishes.$wish['.write'],/!data.exists\(\)/);
 });

@@ -434,7 +434,7 @@ function setupKeyboardControls() {
     "keydown",
 
     function(event) {
-      if (event.isComposing || event.target.closest?.('#chat-panel')) return;
+      if (event.isComposing || event.target.closest?.('#chat-panel') || window.wishingTree?.isOpen()) return;
 
 
       // =================================================
@@ -1504,6 +1504,7 @@ function drawMapPage() {
   // GAME INTERACTION POINT
   // ===================================================
 
+  window.wishingTree?.draw();
   drawLightGameSpot();
 
 
@@ -1827,6 +1828,7 @@ function drawMapPlayer() {
 // =====================================================
 
 function movePlayer() {
+  if (window.wishingTree?.isOpen()) return;
 
   let dx =
     0;
@@ -2860,10 +2862,12 @@ function setupTouchControls() {
 }
 
 function updateTouchControls() {
-  if (touchPanel) touchPanel.hidden = page !== 'map';
-  if (window.mapChat) window.mapChat.setVisible(page === 'map');
-  if (page !== 'map' && joystickInput.pointerId !== null) resetJoystick();
-  if (lightAction) lightAction.hidden = page !== 'map' || !nearLightGame;
+  window.wishingTree?.syncVisibility();
+  const mapControlsVisible = page === 'map' && !window.wishingTree?.isOpen();
+  if (touchPanel) touchPanel.hidden = !mapControlsVisible;
+  if (window.mapChat) window.mapChat.setVisible(mapControlsVisible);
+  if (!mapControlsVisible && joystickInput.pointerId !== null) resetJoystick();
+  if (lightAction) lightAction.hidden = !mapControlsVisible || !nearLightGame;
 }
 
 
@@ -2901,6 +2905,7 @@ function drawPublicDisplay() {
   image(mapImage, 0, 0, mapWorldWidth, mapWorldHeight);
   cameraX = 0;
   cameraY = 0;
+  window.wishingTree?.draw();
   drawLightGameSpot();
   drawRemotePlayers();
   pop();

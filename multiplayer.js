@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { initializeAuth, inMemoryPersistence, signInAnonymously } from 'firebase/auth';
-import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp } from 'firebase/database';
+import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp, query, orderByChild, limitToLast } from 'firebase/database';
 import QRCode from 'qrcode';
 
 const params = new URLSearchParams(location.search);
@@ -107,6 +107,31 @@ window.mapNetwork = {
         : 'Message could not be sent. Check your connection.');
     } finally { chatSending = false; }
   },
+  subscribeWishes(receive, reportError) {
+    if (!database || !user || !state.joined) throw new Error('Join the map before opening the tree.');
+    // This listener is deliberately independent of player presence and chat.
+    return onValue(query(ref(database, `rooms/${room}/wishes`), orderByChild('createdAt'), limitToLast(100)), snapshot => {
+      const wishes = Object.entries(snapshot.val() || {}).map(([id, value]) => ({ ...value, id }))
+        .filter(wish => typeof wish.name === 'string' && typeof wish.text === 'string' && Number.isFinite(wish.createdAt))
+        .sort((a, b) => b.createdAt - a.createdAt || b.id.localeCompare(a.id));
+      receive(wishes);
+    }, () => reportError(new Error('Wishes are unavailable. Ask the host to publish the wishing-tree database rules, then reopen the tree.')));
+  },
+  async sendWish(value, id) {
+    const text = String(value).trim();
+    if (!text || text.length > 160) throw new Error('Use 1–160 characters.');
+    if (!state.connected || !state.joined || !state.readReady || !user) throw new Error('Reconnect to the map before hanging your wish.');
+    if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('Invalid wish identifier.');
+    // A caller retains this ID until acknowledgement; reconnect cannot duplicate it.
+    const record = { name: nickname, text, owner: user.uid, connection: connectionId, createdAt: serverTimestamp() };
+    try { await set(ref(database, `rooms/${room}/wishes/${id}`), record); }
+    catch (error) {
+      throw new Error(['PERMISSION_DENIED', 'permission-denied'].includes(error.code)
+        ? 'Wish could not be saved. Ask the host to check the wishing-tree rules.'
+        : 'Wish could not be saved. Your draft is still here; check your connection.');
+    }
+  },
+  createWishId: makeId,
   ownKey: null
 };
 function fail(error) { lastErrorCode = error.code || ''; connectionError = `Connection error: ${error.code || error.message}`; refreshStatus(); }
