@@ -1,6 +1,10 @@
 # Wishing tree integration test
 
-The user approved the wishing-tree preview, proximity glow and promotion to production on 2026-10-19. The approved immutable release is `4409510c7e28c8f6`. Production and the isolated preview use the same release files; only their entry URL and room differ.
+The user approved the wishing-tree preview and proximity glow on 2026-10-19, then approved abbreviated wish notes and paper sway for production on 2026-10-20 (Australia/Perth). The current approved immutable release is `2a460071474cdf85`. Production and the isolated preview use the same release files; only their entry URL and room differ.
+
+Paper previews show up to five English words, retaining at least one word for the full reading card when the wish has more than two words. For example, `I wish can be rich` previews as `I wish can be…`; longer wishes show at most five opening words. CJK previews use up to eight graphemes. Nicknames and the full original message are retained. Newly encountered notes sway gently for two cycles; new submissions also use the hanging animation. Reduced-motion preferences disable animation.
+
+Backups before the 2026-10-20 promotion: source `backup-before-wish-note-preview-2026-10-20`, deployment `backup-site-before-wish-note-preview-2026-10-20`. Git pushes are not evidence of a completed GitHub Pages deployment. The observed prior Pages run took 12 minutes 22 seconds. Verify the matching Pages deployment before claiming that the public site has updated.
 
 ## Production entry points
 
