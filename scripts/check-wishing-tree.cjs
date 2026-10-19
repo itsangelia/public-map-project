@@ -38,9 +38,11 @@ window.mapNetwork={state:{players:{},joined:true,connected:true,readReady:true},
    await board.locator('#write').click();
    assert.equal(await board.locator('#nickname').inputValue(),index?'Bob':'Alice');
    assert.equal(await board.locator('#nickname').getAttribute('readonly'),'');
-   await board.locator('#message').fill(index?'Hello from Bob':'希望交到新朋友 🌳 <script>alert(1)</script>');
+   await board.locator('#message').fill(index?'I hope to meet new friends on campus.':'希望交到新朋友 🌳 <script>alert(1)</script>');
    await board.locator('button[type=submit]').click();
    await board.locator('#compose').waitFor({state:'hidden'});
+   assert.equal(await board.locator('.wish-note').first().locator('.excerpt').textContent(),index?'I hope to…':'希望交到新朋友…');
+   assert.match(await board.locator('.wish-note').first().evaluate(el=>getComputedStyle(el).animationName),/wish-sway/);
    assert.equal(await page.locator('#movement-controls').isVisible(),false);
   }
   for(const page of pages){
