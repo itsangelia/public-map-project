@@ -28,7 +28,12 @@ window.mapNetwork={state:{players:{},joined:true,connected:true,readReady:true},
    await page.waitForTimeout(250);
    assert.equal(await page.locator('#wishing-tree-entry').isEnabled(),false,'tree requires approach');
    await page.evaluate(()=>{playerX=724*1.6;playerY=417*1.6+150;updateCamera()});
-   await page.locator('#wishing-tree-entry').click();
+   await page.waitForFunction(()=>!document.getElementById('wishing-tree-entry').disabled);
+   await page.waitForTimeout(600);
+   await page.screenshot({path:`/tmp/wish-near-${viewport.width}.png`});
+   // Real touch input does not wait for a breathing target to stop animating.
+   const target=await page.locator('#wishing-tree-entry').boundingBox();
+   await page.touchscreen.tap(target.x+target.width/2,target.y+target.height/2);
    const board=page.frameLocator('#wishing-tree-panel');
    await board.locator('#write').click();
    assert.equal(await board.locator('#nickname').inputValue(),index?'Bob':'Alice');
