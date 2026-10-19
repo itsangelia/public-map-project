@@ -7,7 +7,7 @@ const map=new Image(),tree=new Image();
 let mode=innerWidth<700?'close':'overview',showOriginal=false,ready=false;
 // Source artwork coordinates: cover the existing central tree, keep its flowerbed.
 const placement={x:724,y:417,width:240,height:160};
-map.src='../map%20draft.png';tree.src='assets/wishing-tree-d-v1.png';
+map.src='../map%20draft.png';tree.src='assets/wishing-tree-simple-v1.png';
 function loaded(image){return new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;if(image.complete&&image.naturalWidth)resolve()})}
 function draw(){
  const box=canvas.getBoundingClientRect(),ratio=Math.min(devicePixelRatio||1,2);
