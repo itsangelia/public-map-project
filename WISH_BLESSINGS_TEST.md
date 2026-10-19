@@ -1,6 +1,17 @@
-# Wish blessings — isolated integration test
+# Wish blessings
 
-The user approved implementing a small response action on 2026-10-20 (Australia/Perth). This branch is `feature/wish-blessings`. The approved production source remains `af6de6f`, immutable site release `2a460071474cdf85`. Do not promote this test to production without user approval.
+The user approved implementing a small response action on 2026-10-20 (Australia/Perth), reported that it worked after publishing the Firebase rules, and explicitly approved production promotion. The approved immutable production release is `c7232ff78f0d53fd`. Development was performed on `feature/wish-blessings`.
+
+## Production promotion
+
+- Production display: https://itsangelia.github.io/public-map-project/?mode=display&room=campus
+- Production phones: https://itsangelia.github.io/public-map-project/?room=campus
+- Previous source backup: `backup-before-wish-blessings-2026-10-20`.
+- Previous deployment backup: `backup-site-before-wish-blessings-2026-10-20`.
+
+Production uses the same immutable files that the user approved in the preview; the room remains `campus`. The existing room-generic blessing rules already cover production, so the host need not republish them. Publishing does not move or delete wishes or blessings. The `wish-test` room retains its separate test data. The old map artwork, characters, chat, short excerpts, paper sway and proximity glow are preserved.
+
+Build and validate, then run `python3 scripts/deploy-pages.py` for the user-approved production promotion. That publishes the root entry while retaining older releases and isolated test pages. Git push success is not confirmation that GitHub Pages has finished deploying.
 
 ## Behavior and identity
 
