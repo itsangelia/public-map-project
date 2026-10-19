@@ -29,10 +29,10 @@ function wishExcerpt(value){
  const graphemes=typeof Intl.Segmenter==='function'
   ? [...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(text)].map(part=>part.segment)
   : Array.from(text);
- const limit=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(text)?4:16;
+ const limit=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(text)?8:40;
  let opening=graphemes.slice(0,limit).join('');
  const words=text.split(' ');
- if(words.length>2){const firstWords=words.slice(0,2).join(' ');if(firstWords.length<opening.length)opening=firstWords}
+ if(words.length>5){const firstWords=words.slice(0,5).join(' ');if(firstWords.length<opening.length)opening=firstWords}
  opening=opening.trimEnd();
  return opening+(opening.length<text.length?'…':'');
 }
