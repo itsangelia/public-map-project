@@ -73,6 +73,15 @@
               ".validate": false
             }
           }
+        },
+        "wishBlessings": {
+          "$wish": {
+            ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && root.child('rooms').child($room).child('wishes').child($wish).exists()",
+            "$uid": {
+              ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.exists() && newData.val() === true && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && $wish.matches(/^[a-f0-9-]{36}$/) && root.child('rooms').child($room).child('wishes').child($wish).exists() && root.child('rooms').child($room).child('players').child(auth.uid).exists()",
+              ".validate": "newData.isBoolean() && newData.val() === true"
+            }
+          }
         }
       }
     }

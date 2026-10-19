@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>许愿树测试设置</title><style>body{max-width:760px;margin:24px auto;padding:16px;font:17px/1.7 Arial;color:#303a68;background:#fff8f1}button,a{display:inline-block;margin:8px 10px 8px 0;padding:12px;background:#303a68;color:white;border:0;border-radius:10px;font:inherit}textarea{width:100%;box-sizing:border-box;height:300px;font:12px/1.5 monospace}#result{min-height:30px}</style><h1>许愿树测试设置</h1><p>只需设置一次。规则保留原来的玩家和聊天权限，追加许愿数据权限。</p><ol><li>点击“复制完整规则”。</li><li>打开 Firebase → Realtime Database → Rules，替换编辑框里的全部内容，再点击 Publish。</li><li>打开测试大屏，用两台手机扫描其中的二维码。走近中央树并点击它，写下愿望后点击 Hang wish。</li></ol><button id="copy">复制完整规则</button><a href="https://console.firebase.google.com/project/public-map-project/database/public-map-project-default-rtdb/rules" target="_blank" rel="noopener">打开 Firebase 规则</a><a href="wishing-tree-test.html?mode=display&amp;room=wish-test">打开测试大屏和二维码</a><p id="result" role="status"></p><textarea id="rules" readonly aria-label="完整 Firebase 规则">{
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>许愿树测试设置</title><style>body{max-width:760px;margin:24px auto;padding:16px;font:17px/1.7 Arial;color:#303a68;background:#fff8f1}button,a{display:inline-block;margin:8px 10px 8px 0;padding:12px;background:#303a68;color:white;border:0;border-radius:10px;font:inherit}textarea{width:100%;box-sizing:border-box;height:300px;font:12px/1.5 monospace}#result{min-height:30px}</style><h1>许愿树祝福测试设置</h1><p>测试版本：c7232ff78f0d53fd</p><p>只需设置一次。规则保留原来的玩家、聊天和愿望权限，新增祝福权限。</p><ol><li>点击“复制完整规则”。</li><li>打开 Firebase → Realtime Database → Rules，替换编辑框里的全部内容，再点击 Publish。</li><li>打开测试大屏，用两台手机扫描其中的二维码。走近中央树并打开纸条，点击 May it come true ✨，查看另一台手机上的祝福数量。</li></ol><button id="copy">复制完整规则</button><a href="https://console.firebase.google.com/project/public-map-project/database/public-map-project-default-rtdb/rules" target="_blank" rel="noopener">打开 Firebase 规则</a><a href="wishing-tree-test-c7232ff78f0d53fd.html?mode=display&amp;room=wish-test">打开测试大屏和二维码</a><p id="result" role="status"></p><textarea id="rules" readonly aria-label="完整 Firebase 规则">{
   &quot;rules&quot;: {
     &quot;.read&quot;: false,
     &quot;.write&quot;: false,
@@ -71,6 +71,15 @@
             },
             &quot;$other&quot;: {
               &quot;.validate&quot;: false
+            }
+          }
+        },
+        &quot;wishBlessings&quot;: {
+          &quot;$wish&quot;: {
+            &quot;.read&quot;: &quot;auth != null &amp;&amp; $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) &amp;&amp; root.child(&#x27;rooms&#x27;).child($room).child(&#x27;wishes&#x27;).child($wish).exists()&quot;,
+            &quot;$uid&quot;: {
+              &quot;.write&quot;: &quot;auth != null &amp;&amp; auth.uid === $uid &amp;&amp; !data.exists() &amp;&amp; newData.exists() &amp;&amp; newData.val() === true &amp;&amp; $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) &amp;&amp; $wish.matches(/^[a-f0-9-]{36}$/) &amp;&amp; root.child(&#x27;rooms&#x27;).child($room).child(&#x27;wishes&#x27;).child($wish).exists() &amp;&amp; root.child(&#x27;rooms&#x27;).child($room).child(&#x27;players&#x27;).child(auth.uid).exists()&quot;,
+              &quot;.validate&quot;: &quot;newData.isBoolean() &amp;&amp; newData.val() === true&quot;
             }
           }
         }
