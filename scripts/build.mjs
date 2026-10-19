@@ -1,0 +1,26 @@
+import { build } from 'esbuild';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
+await build({ entryPoints: ['multiplayer.js'], bundle: true, format: 'iife', outfile: 'generated/multiplayer.js' });
+const sources = ['style.css', 'firebase-config.js', 'generated/multiplayer.js', 'sketch.js', 'chat.js'];
+const contents = await Promise.all(sources.map(file => readFile(file)));
+const original = await readFile('index.html', 'utf8');
+const hash = createHash('sha256').update(original);
+contents.forEach(content => hash.update(content));
+const release = hash.digest('hex').slice(0, 16);
+const directory = `generated/site/releases/${release}`;
+await mkdir(directory, { recursive: true });
+let html = original;
+for (let index = 0; index < sources.length; index++) {
+  const source = sources[index];
+  const name = source.split('/').at(-1);
+  await writeFile(`${directory}/${name}`, contents[index]);
+  html = html.replace(new RegExp(`${source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\?[^"\\s]*)?`), `releases/${release}/${name}`);
+}
+html = html.replace('<head>', `<head>\n    <script>window.PUBLIC_MAP_RELEASE="${release}";</script>`);
+await writeFile('generated/site/index.html', html);
+await writeFile('generated/site/.nojekyll', '');
+for (const file of ['p5.js', 'map draft.png', '男角色.png', '女角色.png', '购物袋.png', 'light icon.png']) {
+  await copyFile(file, `generated/site/${file}`);
+}
+console.log(`Built immutable release ${release}`);

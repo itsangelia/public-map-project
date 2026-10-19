@@ -2,9 +2,14 @@
   "name": "public-map-project",
   "private": true,
   "scripts": {
-    "build": "esbuild multiplayer.js --bundle --format=iife --outfile=generated/multiplayer.js",
+    "build": "node scripts/build.mjs",
     "start": "python3 -m http.server 8000 --bind 0.0.0.0"
   },
-  "dependencies": { "firebase": "12.4.0", "qrcode": "1.5.4" },
-  "devDependencies": { "esbuild": "0.25.11" }
+  "dependencies": {
+    "firebase": "12.4.0",
+    "qrcode": "1.5.4"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.11"
+  }
 }

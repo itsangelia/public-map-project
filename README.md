@@ -93,3 +93,18 @@ directions, confirm the correct avatar has the bubble, wait for bubble expiry,
 and confirm joystick/keyboard control still works. Message input must not trigger
 movement or streetlight shortcuts. Check Chinese IME input on a real iPhone and
 Android phone. User text is displayed as text, never HTML.
+
+## Versioned releases and connection recovery
+
+`npm run build` prepares `generated/site` with a content-based release directory.
+All application scripts and styles in one HTML page come from the same release.
+QR links include a fresh scan token to avoid reusing cached HTML. Deploy with
+`python3 scripts/deploy-pages.py` after checking the build. The deployment keeps
+older release directories so already-open clients can still load their files.
+
+The client retries transient authentication failures, falls back to in-memory
+identity when session storage is unavailable, and supports phone browsers without
+`crypto.randomUUID`. Join attempts are fenced by connection generation so an old
+pending join cannot mark a new connection online. Permission errors remain visible
+and are not retried in an endless loop. Offline movement behavior is unchanged.
+These measures reduce known failure modes; real-device verification is still needed.
