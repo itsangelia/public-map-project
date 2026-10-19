@@ -32,7 +32,8 @@ function wishExcerpt(value){
  const limit=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(text)?8:40;
  let opening=graphemes.slice(0,limit).join('');
  const words=text.split(' ');
- if(words.length>5){const firstWords=words.slice(0,5).join(' ');if(firstWords.length<opening.length)opening=firstWords}
+ // Leave the ending hidden even when a wish is exactly five words long.
+ if(words.length>2){const count=Math.min(5,words.length-1);const firstWords=words.slice(0,count).join(' ');if(firstWords.length<opening.length)opening=firstWords}
  opening=opening.trimEnd();
  return opening+(opening.length<text.length?'…':'');
 }
