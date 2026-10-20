@@ -62,3 +62,7 @@ Catch radius is 39.6 (36 × 1.10); target relocation takes 3.5 seconds; missed a
 ## Transparent catch sprites and names
 
 Five separate transparent sprites replace the photo-background viewports. Background removal was performed with the image tool using the selected art as reference; all originals remain in the repository. Success reveals now show Lotus Fish, Goofy Toothy, Bigmouth or Purrmaid; the escaped fish is Smug Finn. Selection still uses the shared round hash, so naming/art is identical for both participants. Difficulty and network behavior are unchanged.
+
+## Production approval — 2026-10-20
+
+The user approved release `52e1a7a26871394a` after device review. Promote these exact built assets to the production homepage and immutable `campus-52e1a7a26871394a.html` entry. The production QR uses that immutable entry and the current room; use `room=campus` for the public session. Existing original files, older release entries and map/drink/wish/chat features are retained. Source and site backup tags before promotion are `backup-before-fishing-production-2026-10-20` and `backup-site-before-fishing-production-2026-10-20`. The source approval tag is `stable-fishing-2026-10-20`. Local 22-test suite and built map/browser checks pass; deployment availability remains dependent on GitHub Pages completing its build.
