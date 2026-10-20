@@ -39,3 +39,7 @@ After publishing the rules and the matching Pages deployment succeeds, open the 
 ## Your-turn notification
 
 A cream/brown non-blocking “Your turn” toast appears once for each confirmed local turn (round + step), then disappears after 1.7 seconds. Re-renders and reconnecting within the same turn do not repeat it. Peer turns, waiting, disconnects and completion hide it; panel disposal clears the timer. Reduced-motion settings suppress the entrance animation. Browser checks cover initial turn, auto-dismiss, duplicate snapshots, next local turn and peer/completion hiding. No backend or rule changes were needed.
+
+## Drink alignment correction
+
+Removed the inherited 90% maximum width on the absolutely positioned mobile drink SVG. It previously left unused space on its right and shifted the drink center left by 5% of the viewport. The SVG now fills its stage width, including the scaled completion state. Browser checks assert centered alignment in both states at all four phone sizes. No recipe, backend, rule or matching changes.

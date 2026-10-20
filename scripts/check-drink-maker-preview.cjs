@@ -15,6 +15,7 @@ const assert=require('node:assert/strict');
    assert.equal(await page.locator('#next').isDisabled(),true);
    assert.ok(await page.locator('#next').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight), 'confirm button fits phone viewport');
    assert.equal(await page.locator('#drink-illustration circle[cx="150"][cy="200"]').count(),0,'cup has no logo');
+   assert.ok(await page.evaluate(()=>{const cup=document.getElementById('drink-illustration').getBoundingClientRect(),stage=document.querySelector('.stage').getBoundingClientRect();return Math.abs(cup.x+cup.width/2-stage.x-stage.width/2)<1}),'drink centered in stage');
    if(viewport.width===390)await page.screenshot({path:'/tmp/drink-maker-base.png',fullPage:true});
    let beforeFinishHeight=0;
    for(const [index,id] of ['milk-tea','mango','pearls','ice-cream'].entries()){
@@ -36,6 +37,7 @@ const assert=require('node:assert/strict');
    assert.equal(await page.locator('#choose').isVisible(),false);
    assert.match(await page.locator('#drink-illustration').getAttribute('aria-label'),/Pearls and Ice Cream/);
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no horizontal overflow');
+   assert.ok(await page.evaluate(()=>{const cup=document.getElementById('drink-illustration').getBoundingClientRect(),stage=document.querySelector('.stage').getBoundingClientRect();return Math.abs(cup.x+cup.width/2-stage.x-stage.width/2)<1}),'finished drink centered');
    if(viewport.width===390)await page.screenshot({path:'/tmp/drink-maker-finished.png',fullPage:true});
    await page.reload();assert.equal(await page.locator('#next').isDisabled(),true);
    await page.close();
