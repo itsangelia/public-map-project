@@ -1,0 +1,74 @@
+html, body { margin: 0; padding: 0; background: #FFF8F1; }
+main { position: relative; width: fit-content; }
+canvas { display: block; }
+/* Fixed to the visible phone viewport, including browser toolbar changes. */
+:root { --joystick-size: clamp(116px, 30vw, 136px); --joystick-bottom: 24px; }
+#movement-controls {
+  appearance: none; -webkit-appearance: none;
+
+  position: fixed; z-index: 30; left: var(--control-center, 50%);
+  top: calc(var(--visible-bottom, 100dvh) - var(--joystick-size) - var(--joystick-bottom) - env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%); width: var(--joystick-size); height: var(--joystick-size);
+  box-sizing: border-box; padding: 0; border: 1px solid rgba(48,58,104,.2); border-radius: 50%;
+  background: radial-gradient(circle, rgba(238,233,224,.72) 0 45%, rgba(255,252,245,.72) 46% 63%, rgba(232,224,210,.72) 64% 66%, rgba(255,248,237,.72) 67%);
+  box-shadow: 0 6px 18px rgba(48,58,104,.12), inset 0 2px 1px rgba(255,255,255,.72);
+  color: #303A68; touch-action: none; user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent; cursor: grab;
+}
+#movement-controls[hidden], #light-action[hidden] { display: none; }
+#movement-controls:focus-visible { outline: 3px solid #7C89D9; outline-offset: 4px; }
+#movement-controls.is-dragging { cursor: grabbing; }
+.joystick-thumb {
+  position: absolute; z-index: 2; left: 50%; top: 50%; width: 43%; height: 43%;
+  box-sizing: border-box; border: 1px solid #85888d; border-radius: 50%;
+  background: radial-gradient(circle at 36% 26%, #eeeeef, #bfc2c6 55%, #9da1a7);
+  box-shadow: none;
+  transform: translate(-50%, -50%); pointer-events: none;
+}
+#movement-controls.is-dragging .joystick-thumb { box-shadow: none; }
+.joystick-directions { position: absolute; inset: 0; pointer-events: none; }
+.joystick-direction { position: absolute; width: 6px; height: 6px; border-top: 2px solid #8b8c92; border-left: 2px solid #8b8c92; }
+.joystick-direction.up { top: 11px; left: calc(50% - 4px); transform: rotate(45deg); }
+.joystick-direction.right { right: 11px; top: calc(50% - 4px); transform: rotate(135deg); }
+.joystick-direction.down { bottom: 11px; left: calc(50% - 4px); transform: rotate(225deg); }
+.joystick-direction.left { left: 11px; top: calc(50% - 4px); transform: rotate(-45deg); }
+#light-action { position: absolute; bottom: 20%; left: 25%; width: 50%; font-size: 16px; min-height: 44px; border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1; color: #303A68; font-weight: bold; touch-action: manipulation; }
+
+#connection-status { position: fixed; left: 8px; bottom: 4px; background: #FFF8F1; color: #303A68; font: 12px Arial; padding: 4px 8px; border-radius: 6px; z-index: 5; }
+#join-qr { position: fixed; right: 16px; top: 16px; background: white; border-radius: 12px; padding: 12px; color: #303A68; text-align: center; font: 16px Arial; max-width: 190px; }
+
+/* Compact chat stays separate from the player's centered joystick. */
+#chat-toggle, #chat-panel button { font: inherit; cursor: pointer; touch-action: manipulation; }
+#chat-toggle {
+  position: fixed; z-index: 40; right: 18px;
+  top: calc(var(--visible-bottom, 100dvh) - 90px - env(safe-area-inset-bottom, 0px));
+  width: 48px; height: 48px; border: 1px solid #d8d4cd; border-radius: 16px;
+  background: #fffcf5; color: #303a68; box-shadow: 0 3px 10px #303a681a;
+}
+#chat-toggle svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+#chat-toggle circle { fill: currentColor; stroke: none; }
+#chat-panel {
+  position: fixed; z-index: 50; right: 12px;
+  top: calc(var(--visible-bottom, 100dvh) - var(--chat-height, min(370px, 82dvh)) - 12px);
+  width: min(340px, calc(100vw - 24px)); height: var(--chat-height, min(370px, 82dvh));
+  box-sizing: border-box; padding: 12px; border: 1px solid #ded9d0; border-radius: 20px;
+  background: #fffaf2; color: #303a68; font: 15px Arial, sans-serif;
+  box-shadow: 0 5px 24px #303a6826; display: flex; flex-direction: column; gap: 8px;
+}
+#chat-panel[hidden], #chat-toggle[hidden] { display: none; }
+#chat-panel header { display: flex; justify-content: space-between; align-items: center; }
+#chat-panel button { border: 0; border-radius: 12px; background: #ececf5; color: #303a68; min-width: 44px; min-height: 44px; }
+#chat-panel .chat-close { font-size: 26px; background: transparent; }
+.chat-messages { flex: 1; min-height: 24px; overflow-y: auto; overflow-wrap: anywhere; overscroll-behavior: contain; }
+.chat-messages p { margin: 6px 0; padding: 6px 8px; background: white; border-radius: 10px; white-space: pre-wrap; }
+.chat-messages .chat-empty { text-align: center; background: none; font-size: 28px; }
+.chat-reactions { display: flex; gap: 8px; }
+#chat-panel .chat-reactions button { font-size: 22px; }
+#chat-panel form { display: flex; gap: 8px; }
+#chat-panel input { width: 0; flex: 1; min-width: 0; border: 1px solid #ddd9d4; border-radius: 12px; padding: 10px; font: 16px Arial; background: white; color: #303a68; }
+#chat-panel form button { background: #303a68; color: white; font-size: 22px; }
+#chat-panel button:disabled { opacity: .45; cursor: default; }
+.chat-feedback { min-height: 14px; font-size: 12px; }
+
+#join-feedback { position: fixed; z-index: 60; left: 50%; top: 12px; transform: translateX(-50%); width: min(360px, calc(100vw - 32px)); box-sizing: border-box; padding: 14px 18px; border: 1px solid #d8d4cd; border-radius: 14px; background: #fffaf2; color: #303a68; font: 15px Arial, sans-serif; box-shadow: 0 4px 16px #303a6826; }
+#join-feedback[hidden] { display: none; }
