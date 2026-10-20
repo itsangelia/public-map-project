@@ -1,3 +1,4 @@
+import { installPianoNetwork } from './piano-network.js';
 import { installFishingNetwork } from './fishing-network.js';
 import { installDrinkNetwork } from './drink-network.js';
 import { initializeApp } from 'firebase/app';
@@ -303,4 +304,5 @@ async function initFirebaseRetry() {
 }
 installDrinkNetwork(() => ({database,user,room,connectionId,state}));
 installFishingNetwork(() => ({database,user,room,connectionId,state,now:() => Date.now()+serverTimeOffset}));
+installPianoNetwork(() => ({database,user,room,connectionId,state,now:() => Date.now()+serverTimeOffset}));
 init().catch(fail);

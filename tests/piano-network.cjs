@@ -1,0 +1,21 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),{webcrypto}=require('node:crypto');
+test('two independent piano clients compete for one seat and share live notes without replay on joining',async()=>{
+ const data={rooms:{test:{players:{a:{conn:{nickname:'A'}},b:{conn:{nickname:'B'}},c:{conn:{nickname:'C'}}}}}},values=new Map(),children=new Map(),intervals=[];let serial=0;
+ const path=p=>p.path||p;
+ const h={time:10000,read(p){return path(p).split('/').reduce((v,k)=>v?.[k],data)??null;},
+  async set(p,value){p=path(p);const keys=p.split('/');let o=data;for(const k of keys.slice(0,-1))o=o[k]??={};const fresh=!o[keys.at(-1)];if(value===null)delete o[keys.at(-1)];else o[keys.at(-1)]=structuredClone(value);for(const [q,cbs]of values)if(q===p)for(const cb of cbs)cb({val:()=>structuredClone(h.read(q))});if(fresh&&value!==null)for(const cb of children.get(keys.slice(0,-1).join('/'))||[])cb({key:keys.at(-1),val:()=>structuredClone(value)});},
+  value(p,cb){if(!values.has(p))values.set(p,[]);values.get(p).push(cb);cb({val:()=>structuredClone(h.read(p))});return()=>{};},
+  child(p,cb){if(!children.has(p))children.set(p,[]);children.get(p).push(cb);for(const [key,value]of Object.entries(h.read(p)||{}))cb({key,val:()=>structuredClone(value)});return()=>{};},
+  async transaction(p,fn){const v=fn(structuredClone(h.read(p)));if(v===undefined)return{committed:false,snapshot:{val:()=>h.read(p)}};await h.set(p,v);return{committed:true,snapshot:{val:()=>structuredClone(v)}};}};
+ const shim=`export const ref=(d,p)=>p;export const get=async p=>({val:()=>structuredClone(h.read(p))});export const onValue=(p,cb)=>h.value(p,cb);export const onChildAdded=(p,cb)=>h.child(p,cb);export const query=p=>p;export const limitToLast=n=>n;export const push=p=>({path:p+'/'+(++serial.value),key:String(serial.value)});export const set=(p,v)=>h.set(p,v);export const remove=p=>h.set(p,null);export const runTransaction=(p,f)=>h.transaction(p,f);export const serverTimestamp=()=>h.time;`;
+ const code=(await require('esbuild').build({stdin:{contents:"import{installPianoNetwork}from'./piano-network.js';installPianoNetwork(()=>({database:{},user:{uid},room:'test',connectionId:'conn',state,now:()=>h.time}));",resolveDir:process.cwd()},bundle:true,format:'iife',write:false,plugins:[{name:'transport',setup(b){b.onResolve({filter:/^firebase\/database$/},()=>({path:'db',namespace:'fake'}));b.onLoad({filter:/.*/,namespace:'fake'},()=>({contents:shim}));}}]})).outputFiles[0].text;
+ const sharedSerial={value:serial};
+ function client(uid){const events=[],handlers={},document={hidden:false,addEventListener(n,fn){handlers[n]=fn;}},state={joined:true,connected:true},window={dispatchEvent(e){events.push(e);},addEventListener(){}};const scope={window,document,state,uid,h,serial:sharedSerial,structuredClone,crypto:webcrypto,performance:{now:()=>h.time},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}},setInterval(fn){intervals.push(fn);},setTimeout(){}};vm.runInNewContext(code,scope);return{api:window.pianoNetwork,events,handlers,document};}
+ const a=client('a'),b=client('b');const errors=[];a.api.subscribe(()=>{},e=>errors.push(e));b.api.subscribe(()=>{},e=>errors.push(e));intervals.forEach(f=>f());
+ const attempts=await Promise.allSettled([a.api.claim(),b.api.claim()]);assert.equal(attempts.filter(x=>x.status==='fulfilled').length,1);assert.equal(a.api.isOwner,true);assert.equal(b.api.isOwner,false);
+ await a.api.note(7);assert.equal(b.events.length,1);assert.equal(b.events[0].detail.key,7);assert.equal(a.events.length,2);assert.equal(a.events[0].detail.id,a.events[1].detail.id,'local and echoed notes can be deduplicated');
+ await b.api.note(3);assert.equal(b.events.length,1,'listener cannot play');
+ h.time+=1600;const c=client('c');intervals.forEach(f=>f());assert.equal(c.events.length,0,'late join does not replay old notes');
+ await a.api.release();await b.api.claim();assert.equal(b.api.isOwner,true);assert.equal(a.api.isOwner,false);h.time+=50;await b.api.note(20);assert.equal(c.events.length,1);assert.equal(c.events[0].detail.key,20);
+ b.document.hidden=true;await b.handlers.visibilitychange();await new Promise(r=>setImmediate(r));assert.equal(b.api.isOwner,false,'backgrounding releases the seat');assert.deepEqual(errors,[]);
+});

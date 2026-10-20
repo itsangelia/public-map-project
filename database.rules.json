@@ -229,6 +229,51 @@
               }
             }
           }
+        },
+        "pianoSeat": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && ((!newData.exists() && data.child('uid').val() === auth.uid) || (newData.exists() && newData.child('uid').val() === auth.uid && root.child('rooms').child($room).child('players').child(auth.uid).child(newData.child('connection').val()).exists() && (!data.exists() || data.child('until').val() <= now || !root.child('rooms').child($room).child('players').child(data.child('uid').val()).child(data.child('connection').val()).exists() || (data.child('uid').val() === auth.uid && data.child('connection').val() === newData.child('connection').val()))))",
+          ".validate": "newData.hasChildren(['uid','connection','nickname','token','until'])",
+          "uid": {
+            ".validate": "newData.isString() && newData.val() === auth.uid"
+          },
+          "connection": {
+            ".validate": "newData.isString()"
+          },
+          "nickname": {
+            ".validate": "newData.isString() && newData.val() === root.child('rooms').child($room).child('players').child(auth.uid).child(newData.parent().child('connection').val()).child('nickname').val()"
+          },
+          "token": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"
+          },
+          "until": {
+            ".validate": "newData.isNumber() && newData.val() > now && newData.val() <= now + 13000"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "pianoNotes": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          "$id": {
+            ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && ((!newData.exists() && data.child('uid').val() === auth.uid) || (!data.exists() && newData.exists() && root.child('rooms').child($room).child('pianoSeat').child('uid').val() === auth.uid && root.child('rooms').child($room).child('pianoSeat').child('until').val() > now && root.child('rooms').child($room).child('players').child(auth.uid).child(root.child('rooms').child($room).child('pianoSeat').child('connection').val()).exists() && newData.child('uid').val() === auth.uid && newData.child('token').val() === root.child('rooms').child($room).child('pianoSeat').child('token').val()))",
+            ".validate": "newData.hasChildren(['uid','token','key','at'])",
+            "uid": {
+              ".validate": "newData.isString() && newData.val() === auth.uid"
+            },
+            "token": {
+              ".validate": "newData.isString()"
+            },
+            "key": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 20 && newData.val() % 1 === 0"
+            },
+            "at": {
+              ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 5000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
         }
       }
     }

@@ -10,7 +10,7 @@
   entry.id='drink-shop-entry';entry.hidden=true;entry.setAttribute('aria-label','Open Drink Together');
   Object.assign(entry.style,{position:'fixed',zIndex:'11',background:'transparent',border:'0',padding:'0',borderRadius:'25%',touchAction:'manipulation'});
   entry.onclick=()=>{
-    if(!near||frame||page!=='map'||(window.wishingTree?.isOpen() || window.fishingSpot?.isOpen()))return;
+    if(!near||frame||page!=='map'||(window.wishingTree?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen())))return;
     stopMovement();
     frame=document.createElement('iframe');frame.title='Drink Together';frame.src=new URL('drink-maker.html',base).href;
     Object.assign(frame.style,{position:'fixed',inset:'0',width:'100%',height:'100dvh',border:'0',zIndex:'100',background:'#ecdfcb'});
@@ -48,7 +48,7 @@
     draw() {
       if (!sprite.complete || !sprite.naturalWidth) return;
       const x = shop.x - cameraX, y = shop.y - cameraY;
-      const active = !displayMode && page === 'map' && !(window.wishingTree?.isOpen() || window.fishingSpot?.isOpen())
+      const active = !displayMode && page === 'map' && !(window.wishingTree?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen()))
         && Math.hypot(playerX - shop.x, playerY - (shop.y + shop.height / 2 - 74)) <= 230;
       near=active;
       const now = performance.now();
@@ -72,7 +72,7 @@
       context.shadowBlur = 5;
       context.drawImage(sprite, left, top, drawWidth, drawHeight);
       context.restore();
-      entry.hidden=displayMode||page!=='map'||!!frame||!!(window.wishingTree?.isOpen() || window.fishingSpot?.isOpen());
+      entry.hidden=displayMode||page!=='map'||!!frame||!!(window.wishingTree?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen()));
       if(!entry.hidden){const bounds=document.querySelector('main canvas')?.getBoundingClientRect();if(bounds){Object.assign(entry.style,{left:`${bounds.left+left*bounds.width/width}px`,top:`${bounds.top+top*bounds.height/height}px`,width:`${drawWidth*bounds.width/width}px`,height:`${drawHeight*bounds.height/height}px`});entry.disabled=!near;}}
 
     }

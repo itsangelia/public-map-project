@@ -38,7 +38,7 @@
   entry.hidden = true;
   Object.assign(entry.style, { position: 'fixed', zIndex: '10', background: 'transparent', border: '0', padding: '0', borderRadius: '35%', touchAction: 'manipulation', cursor: 'pointer' });
   entry.onclick = () => {
-    if (!near || frame || (window.drinkShop?.isOpen() || window.fishingSpot?.isOpen()) || page !== 'map') return;
+    if (!near || frame || (window.drinkShop?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen())) || page !== 'map') return;
     stopMovement();
     frame = document.createElement('iframe');
     frame.id = 'wishing-tree-panel';
@@ -60,7 +60,7 @@
       updateTouchControls();
       entry.focus({ preventScroll: true });
     },
-    syncVisibility() { entry.hidden = displayMode || page !== 'map' || !!frame || !!(window.drinkShop?.isOpen() || window.fishingSpot?.isOpen()); },
+    syncVisibility() { entry.hidden = displayMode || page !== 'map' || !!frame || !!(window.drinkShop?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen())); },
     draw() {
       if (!sprite.complete || !sprite.naturalWidth) return;
       const x = tree.x - cameraX, y = tree.y - cameraY;
@@ -88,7 +88,7 @@
       context.shadowBlur = 5;
       context.drawImage(sprite, left, top, drawWidth, drawHeight);
       context.restore();
-      entry.hidden = displayMode || page !== 'map' || !!frame || !!(window.drinkShop?.isOpen() || window.fishingSpot?.isOpen());
+      entry.hidden = displayMode || page !== 'map' || !!frame || !!(window.drinkShop?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen()));
       if (entry.hidden) return;
       const canvas = document.querySelector('main canvas');
       if (!canvas) return;

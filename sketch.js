@@ -274,7 +274,7 @@ async function setup() {
 
 function draw() {
   // The opaque fishing panel owns animation while open; skip the covered map.
-  if (window.fishingSpot?.isOpen()) return;
+  if ((window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen())) return;
   updateTouchControls();
   if (page === 'display') {
     drawPublicDisplay();
@@ -436,7 +436,7 @@ function setupKeyboardControls() {
     "keydown",
 
     function(event) {
-      if (event.isComposing || event.target.closest?.('#chat-panel') || (window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || window.fishingSpot?.isOpen())) return;
+      if (event.isComposing || event.target.closest?.('#chat-panel') || (window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen()))) return;
 
 
       // =================================================
@@ -1507,6 +1507,7 @@ function drawMapPage() {
   // ===================================================
 
   window.fishingSpot?.draw();
+  window.pianoSpot?.draw();
   window.drinkShop?.draw();
   window.wishingTree?.draw();
   drawLightGameSpot();
@@ -1832,7 +1833,7 @@ function drawMapPlayer() {
 // =====================================================
 
 function movePlayer() {
-  if ((window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || window.fishingSpot?.isOpen())) return;
+  if ((window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen()))) return;
 
   let dx =
     0;
@@ -2867,7 +2868,7 @@ function setupTouchControls() {
 
 function updateTouchControls() {
   window.wishingTree?.syncVisibility();
-  const mapControlsVisible = page === 'map' && !(window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || window.fishingSpot?.isOpen());
+  const mapControlsVisible = page === 'map' && !(window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || (window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen()));
   if (touchPanel) touchPanel.hidden = !mapControlsVisible;
   if (window.mapChat) window.mapChat.setVisible(mapControlsVisible);
   if (!mapControlsVisible && joystickInput.pointerId !== null) resetJoystick();
@@ -2910,6 +2911,7 @@ function drawPublicDisplay() {
   cameraX = 0;
   cameraY = 0;
   window.fishingSpot?.draw();
+  window.pianoSpot?.draw();
   window.drinkShop?.draw();
   window.wishingTree?.draw();
   drawLightGameSpot();

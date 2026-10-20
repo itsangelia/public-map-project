@@ -16,7 +16,7 @@ async function source() {
       export const initializeAuth=(a,options)=>{harness.persist.push(options.persistence);return {}};
       export async function setPersistence(a,p){harness.persist.push(p);if(p==='session'&&harness.noStorage)throw Error('storage unavailable')}
       export async function signInAnonymously(){if(harness.authFailures-->0)throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});return {user:{uid:harness.uid}}}`,
-    'firebase/database': `export const remove=async()=>{};export const get=async()=>({val:()=>null});export const runTransaction=async()=>{throw Error('Drink transactions are tested separately')};export const getDatabase=()=>({});export const ref=(d,path)=>path;
+    'firebase/database': `export const onChildAdded=()=>()=>{};export const push=path=>path+'/test-note';export const remove=async()=>{};export const get=async()=>({val:()=>null});export const runTransaction=async()=>{throw Error('Drink transactions are tested separately')};export const getDatabase=()=>({});export const ref=(d,path)=>path;
       export const serverTimestamp=()=>Date.now();
       export const query=(path,...constraints)=>path;export const orderByChild=key=>key;export const limitToLast=count=>count;
       export const onValue=(path,fn,error)=>harness.subscribe(path,fn,error);
@@ -67,13 +67,13 @@ function fixture() {
       },
       connected(value) { this.callbacks['.info/connected']?.(snapshot(value)); }
     };
-    const document={createElement:()=>({setAttribute(){},append(){},textContent:'',title:''}),body:{appendChild(){}},getElementById:()=>null};
+    const document={addEventListener(){},createElement:()=>({setAttribute(){},append(){},textContent:'',title:''}),body:{appendChild(){}},getElementById:()=>null};
     const context={PUBLIC_MAP_CONFIG:{firebase:{}},document,location:{search:''},URLSearchParams,URL,CustomEvent,
       crypto:{getRandomValues:webcrypto.getRandomValues.bind(webcrypto)},
       performance:{now:()=>harness.clock},harness,console,
       setTimeout(fn,ms){const id=setTimeout(()=>{timers.delete(id);fn()},ms);timers.add(id);return id},
       clearTimeout(id){clearTimeout(id);timers.delete(id)},
-      dispatchEvent:events.dispatchEvent.bind(events)};
+      setInterval:()=>0,clearInterval(){},addEventListener:events.addEventListener.bind(events),dispatchEvent:events.dispatchEvent.bind(events)};
     context.window=context;
     vm.createContext(context);clients.push(harness);
     vm.runInContext(await source(),context);
