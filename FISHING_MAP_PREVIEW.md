@@ -11,3 +11,7 @@ Provisional placement is on the southwest lawn: original-art center (350, 690), 
 `python3 scripts/deploy-fishing-map-preview.py` publishes only a dedicated preview entry and that release's assets, asserting the production homepage is unchanged. Its QR keeps both phones on the same immutable preview and room. Wait for the corresponding Pages deployment before opening it. The production drink-shop stable version and backups remain unchanged.
 
 After user approval of the southwest placement, the icon was uniformly reduced by 10% around the same center. Proximity cue and artwork remain unchanged.
+
+## Production approval — 2026-10-20
+
+The user approved the reduced icon at the southwest lawn and authorized production publication. Publish immutable release `077c10fdaab26ed2`. This promotion adds only the pond artwork and proximity reminder to the live map; the standalone fishing mechanics preview is not integrated into production. Existing Firebase rules and multiplayer game behavior are unchanged. The previous stable drink-shop source/site tags remain available.
