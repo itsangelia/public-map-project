@@ -7,8 +7,17 @@
  const wait=document.createElement('section');wait.id='drink-match';
  wait.innerHTML='<h2>Make a drink together</h2><div class="match-pair"><article><h3 id="match-a-name">You</h3><div class="match-square" id="match-a-avatar">?</div></article><span class="match-plus">＋</span><article><h3 id="match-b-name">Waiting…</h3><div class="match-square" id="match-b-avatar">?</div></article></div><p id="match-status" role="status">Finding a partner…</p><button id="match-retry" hidden>Try again</button>';
  document.querySelector('.steps').after(wait);
+ const turnToast=document.createElement('div');turnToast.id='drink-turn-toast';turnToast.hidden=true;turnToast.textContent='Your turn';turnToast.setAttribute('role','status');document.getElementById('app').append(turnToast);
+ let toastTimer=null,lastAnnouncedTurn='';
+ function hideTurnToast(){clearTimeout(toastTimer);turnToast.hidden=true;}
+ function announceTurn(key){
+  if(key===lastAnnouncedTurn)return;lastAnnouncedTurn=key;hideTurnToast();
+  turnToast.dataset.turn=key;turnToast.hidden=false;
+  turnToast.style.animation='none';void turnToast.offsetWidth;turnToast.style.animation='';
+  toastTimer=setTimeout(()=>{turnToast.hidden=true;},1700);
+ }
  const feedback=document.createElement('p');feedback.id='drink-online-status';feedback.setAttribute('role','status');document.getElementById('app').append(feedback);
- const style=document.createElement('style');style.textContent=`#drink-match{margin:auto 16px;padding:24px 12px;background:#f3e7d2;border:3px solid #654936;border-radius:15px;text-align:center}#drink-match h2{font:700 21px Georgia;color:#59452e;margin:0 0 25px}.match-pair{display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:7px;align-items:center}.match-pair article{min-width:0}.match-pair h3{font:700 15px Georgia;margin:0 0 9px;overflow-wrap:anywhere}.match-square{aspect-ratio:1;border:3px solid #75583f;border-radius:10px;background:#e7d8bd;display:grid;place-items:center;font:45px Georgia;color:#a58a78}.match-square{overflow:hidden}.match-square img{width:90%;height:90%;object-fit:contain;transform:scale(1.8)}.match-plus{font-size:25px;margin-top:24px}#match-status{font:14px Georgia;line-height:1.5;margin:24px 0 5px}#match-retry{border:2px solid #654936;background:#c78e85;color:#fff7e7;border-radius:12px;padding:10px 20px;font:16px Georgia}#drink-online-status{position:absolute;bottom:0;left:6px;right:6px;margin:0;text-align:center;font:11px Georgia;color:#654936;background:#f5e8d1}.option:disabled{cursor:default}.option:disabled:not([aria-pressed="true"]){opacity:.7}`;document.head.append(style);
+ const style=document.createElement('style');style.textContent=`#drink-match{margin:auto 16px;padding:24px 12px;background:#f3e7d2;border:3px solid #654936;border-radius:15px;text-align:center}#drink-match h2{font:700 21px Georgia;color:#59452e;margin:0 0 25px}.match-pair{display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:7px;align-items:center}.match-pair article{min-width:0}.match-pair h3{font:700 15px Georgia;margin:0 0 9px;overflow-wrap:anywhere}.match-square{aspect-ratio:1;border:3px solid #75583f;border-radius:10px;background:#e7d8bd;display:grid;place-items:center;font:45px Georgia;color:#a58a78}.match-square{overflow:hidden}.match-square img{width:90%;height:90%;object-fit:contain;transform:scale(1.8)}.match-plus{font-size:25px;margin-top:24px}#match-status{font:14px Georgia;line-height:1.5;margin:24px 0 5px}#match-retry{border:2px solid #654936;background:#c78e85;color:#fff7e7;border-radius:12px;padding:10px 20px;font:16px Georgia}#drink-online-status{position:absolute;bottom:0;left:6px;right:6px;margin:0;text-align:center;font:11px Georgia;color:#654936;background:#f5e8d1}#drink-turn-toast{position:absolute;z-index:5;top:29%;left:50%;transform:translateX(-50%);padding:13px 30px;border:3px solid #654936;border-radius:14px;background:#f3e7d2;color:#654936;font:700 25px Georgia,serif;white-space:nowrap;pointer-events:none;animation:drink-turn-pop 1.7s ease both}@keyframes drink-turn-pop{0%{opacity:0;transform:translate(-50%,12px) scale(.92)}14%,78%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-6px)}}@media(prefers-reduced-motion:reduce){#drink-turn-toast{animation:none}}.option:disabled{cursor:default}.option:disabled:not([aria-pressed="true"]){opacity:.7}`;document.head.append(style);
  const report=error=>{feedback.textContent=lastError=/permission/i.test(error.code||error.message)?'Drink shop rules need to be published by the host.':error.message||'Connection interrupted. Please try again.';document.getElementById('match-status').textContent=feedback.textContent;document.getElementById('match-retry').hidden=false;};
  function person(uid){return Object.entries(host.mapNetwork?.state.players||{}).find(([key])=>key.startsWith(uid+'/'))?.[1];}
  function drawMatch(id,uid){const player=uid?person(uid):null;document.getElementById('match-'+id+'-name').textContent=player?.nickname||(uid===snapshot?.uid?'You':'Waiting…');const box=document.getElementById('match-'+id+'-avatar');box.replaceChildren();if(player){const img=document.createElement('img');img.src=new URL(['男角色.png','女角色.png','购物袋.png'][player.avatar],host.document.baseURI).href;img.alt='';box.append(img);}else box.textContent='?';}
@@ -25,6 +34,7 @@
   drawMatch('a',table?.a||snapshot?.uid);drawMatch('b',table?.b);
   const alive=table&&snapshot?.visitors[table.a]&&snapshot?.visitors[table.b];
   const ownTurn=member&&table?.b&&(table.step%2===0?table.a:table.b)===snapshot?.uid;
+  if(!waiting&&!finished&&alive&&snapshot?.online&&ownTurn)announceTurn(table.round+':'+table.step);else hideTurnToast();
   document.querySelectorAll('.player').forEach((el,i)=>{el.querySelector('.player-name').textContent=person(i===0?table?.a:table?.b)?.nickname||'Player '+(i===0?'A':'B');el.querySelector('.player-status').textContent=finished?'Made together':table&&table.step%2===i?(ownTurn?'Your turn':'Choosing…'):'Waiting';});
   document.querySelectorAll('.option').forEach(el=>{el.disabled=!ownTurn||!alive||!snapshot?.online||sending;});
   document.getElementById('next').disabled=!ownTurn||!alive||!snapshot?.online||sending||!choices[step];
@@ -47,7 +57,7 @@
  const close=()=>{host.drinkShop.close();};
  document.querySelector('.exit').onclick=e=>{e.preventDefault();close();};document.getElementById('back-to-map').onclick=e=>{e.preventDefault();close();};
  document.getElementById('match-retry').onclick=connect;
- window.disposeDrinkMaker=()=>{disposed=true;abortController.abort();controller?.close();};
+ window.disposeDrinkMaker=()=>{disposed=true;hideTurnToast();abortController.abort();controller?.close();};
  window.addEventListener('pagehide',()=>window.disposeDrinkMaker());
  render();connect();
 })();

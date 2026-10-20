@@ -35,3 +35,7 @@ The new rules restrict presence writes to its owner, require a joined map connec
 These controlled tests do not prove deployed Firebase permissions or physical-device networking. Firebase emulator setup was attempted, but the cloud environment could not download its database emulator JAR from storage.googleapis.com. Therefore real rules enforcement is unverified here. GitHub Pages/Actions are also not reachable for live verification from this environment.
 
 After publishing the rules and the matching Pages deployment succeeds, open the preview on a computer in display mode. Scan its QR with two phones, join with different nicknames, walk to the northwest shop and tap it on both phones. Confirm square portraits and both names, A/B/A/B turn locks, simultaneous visible drink updates, equal final name/appearance, return to map, waiting-player exit/reentry, partner disconnect, and ordinary movement/chat/wishes still working. Do not promote production until this device test passes.
+
+## Your-turn notification
+
+A cream/brown non-blocking “Your turn” toast appears once for each confirmed local turn (round + step), then disappears after 1.7 seconds. Re-renders and reconnecting within the same turn do not repeat it. Peer turns, waiting, disconnects and completion hide it; panel disposal clears the timer. Reduced-motion settings suppress the entrance animation. Browser checks cover initial turn, auto-dismiss, duplicate snapshots, next local turn and peer/completion hiding. No backend or rule changes were needed.
