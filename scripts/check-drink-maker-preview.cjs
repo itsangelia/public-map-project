@@ -13,6 +13,8 @@ const assert=require('node:assert/strict');
    await page.goto('http://127.0.0.1:8196/drink-maker-preview.html');
    assert.equal(await page.locator('#options button').count(),3);
    assert.equal(await page.locator('#next').isDisabled(),true);
+   assert.ok(await page.locator('#next').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight), 'confirm button fits phone viewport');
+   assert.equal(await page.locator('#drink-illustration circle[cx="150"][cy="200"]').count(),0,'cup has no logo');
    if(viewport.width===390)await page.screenshot({path:'/tmp/drink-maker-base.png',fullPage:true});
    for(const [index,id] of ['milk-tea','mango','pearls','ice-cream'].entries()){
     assert.equal(await page.locator('.player.active').getAttribute('data-player'),String(index%2));

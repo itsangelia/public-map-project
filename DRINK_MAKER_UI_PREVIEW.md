@@ -28,3 +28,9 @@ Review screenshots are in `previews/drink-maker-base.png`, `previews/drink-maker
 ## Preview deployment
 
 Run `python3 scripts/deploy-drink-maker-preview.py`. It publishes only `preview/drink-maker.html` and a version-specific `preview/drink-maker-{hash}.html`; it asserts production index and all unrelated deployment paths are unchanged. No production build, Firebase setup or data migration is needed. A Git push is not verification of a completed Pages deployment. The last observed slow Pages deployment took approximately 12 minutes; await the corresponding successful deployment before claiming the new URL is live. Screenshots on the source branch can be reviewed immediately.
+
+## Approved counter style — 2026-10-20
+
+Updated the isolated preview to the approved muted illustrated counter style: upright ingredient cards, dusty pink/cream controls, wooden scene and an unbranded dynamic SVG cup. The background is embedded so each immutable HTML preview remains self-contained. All twelve choices and alternating A/B/A/B steps remain locally interactive. No Firebase, matching or production map changes.
+
+Validation: four portrait sizes (320×568 through 430×932), visible confirmation controls, no cup logo, selection guards, all 81 recipes, completion/reset, no runtime errors. This validates the local interface only; independent devices are not connected in this preview.
