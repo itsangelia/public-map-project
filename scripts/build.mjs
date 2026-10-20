@@ -5,7 +5,7 @@ await build({ entryPoints: ['multiplayer.js'], bundle: true, format: 'iife', out
 const drinkPage = (await readFile('drink-maker-preview.html','utf8')).replace('</body>', '<script src="drink-maker-online.js"></script></body>');
 await mkdir('generated',{recursive:true});
 await writeFile('generated/drink-maker.html',drinkPage);
-const sources = ['style.css', 'firebase-config.js', 'generated/multiplayer.js', 'sketch.js', 'chat.js', 'wishing-tree.js', 'wishing-tree-board.html', 'wishing-tree.png', 'drink-shop.js', 'drink-shop.png', 'generated/drink-maker.html', 'drink-maker-online.js'];
+const sources = ['style.css', 'firebase-config.js', 'generated/multiplayer.js', 'sketch.js', 'chat.js', 'wishing-tree.js', 'wishing-tree-board.html', 'wishing-tree.png', 'drink-shop.js', 'drink-shop.png', 'generated/drink-maker.html', 'drink-maker-online.js', 'fishing-spot.js', 'fishing-spot.png'];
 const contents = await Promise.all(sources.map(file => readFile(file)));
 const original = await readFile('index.html', 'utf8');
 const hash = createHash('sha256').update(original);
