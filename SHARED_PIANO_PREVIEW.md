@@ -29,3 +29,7 @@ The deployment helper creates a phone-readable setup page containing a copy butt
 - Build with `npm run build`, publish only with `python3 scripts/deploy-piano-preview.py`. It preserves the production homepage and existing immutable entries, writes an immutable preview and ensures its QR points to that same preview. Production remains on the approved fishing release until explicitly approved.
 
 Device review: publish the additive rules, open the preview display in room `piano-test`, scan with two phones, join and approach the east stage. One claims, the other must be unable to claim/play but hears/observes notes. Test all three pitch rows, mute on/off, handover, closing, backgrounding and disconnection expiry, new joins without old-note playback, and map/chat/drink/fishing/wish behavior. Check whether piano position/size and phone layout match the user's preferences before production promotion.
+
+## Approved icon revision
+
+Replace the textured piano with the user-approved flat icon. Scale both map dimensions by1.15 (155.25 ×144.9 original map units) while retaining center x1210/y435. No networking, pitch mapping, permission or interaction behavior changes.

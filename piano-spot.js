@@ -2,7 +2,7 @@
 (() => {
  const base=new URL('.',document.currentScript.src);
  const sprite=new Image();
- const spot={x:1210*1.6,y:435*1.6,width:135*1.6,height:126*1.6};
+ const spot={x:1210*1.6,y:435*1.6,width:135*1.15*1.6,height:126*1.15*1.6};
  const opened=()=>!!window.sharedPiano?.isOpen();
  const entry=document.createElement('button');entry.id='piano-spot-entry';entry.hidden=true;entry.setAttribute('aria-label','Open Shared Piano');
  Object.assign(entry.style,{position:'fixed',zIndex:'11',background:'transparent',border:'0',padding:'0',borderRadius:'30%',touchAction:'manipulation'});
