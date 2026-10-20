@@ -1,3 +1,4 @@
+import { installFishingNetwork } from './fishing-network.js';
 import { installDrinkNetwork } from './drink-network.js';
 import { initializeApp } from 'firebase/app';
 import { initializeAuth, inMemoryPersistence, signInAnonymously } from 'firebase/auth';
@@ -301,4 +302,5 @@ async function initFirebaseRetry() {
   await init();
 }
 installDrinkNetwork(() => ({database,user,room,connectionId,state}));
+installFishingNetwork(() => ({database,user,room,connectionId,state,now:() => Date.now()+serverTimeOffset}));
 init().catch(fail);

@@ -434,7 +434,7 @@ function setupKeyboardControls() {
     "keydown",
 
     function(event) {
-      if (event.isComposing || event.target.closest?.('#chat-panel') || (window.wishingTree?.isOpen() || window.drinkShop?.isOpen())) return;
+      if (event.isComposing || event.target.closest?.('#chat-panel') || (window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || window.fishingSpot?.isOpen())) return;
 
 
       // =================================================
@@ -1830,7 +1830,7 @@ function drawMapPlayer() {
 // =====================================================
 
 function movePlayer() {
-  if ((window.wishingTree?.isOpen() || window.drinkShop?.isOpen())) return;
+  if ((window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || window.fishingSpot?.isOpen())) return;
 
   let dx =
     0;
@@ -2865,7 +2865,7 @@ function setupTouchControls() {
 
 function updateTouchControls() {
   window.wishingTree?.syncVisibility();
-  const mapControlsVisible = page === 'map' && !(window.wishingTree?.isOpen() || window.drinkShop?.isOpen());
+  const mapControlsVisible = page === 'map' && !(window.wishingTree?.isOpen() || window.drinkShop?.isOpen() || window.fishingSpot?.isOpen());
   if (touchPanel) touchPanel.hidden = !mapControlsVisible;
   if (window.mapChat) window.mapChat.setVisible(mapControlsVisible);
   if (!mapControlsVisible && joystickInput.pointerId !== null) resetJoystick();

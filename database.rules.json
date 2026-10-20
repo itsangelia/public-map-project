@@ -127,6 +127,108 @@
           "c3": {
             ".validate": "newData.isString() && (newData.val() === 'foam' || newData.val() === 'ice-cream' || newData.val() === 'lemon') && newData.parent().child('step').val() > 3 && (!data.exists() || newData.val() === data.val())"
           }
+        },
+        "fishingVisitors": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          "$uid": {
+            ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['connection'])",
+            "connection": {
+              ".validate": "newData.isString() && root.child('rooms').child($room).child('players').child(auth.uid).child(newData.val()).exists()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "fishingTable": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && newData.exists() && root.child('rooms').child($room).child('fishingVisitors').child(auth.uid).exists() && (((!data.exists() || !root.child('rooms').child($room).child('fishingVisitors').child(data.child('a').val()).exists() || (data.child('b').exists() && !root.child('rooms').child($room).child('fishingVisitors').child(data.child('b').val()).exists())) && (newData.child('a').val() === auth.uid && !newData.child('b').exists() && newData.child('step').val() === 0)) || (newData.child('round').val() === data.child('round').val() && newData.child('a').val() === data.child('a').val() && !data.child('b').exists() && newData.child('b').val() === auth.uid && auth.uid !== data.child('a').val() && root.child('rooms').child($room).child('fishingVisitors').child(data.child('a').val()).exists()) || (data.child('b').exists() && newData.child('a').val() === data.child('a').val() && newData.child('b').val() === data.child('b').val() && newData.child('round').val() !== data.child('round').val() && (auth.uid === data.child('a').val() || auth.uid === data.child('b').val()) && root.child('rooms').child($room).child('fishingVisitors').child(data.child('a').val()).exists() && root.child('rooms').child($room).child('fishingVisitors').child(data.child('b').val()).exists() && (root.child('rooms').child($room).child('fishingGames').child(data.child('round').val()).child('sim').child('phase').val() === 'caught' || root.child('rooms').child($room).child('fishingGames').child(data.child('round').val()).child('sim').child('phase').val() === 'escaped')))",
+          ".validate": "newData.hasChildren(['round','a','step'])",
+          "round": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"
+          },
+          "a": {
+            ".validate": "newData.isString()"
+          },
+          "b": {
+            ".validate": "newData.isString() && newData.val() !== newData.parent().child('a').val()"
+          },
+          "step": {
+            ".validate": "newData.isNumber() && newData.val() === 0"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "fishingGames": {
+          "$round": {
+            ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+            "sim": {
+              ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && newData.exists() && root.child('rooms').child($room).child('fishingTable').child('round').val() === $round && root.child('rooms').child($room).child('fishingTable').child('b').exists() && auth.uid === root.child('rooms').child($room).child('fishingTable').child('a').val() && root.child('rooms').child($room).child('fishingVisitors').child(auth.uid).exists() && root.child('rooms').child($room).child('fishingVisitors').child(root.child('rooms').child($room).child('fishingTable').child('b').val()).exists() && (!data.exists() || (data.child('phase').val() === 'playing' && newData.child('seq').val() === data.child('seq').val() + 1))",
+              ".validate": "newData.hasChildren(['x','y','fishX','fishY','targetX','targetY','progress','moveIn','phase','startsAt','updatedAt','seq','seed']) && (data.exists() || (newData.child('seq').val() === 0 && newData.child('progress').val() === 0.2 && newData.child('x').val() === 180 && newData.child('y').val() === 265 && newData.child('startsAt').val() >= now && newData.child('startsAt').val() <= now + 10000))",
+              "$other": {
+                ".validate": false
+              },
+              "x": {
+                ".validate": "newData.isNumber() && newData.val() >= 45 && newData.val() <= 305"
+              },
+              "y": {
+                ".validate": "newData.isNumber() && newData.val() >= 45 && newData.val() <= 390"
+              },
+              "fishX": {
+                ".validate": "newData.isNumber() && newData.val() >= 45 && newData.val() <= 315"
+              },
+              "fishY": {
+                ".validate": "newData.isNumber() && newData.val() >= 45 && newData.val() <= 390"
+              },
+              "targetX": {
+                ".validate": "newData.isNumber() && newData.val() >= 55 && newData.val() <= 285"
+              },
+              "targetY": {
+                ".validate": "newData.isNumber() && newData.val() >= 60 && newData.val() <= 380"
+              },
+              "progress": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+              },
+              "moveIn": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2.8"
+              },
+              "seed": {
+                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 2147483646"
+              },
+              "seq": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+              },
+              "startsAt": {
+                ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val())"
+              },
+              "updatedAt": {
+                ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 10000 && (!data.exists() || newData.val() >= data.val())"
+              },
+              "phase": {
+                ".validate": "newData.isString() && ((newData.val() === 'playing' && newData.parent().child('progress').val() > 0 && newData.parent().child('progress').val() < 1) || (newData.val() === 'caught' && newData.parent().child('progress').val() === 1) || (newData.val() === 'escaped' && newData.parent().child('progress').val() === 0))"
+              }
+            },
+            "inputs": {
+              "$uid": {
+                ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && auth.uid === $uid && root.child('rooms').child($room).child('fishingTable').child('round').val() === $round && root.child('rooms').child($room).child('fishingTable').child('b').exists() && (auth.uid === root.child('rooms').child($room).child('fishingTable').child('a').val() || auth.uid === root.child('rooms').child($room).child('fishingTable').child('b').val()) && root.child('rooms').child($room).child('fishingVisitors').child(auth.uid).exists()",
+                ".validate": "newData.hasChildren(['dir','ready','at'])",
+                "dir": {
+                  ".validate": "newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1)"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "at": {
+                  ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 10000"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              }
+            }
+          }
         }
       }
     }
