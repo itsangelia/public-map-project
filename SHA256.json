@@ -1,0 +1,15 @@
+{
+  "source_commit": "10cbc8ac52935635a5117e03b4ad9d9115e3df49",
+  "site_commit": "ef181b3f3b4ee4ce259e0ec37088f33f1fd17ab2",
+  "release": "0375db001d569553",
+  "archives": {
+    "public-map-source-drink-shop-stable-2026-10-20.zip": {
+      "bytes": 14522120,
+      "sha256": "c30b0af8966184731e67f9a4ec45bb555970972167088feab8a8943fda6e53e8"
+    },
+    "public-map-website-drink-shop-stable-2026-10-20.zip": {
+      "bytes": 9687917,
+      "sha256": "8fbc714073f078c2c88d776d93be6efe6189723ffac6336b70225307d9378562"
+    }
+  }
+}
