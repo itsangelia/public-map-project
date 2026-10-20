@@ -1,0 +1,27 @@
+(() => {
+ let panel=null,unsubscribe=null,error='',claiming=false;
+ const shell=document.createElement('style');shell.textContent=`#shared-piano{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,520px);max-height:62svh;z-index:100;box-sizing:border-box;background:#f7eeddeF;color:#594834;font-family:Georgia,serif;display:flex;flex-direction:column;gap:10px;padding:14px 14px max(14px,env(safe-area-inset-bottom));border:2px solid #bba58a;border-bottom:0;border-radius:25px 25px 0 0;overflow:auto}#shared-piano header{display:flex;align-items:center;justify-content:space-between;gap:12px}#shared-piano h1{font-size:20px;margin:0}#shared-piano button{touch-action:manipulation;font:inherit;color:inherit;cursor:pointer}#piano-close{flex:none;width:32px;height:32px;border:1.5px solid #987b60;border-radius:50%;background:#fff8e9;font-size:23px}#piano-owner{margin:4px 0 0;font-size:13px}#piano-keys{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px 6px}#piano-keys button{position:relative;aspect-ratio:1;border:2px solid #987b60;border-radius:50%;background:#fff9e9;font:700 21px Georgia;color:#6a5541;padding:0;user-select:none;-webkit-user-select:none;touch-action:none}#piano-keys button:nth-child(n+8):nth-child(-n+14){background:#e2e8d2}#piano-keys button:nth-child(n+15){background:#edd8d4}#piano-keys button.active{background:#efd393;border-color:#9b7550;transform:scale(.94)}#piano-keys button:disabled{cursor:default;color:#938575}#piano-keys small{position:absolute;left:0;width:100%;line-height:5px;font-size:15px}#piano-keys .low{bottom:3px}#piano-keys .high{top:6px}#piano-claim{padding:10px;border:2px solid #826449;border-radius:13px;background:#d7b6a3;font-size:16px;font-weight:bold}#piano-status{font:12px Arial;text-align:center;margin:0}#piano-status:empty{display:none}#shared-piano button:focus-visible{outline:3px solid #747ca5;outline-offset:2px}@media(max-height:600px){#shared-piano{gap:8px;padding-top:10px}#shared-piano h1{font-size:18px}}`;document.head.append(shell);
+ const keyboard=['z','x','c','v','b','n','m','a','s','d','f','g','h','j','q','w','e','r','t','y','u'];
+ function view(){
+  if(!panel)return;const seat=window.pianoNetwork.seat,live=seat&&seat.until>(window.mapNetwork?.now()||Date.now()),own=window.pianoNetwork.isOwner;
+  panel.querySelector('#piano-owner').textContent=live?seat.nickname+' is playing':'The piano is free';
+  panel.querySelector('#piano-status').textContent=error||(window.pianoNetwork.releaseReason==='idle'?'Your turn ended after 8 seconds of silence.':own?'':live?'Listen together':'');
+  const claim=panel.querySelector('#piano-claim');claim.textContent=own?'Finish playing':live?'Someone is playing':'Start playing';claim.disabled=claiming||live&&!own;
+  panel.querySelectorAll('#piano-keys button').forEach(b=>b.disabled=!own);
+ }
+ async function play(key){if(!window.pianoNetwork?.isOwner)return;try{void window.mapPianoAudio?.unlock().catch(()=>{});await window.pianoNetwork.note(key);}catch(e){error=e.message;view();}}
+ const api=window.sharedPiano={isOpen:()=>!!panel,coveredFraction:()=>panel?Math.min(.7,panel.getBoundingClientRect().height/(window.visualViewport?.height||innerHeight)):0,
+  open(){
+   if(panel)return;error='';stopMovement();panel=document.createElement('section');panel.id='shared-piano';panel.setAttribute('role','region');panel.setAttribute('aria-label','Shared piano');
+   panel.innerHTML='<header><div><h1>Shared Piano</h1><p id="piano-owner"></p></div><button id="piano-close" aria-label="Close piano controls">×</button></header><div id="piano-keys"></div><button id="piano-claim">Start playing</button><p id="piano-status" role="status"></p>';
+   document.body.append(panel);
+   for(let i=0;i<21;i++){const key=document.createElement('button');key.type='button';key.dataset.key=i;key.setAttribute('aria-label',['Low','Middle','High'][Math.floor(i/7)]+' note '+(i%7+1));key.innerHTML=(i%7+1)+(i<7?'<small class="low">•</small>':i>=14?'<small class="high">•</small>':'');key.onpointerdown=e=>{e.preventDefault();void play(i);};key.onclick=e=>{if(e.detail===0)void play(i);};panel.querySelector('#piano-keys').append(key);}
+   panel.querySelector('#piano-close').onclick=()=>api.close();
+   panel.querySelector('#piano-claim').onclick=async()=>{if(claiming)return;claiming=true;error='';view();try{if(window.pianoNetwork.isOwner)await window.pianoNetwork.release();else{await window.mapPianoAudio?.enable();await window.pianoNetwork.claim();}}catch(e){error=/permission/i.test(e.code||'')?'The host needs to publish the piano rules.':e.message;}finally{claiming=false;view();}};
+   unsubscribe=window.pianoNetwork.subscribe(view,e=>{error=/permission/i.test(e.code||'')?'The host needs to publish the piano rules.':e.message;view();});updateTouchControls();panel.querySelector('#piano-close').focus();view();
+  },
+  close(){if(!panel)return;unsubscribe?.();unsubscribe=null;panel.remove();panel=null;void window.pianoNetwork.release().catch(()=>{});stopMovement();updateTouchControls();}
+ };
+ document.addEventListener('piano-flash',e=>{const key=panel?.querySelector(`[data-key="${e.detail}"]`);if(!key)return;key.classList.add('active');clearTimeout(key.flashTimer);key.flashTimer=setTimeout(()=>key.classList.remove('active'),220);});
+ document.addEventListener('keydown',e=>{if(!panel)return;if(e.key==='Escape'){api.close();return;}const index=keyboard.indexOf(e.key.toLowerCase());if(index>=0&&!e.repeat){e.preventDefault();void play(index);}});
+})();
