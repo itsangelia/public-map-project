@@ -4,7 +4,7 @@ test('Safari interrupted audio resumes; performer enable clears saved mute and p
  const param=()=>({value:0,setTargetAtTime(){},setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}});
  const node=()=>({gain:param(),threshold:param(),ratio:param(),frequency:param(),connect(){},disconnect(){},start(){},stop(){}});
  class Audio{constructor(){this.state='interrupted';this.currentTime=0;this.destination={};contexts.push(this);}createGain(){return node();}createDynamicsCompressor(){return node();}createOscillator(){oscillatorCount++;return node();}resume(){resumes++;this.state='running';return Promise.resolve();}}
- const document={hidden:false,createElement(){const b={style:{},setAttribute(){}};buttons.push(b);return b;},body:{append(){}},addEventListener(){},dispatchEvent(){}};
+ const document={hidden:false,createElement(){const icons={};const b={style:{},setAttribute(){},querySelector(k){return icons[k]??={style:{}};}};buttons.push(b);return b;},body:{append(){}},addEventListener(){},dispatchEvent(){}};
  const window={AudioContext:Audio,addEventListener(n,fn){handlers[n]=fn;}};
  const scope={window,document,location:{search:''},URLSearchParams,navigator:{audioSession:{get type(){return session},set type(v){session=v}}},localStorage:{getItem:()=>stored,setItem:(k,v)=>stored=v},setInterval(){},setTimeout(){},performance:{now:()=>1000},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}}};
  vm.runInNewContext(fs.readFileSync('piano-audio.js','utf8'),scope);

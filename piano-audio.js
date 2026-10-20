@@ -4,10 +4,10 @@
  let ctx=null,master=null,muted=new URLSearchParams(location.search).get('mode')==='display';
  try{const saved=localStorage.getItem('campus-piano-muted');if(saved!==null&&new URLSearchParams(location.search).get('mode')!=='display')muted=saved==='true';}catch{}
  const seen=new Set(),voices=new Set();
- const button=document.createElement('button');button.id='piano-sound';button.type='button';button.textContent='🔊';button.hidden=true;
+ const button=document.createElement('button');button.id='piano-sound';button.type='button';button.innerHTML='<svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4Z"/><g id="piano-sound-waves"><path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></g><path id="piano-sound-slash" d="m3 3 18 18" style="display:none"/></svg>';button.hidden=true;
  button.setAttribute('aria-label','Enable map piano sound');
- Object.assign(button.style,{position:'fixed',right:'14px',top:'max(14px,env(safe-area-inset-top))',width:'42px',height:'42px',borderRadius:'50%',border:'2px solid #826449',background:'#fff8e9e8',color:'#594834',zIndex:'110',fontSize:'23px',touchAction:'manipulation'});document.body.append(button);
- function sync(){button.textContent=muted?'🔇':'🔊';button.setAttribute('aria-label',muted?'Enable map piano sound':'Mute map piano sound');button.setAttribute('aria-pressed',String(!muted));if(master)master.gain.setTargetAtTime(muted?0:.6,ctx.currentTime,.03);}
+ Object.assign(button.style,{position:'fixed',right:'14px',top:'max(14px,env(safe-area-inset-top))',width:'42px',height:'42px',borderRadius:'50%',border:'2px solid #826449',background:'#fff8e9e8',color:'#594834',zIndex:'110',display:'grid',placeItems:'center',padding:'0',boxShadow:'none',touchAction:'manipulation'});document.body.append(button);
+ function sync(){button.querySelector('#piano-sound-waves').style.display=muted?'none':'';button.querySelector('#piano-sound-slash').style.display=muted?'':'none';button.setAttribute('aria-label',muted?'Enable map piano sound':'Mute map piano sound');button.setAttribute('aria-pressed',String(!muted));if(master)master.gain.setTargetAtTime(muted?0:.6,ctx.currentTime,.03);}
  function unlock(){
   // Safari's playback session can route Web Audio through media output rather
   // than the ambient/silent-switch channel. Older browsers simply omit it.
@@ -47,6 +47,6 @@
   // Preserve the current gesture's note across a resume, never replay old notes.
   void unlock().then(()=>{if(performance.now()-received<350)sound(note);}).catch(()=>{});
  });
- setInterval(()=>{button.hidden=typeof page!=='string'||page!=='map';sync();},500);
+ setInterval(()=>{button.hidden=typeof page!=='string'||page!=='map';button.style.display=button.hidden?'none':'grid';sync();},500);
  window.mapPianoAudio={unlock,enable,isMuted:()=>muted,state:()=>ctx?.state||'locked'};sync();
 })();
