@@ -11,6 +11,10 @@ root = Path(__file__).resolve().parent.parent
 site = root / 'generated' / 'site'
 page = (site / 'index.html').read_text()
 release = re.search(r'PUBLIC_MAP_RELEASE="([a-f0-9]+)"', page).group(1)
+# Never publish a result screen referencing artwork that was not supplied/built.
+for asset in ('fishing-catch-cat.png', 'fishing-catch-big-mouth.png', 'fishing-escaped.png'):
+    if not (site / 'releases' / release / asset).is_file():
+        raise SystemExit(f'Preview not published: missing original artwork {asset}')
 page = page.replace('<head>', '<head>\n    <base href="../">', 1)
 network_script = f'<script src="releases/{release}/multiplayer.js"></script>'
 assert network_script in page

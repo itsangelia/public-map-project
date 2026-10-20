@@ -1,6 +1,7 @@
 // Parent-owned Firebase session; no local simulation or role switching online.
 (() => {
  const host=window.parent,app=document.querySelector('.app');
+ const presentation=new FishingPresentation();
  let controller=null,snapshot=null,abort=new AbortController(),disposed=false,lastError='',round=null,lastOutcome=null,sentDirection=0,controlsEnabled=false,statusMessage='Finding a partner…';
  const waiting=document.createElement('section');waiting.id='fishing-match';waiting.innerHTML='<h2>Fish together</h2><div class="match-pair"><article><h3 id="fish-a-name">You</h3><div class="match-square" id="fish-a-avatar">?</div></article><span>＋</span><article><h3 id="fish-b-name">Waiting…</h3><div class="match-square" id="fish-b-avatar">?</div></article></div><p id="fish-match-status" role="status">Finding a partner…</p><button id="fish-match-retry" hidden>Try again</button>';
  document.querySelector('.roles').after(waiting);
@@ -23,7 +24,7 @@
   const countdown=g?Math.max(0,Math.ceil((g.startsAt-now())/1000)):0;
   countdownBadge.hidden=!(paired&&snapshot.online&&ready&&g?.phase==='playing'&&countdown>0);
   if(!countdownBadge.hidden)countdownBadge.innerHTML='<small>Get ready</small>'+countdown;
-  const enabled=paired&&snapshot.online&&ready&&fresh&&g?.phase==='playing'&&!countdown&&now()-g.updatedAt<3000&&!lastError;
+  const enabled=paired&&snapshot.online&&ready&&fresh&&g?.phase==='playing'&&!countdown&&!snapshot.settling&&now()-g.updatedAt<3000&&!lastError;
   document.querySelectorAll('.role').forEach(button=>{button.disabled=true;const seat=button.dataset.role;button.firstChild.textContent=(player(seat==='a'?t?.a:t?.b)?.nickname||'Player '+seat.toUpperCase())+' · '+(seat==='a'?'↕':'↔');});
   document.querySelectorAll('.arrow').forEach(button=>{button.disabled=!enabled;});
   if(!enabled){release();if(sentDirection!==0){controller?.setDirection(0);sentDirection=0;}}
@@ -36,26 +37,40 @@
   else if(countdown)message='Starting in '+countdown+'…';
   else if(g.phase==='caught')message='Caught together!';
   else if(g.phase==='escaped')message='The fish got away';
+  else if(snapshot.settling)message='Checking the catch…';
   else if(!enabled)message='Waiting for your partner to reconnect…';
-  else message=Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius?'Stay together…':'Keep the float over the fish.';
+  else message=Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius?'Stay together…':'Keep the float over the ripples.';
   statusMessage=message;controlsEnabled=enabled;document.getElementById('status').textContent=message;
   if(!paired)document.getElementById('fish-match-status').textContent=message;
   if(snapshot?.ready&&!member){document.getElementById('fish-match-status').textContent='This pond is busy. Please try again.';document.getElementById('fish-match-retry').hidden=false;}
   if(paired){const role=t.a===uid?'a':'b';if(state.role!==role)setRole(role);document.getElementById('role-label').textContent=(player(uid)?.nickname||'You')+' · '+(role==='a'?'Up & down':'Left & right');}
   if(!paired)document.querySelector('.result').hidden=true;
-  if(g&&paired&&g.phase!=='playing'&&lastOutcome!==t.round+':'+g.phase){lastOutcome=t.round+':'+g.phase;finish(g.phase);}
+  if(g&&paired&&g.phase!=='playing'&&lastOutcome!==t.round+':'+g.phase){lastOutcome=t.round+':'+g.phase;finish(g.phase,t.round);}
   document.querySelector('.again').disabled=!snapshot?.online||!ready;
   return enabled;
  }
  function receive(next){
   if(disposed)return;snapshot=next;const t=next.table,g=next.game;
   if(t?.round!==round){round=t?.round;lastError='';lastOutcome=null;release();state.complete=false;state.outcome=null;state.progress=settings.initialProgress;document.querySelector('.result').hidden=true;}
-  if(g){state.progress=g.progress;state.target={x:g.targetX,y:g.targetY};}
+  if(g){presentation.sample(g,performance.now(),t.round);state.progress=g.progress;state.target={x:g.targetX,y:g.targetY};}
   draw(!!g&&Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius);
   view();
  }
  let frameId,lastPaint=performance.now();
- function paint(){if(disposed)return;const at=performance.now(),dt=Math.min(.1,(at-lastPaint)/1000),blend=1-Math.exp(-dt/.065);lastPaint=at;const g=snapshot?.game;if(g){for(const [key,target]of [['float',{x:g.x,y:g.y}],['fish',{x:g.fishX,y:g.fishY}]]){state[key].x+=(target.x-state[key].x)*blend;state[key].y+=(target.y-state[key].y)*blend;}draw(Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius);}document.getElementById('status').textContent=statusMessage;const next=controlsEnabled?(direction||0):0;if(next!==sentDirection){controller?.setDirection(next);sentDirection=next;}frameId=requestAnimationFrame(paint);}
+ function paint(){
+  if(disposed)return;const at=performance.now(),dt=Math.min(.05,(at-lastPaint)/1000);lastPaint=at;
+  const g=snapshot?.game,t=snapshot?.table;
+  if(g&&t){
+   const inputs=snapshot.inputs||{},next=controlsEnabled?(direction||0):0;
+   const visual=presentation.frame(dt,at,state.role,next,controlsEnabled,inputs[t.a]?.dir||0,inputs[t.b]?.dir||0);
+   if(visual){state.float={x:visual.x,y:visual.y};state.fish={x:visual.fishX,y:visual.fishY};}
+   draw(Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius);
+  }
+  document.getElementById('status').textContent=statusMessage;
+  const next=controlsEnabled?(direction||0):0;if(next!==sentDirection){controller?.setDirection(next);sentDirection=next;}
+  frameId=requestAnimationFrame(paint);
+ }
+
  async function connect(){lastError='';document.getElementById('fish-match-retry').hidden=true;try{abort.abort();await controller?.close();controller=null;abort=new AbortController();const next=await host.fishingNetwork.open(receive,report,abort.signal);if(disposed)await next.close();else controller=next;}catch(error){report(error);}}
  document.getElementById('fish-match-retry').onclick=connect;
  const close=e=>{e.preventDefault();host.fishingSpot.close();};document.querySelector('.back').onclick=close;document.querySelector('.map').onclick=close;

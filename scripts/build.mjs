@@ -1,6 +1,6 @@
 import { build } from 'esbuild';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, copyFile, access } from 'node:fs/promises';
 await build({ entryPoints: ['multiplayer.js'], bundle: true, format: 'iife', outfile: 'generated/multiplayer.js' });
 const drinkPage = (await readFile('drink-maker-preview.html','utf8')).replace('</body>', '<script src="drink-maker-online.js"></script></body>');
 await mkdir('generated',{recursive:true});
@@ -8,9 +8,13 @@ await writeFile('generated/drink-maker.html',drinkPage);
 const fishingSource=await readFile('fishing-preview.html','utf8');
 const localFishingBoot='draw();requestAnimationFrame(frame);';
 if(!fishingSource.includes(localFishingBoot))throw new Error('Fishing local bootstrap changed; update the online build adapter before publishing.');
-const fishingPage=fishingSource.replace(localFishingBoot,'draw();').replace('</body>','<script src="fishing-online.js"></script></body>');
+const fishingPage=fishingSource.replace(localFishingBoot,'draw();').replace('</body>','<script src="fishing-presentation.js"></script><script src="fishing-online.js"></script></body>');
 await writeFile('generated/fishing-game.html',fishingPage);
-const sources = ['style.css', 'firebase-config.js', 'generated/multiplayer.js', 'sketch.js', 'chat.js', 'wishing-tree.js', 'wishing-tree-board.html', 'wishing-tree.png', 'drink-shop.js', 'drink-shop.png', 'generated/drink-maker.html', 'drink-maker-online.js', 'fishing-spot.js', 'fishing-spot.png', 'generated/fishing-game.html', 'fishing-online.js'];
+const sources = ['style.css', 'firebase-config.js', 'generated/multiplayer.js', 'sketch.js', 'chat.js', 'wishing-tree.js', 'wishing-tree-board.html', 'wishing-tree.png', 'drink-shop.js', 'drink-shop.png', 'generated/drink-maker.html', 'drink-maker-online.js', 'fishing-spot.js', 'fishing-spot.png', 'generated/fishing-game.html', 'fishing-online.js', 'fishing-presentation.js', 'fishing-catch-sheet.png'];
+// User originals may be delivered separately; include them unchanged once available.
+for (const asset of ['fishing-catch-cat.png','fishing-catch-big-mouth.png','fishing-escaped.png']) {
+  try { await access(asset); sources.push(asset); } catch { console.warn(`Pending original artwork: ${asset}`); }
+}
 const contents = await Promise.all(sources.map(file => readFile(file)));
 const original = await readFile('index.html', 'utf8');
 const hash = createHash('sha256').update(original);

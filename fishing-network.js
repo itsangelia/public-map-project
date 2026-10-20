@@ -8,9 +8,13 @@ export function installFishingNetwork(context){
   const ctx=context();if(!ctx.database||!ctx.user||!ctx.state.joined||!ctx.state.connected)throw Error('Reconnect to the map first.');
   const {database,user,room,connectionId}=ctx,uid=user.uid,clock=ctx.now;
   const path=`rooms/${room}`,visitor=ref(database,`${path}/fishingVisitors/${uid}`),tableRef=ref(database,`${path}/fishingTable`),disconnect=onDisconnect(visitor);
-  const session={table:null,visitors:{},game:null,inputs:{},ready:false,online:true,closed:false,dir:0,round:null,stops:[],roundStops:[],busy:false,pendingWrites:0,lastInput:0,lastDir:null,lastReady:null,lastStep:performance.now(),error:null};active=session;
+  const session={table:null,visitors:{},game:null,draft:null,nextSequence:0,ackPhase:null,terminalPending:false,lastPublish:0,lastAck:performance.now(),inputs:{},ready:false,online:true,closed:false,dir:0,round:null,stops:[],roundStops:[],busy:false,pendingWrites:0,lastInput:0,lastDir:null,lastReady:null,lastStep:performance.now(),error:null};active=session;
   let timer;
-  const emit=()=>{if(!session.closed)receive({table:session.table,visitors:session.visitors,game:session.game,inputs:session.inputs,uid,ready:session.ready,online:session.online,now:clock()});};
+  const emit=()=>{
+   let game=session.game,settling=false;
+   if(session.table?.a===uid&&session.draft){game=session.draft;settling=game.phase!=='playing'&&session.ackPhase!==game.phase;if(settling)game={...game,phase:'playing'};}
+   if(!session.closed)receive({table:session.table,visitors:session.visitors,game,settling,inputs:session.inputs,uid,ready:session.ready,online:session.online,now:clock()});
+  };
   const fail=error=>{if(session.closed)return;session.error=error;session.dir=0;report(error);};
   const close=async()=>{if(session.closed)return;session.closed=true;session.dir=0;clearInterval(timer);signal?.removeEventListener('abort',abort);document.removeEventListener('visibilitychange',visibility);session.stops.forEach(f=>f());session.roundStops.forEach(f=>f());if(active===session)active=null;try{await Promise.all([disconnect.cancel(),remove(visitor)]);}catch{}};
   const abort=()=>{void close();};signal?.addEventListener('abort',abort,{once:true});
@@ -18,9 +22,9 @@ export function installFishingNetwork(context){
   const alive=()=>session.table?.b&&session.visitors[session.table.a]&&session.visitors[session.table.b];
   function watchRound(table){
    if(session.closed||!table?.b||![table.a,table.b].includes(uid)||session.round===table.round)return;
-   session.roundStops.forEach(f=>f());session.roundStops=[];session.round=table.round;session.game=null;session.inputs={};session.error=null;session.dir=0;session.lastInput=0;session.lastDir=null;session.lastStep=performance.now();
+   session.roundStops.forEach(f=>f());session.roundStops=[];session.round=table.round;session.game=null;session.draft=null;session.nextSequence=0;session.ackPhase=null;session.terminalPending=false;session.lastPublish=0;session.lastAck=performance.now();session.inputs={};session.error=null;session.dir=0;session.lastInput=0;session.lastDir=null;session.lastStep=performance.now();
    const round=table.round;
-   session.roundStops.push(onValue(ref(database,`${path}/fishingGames/${round}/sim`),snap=>{if(session.closed||session.round!==round)return;session.game=snap.val();emit();},fail));
+   session.roundStops.push(onValue(ref(database,`${path}/fishingGames/${round}/sim`),snap=>{if(session.closed||session.round!==round)return;session.game=snap.val();if(table.a===uid&&session.game){if(!session.draft)session.draft={...session.game};session.nextSequence=Math.max(session.nextSequence,session.game.seq);}emit();},fail));
    session.roundStops.push(onValue(ref(database,`${path}/fishingGames/${round}/inputs`),snap=>{if(session.closed||session.round!==round)return;session.inputs=snap.val()||{};emit();},fail));
   }
   async function writeInput(force=false){
@@ -36,7 +40,8 @@ export function installFishingNetwork(context){
    void writeInput();
    const t=session.table;
    if(!session.ready||!session.online||session.error||document.hidden||!alive()||t.a!==uid){session.lastStep=at;return;}
-   if(session.busy||session.pendingWrites>=3)return;
+   if(session.busy)return;
+   if(session.pendingWrites>=3&&at-session.lastAck>1000){session.lastStep=at;return;}
    const round=t.round,sim=ref(database,`${path}/fishingGames/${round}/sim`);
    const a=session.inputs[t.a],b=session.inputs[t.b];
    if(!a?.ready||!b?.ready||!Number.isFinite(a.at)||!Number.isFinite(b.at)||clock()-a.at>2500||clock()-b.at>2500){session.lastStep=at;return;}
@@ -46,17 +51,23 @@ export function installFishingNetwork(context){
     catch(error){if(session.round===round)fail(error);}finally{session.busy=false;}
     return;
    }
-   const game=session.game;
-   if(game.phase!=='playing'||clock()<game.startsAt){session.lastStep=at;return;}
-   const dt=Math.min(.2,(at-session.lastStep)/1000);session.lastStep=at;
-   const next={...advanceFishing(game,a.dir,b.dir,dt),updatedAt:clock()};
-   // Only A writes this state. Firebase preserves write order, so a transaction
-   // round trip is unnecessary for every frame. Cap in-flight writes to avoid
-   // building an unbounded queue on a slow or interrupted connection.
-   session.game=next;session.pendingWrites++;emit();
-   void set(sim,{...next,updatedAt:serverTimestamp()})
+   const game=session.draft||session.game;
+   if(clock()<game.startsAt){session.lastStep=at;return;}
+   if(game.phase==='playing'){
+    const dt=Math.min(.2,(at-session.lastStep)/1000);session.lastStep=at;
+    session.draft={...advanceFishing(game,a.dir,b.dir,dt),updatedAt:clock()};emit();
+   }else session.lastStep=at;
+   if(session.pendingWrites>=3||at-session.lastPublish<100)return;
+   if(session.terminalPending||session.draft.phase!=='playing'&&session.ackPhase===session.draft.phase)return;
+   const outgoing={...session.draft,seq:++session.nextSequence,updatedAt:clock()};
+   session.draft=outgoing;session.lastPublish=at;session.pendingWrites++;if(outgoing.phase!=='playing')session.terminalPending=true;
+   // Physics keeps running locally between checkpoints; publishing cannot stall
+   // it on every network acknowledgment. Only acknowledged outcomes are final.
+   void set(sim,{...outgoing,updatedAt:serverTimestamp()})
+    .then(()=>{if(session.round===round){session.lastAck=performance.now();session.ackPhase=outgoing.phase;emit();}})
     .catch(error=>{if(session.round===round)fail(error);})
     .finally(()=>{session.pendingWrites--;});
+
   }
 
   try{
