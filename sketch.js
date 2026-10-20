@@ -1504,6 +1504,7 @@ function drawMapPage() {
   // GAME INTERACTION POINT
   // ===================================================
 
+  window.drinkShop?.draw();
   window.wishingTree?.draw();
   drawLightGameSpot();
 
@@ -2905,6 +2906,7 @@ function drawPublicDisplay() {
   image(mapImage, 0, 0, mapWorldWidth, mapWorldHeight);
   cameraX = 0;
   cameraY = 0;
+  window.drinkShop?.draw();
   window.wishingTree?.draw();
   drawLightGameSpot();
   drawRemotePlayers();
