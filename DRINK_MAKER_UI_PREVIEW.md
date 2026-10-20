@@ -38,3 +38,7 @@ Validation: four portrait sizes (320×568 through 430×932), visible confirmatio
 ## Ingredient visibility refinement
 
 Preserved the approved background and existing selection cards. Drink rendering now keeps distinct base textures after adding any flavor: outlined bubbles for sparkling water, cream ribbons for milk tea, and large crushed-ice shapes with a rough surface for slush. Muted pink/green/ochre palettes distinguish flavors; larger round pearls, angular coconut jelly and grooved red beans distinguish toppings. A low foam layer, tall ice-cream scoop and whole lemon wheel distinguish finishes. No cup logo was added. All 81 combinations are checked for base, topping and finish layers, alongside existing responsive UI checks. See `previews/drink-maker-comparison.png` for three actual rendered recipes.
+
+## Simplified completion screen
+
+Removed the drink ground shadow and all straws (including option illustrations). Completion enlarges the drink and replaces the restart action with a direct Back to map link. The final screen uses a generic completion heading and no ingredient names or recipe chips. Checked all 81 recipes, four phone sizes, enlarged cup, visible return control, and absence of straws/shadow/summary. Production remains unchanged.
