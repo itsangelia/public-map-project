@@ -8,7 +8,7 @@ export function installFishingNetwork(context){
   const ctx=context();if(!ctx.database||!ctx.user||!ctx.state.joined||!ctx.state.connected)throw Error('Reconnect to the map first.');
   const {database,user,room,connectionId}=ctx,uid=user.uid,clock=ctx.now;
   const path=`rooms/${room}`,visitor=ref(database,`${path}/fishingVisitors/${uid}`),tableRef=ref(database,`${path}/fishingTable`),disconnect=onDisconnect(visitor);
-  const session={table:null,visitors:{},game:null,inputs:{},ready:false,online:true,closed:false,dir:0,round:null,stops:[],roundStops:[],busy:false,inputBusy:false,lastInput:0,lastDir:null,lastReady:null,lastStep:performance.now(),error:null};active=session;
+  const session={table:null,visitors:{},game:null,inputs:{},ready:false,online:true,closed:false,dir:0,round:null,stops:[],roundStops:[],busy:false,pendingWrites:0,lastInput:0,lastDir:null,lastReady:null,lastStep:performance.now(),error:null};active=session;
   let timer;
   const emit=()=>{if(!session.closed)receive({table:session.table,visitors:session.visitors,game:session.game,inputs:session.inputs,uid,ready:session.ready,online:session.online,now:clock()});};
   const fail=error=>{if(session.closed)return;session.error=error;session.dir=0;report(error);};
@@ -24,27 +24,41 @@ export function installFishingNetwork(context){
    session.roundStops.push(onValue(ref(database,`${path}/fishingGames/${round}/inputs`),snap=>{if(session.closed||session.round!==round)return;session.inputs=snap.val()||{};emit();},fail));
   }
   async function writeInput(force=false){
-   const t=session.table;if(session.closed||!session.online||!session.ready||!t?.b||![t.a,t.b].includes(uid)||session.inputBusy)return;
+   const t=session.table;if(session.closed||!session.online||!session.ready||!t?.b||![t.a,t.b].includes(uid)||session.error)return;
    const ready=!document.hidden&&!!alive(),dir=ready?session.dir:0;
    if(!force&&session.lastDir===dir&&session.lastReady===ready&&clock()-session.lastInput<500)return;
-   session.inputBusy=true;const round=t.round;
-   try{await set(ref(database,`${path}/fishingGames/${round}/inputs/${uid}`),{dir,ready,at:serverTimestamp()});if(round===session.round){session.lastInput=clock();session.lastDir=dir;session.lastReady=ready;}}catch(error){if(session.round===round)fail(error);}finally{session.inputBusy=false;}
+   const round=t.round;session.lastInput=clock();session.lastDir=dir;session.lastReady=ready;
+   try{await set(ref(database,`${path}/fishingGames/${round}/inputs/${uid}`),{dir,ready,at:serverTimestamp()});}catch(error){if(session.round===round)fail(error);}
   }
   const visibility=()=>{session.dir=0;session.lastStep=performance.now();void writeInput(true);};document.addEventListener('visibilitychange',visibility);
   async function pump(){
-   if(session.closed)return;const at=performance.now(),dt=Math.min(.2,(at-session.lastStep)/1000);session.lastStep=at;
+   if(session.closed)return;const at=performance.now();
    void writeInput();
-   const t=session.table;if(!session.ready||!session.online||session.busy||session.error||document.hidden||!alive()||t.a!==uid)return;
+   const t=session.table;
+   if(!session.ready||!session.online||session.error||document.hidden||!alive()||t.a!==uid){session.lastStep=at;return;}
+   if(session.busy||session.pendingWrites>=3)return;
    const round=t.round,sim=ref(database,`${path}/fishingGames/${round}/sim`);
-   session.busy=true;
-   try{
-    if(!session.game){await runTransaction(sim,game=>game||createFishingGame(clock(),Math.floor(Math.random()*1000000)),{applyLocally:false});return;}
-    const game=session.game;if(game.phase!=='playing'||clock()<game.startsAt)return;
-    const a=session.inputs[t.a],b=session.inputs[t.b];if(!a?.ready||!b?.ready||!Number.isFinite(a.at)||!Number.isFinite(b.at)||clock()-a.at>1500||clock()-b.at>1500)return;
-    const expected=game.seq;
-    await runTransaction(sim,latest=>!latest||latest.seq!==expected?undefined:{...advanceFishing(latest,a.dir,b.dir,dt),updatedAt:serverTimestamp()},{applyLocally:false});
-   }catch(error){if(session.round===round)fail(error);}finally{session.busy=false;}
+   const a=session.inputs[t.a],b=session.inputs[t.b];
+   if(!a?.ready||!b?.ready||!Number.isFinite(a.at)||!Number.isFinite(b.at)||clock()-a.at>2500||clock()-b.at>2500){session.lastStep=at;return;}
+   if(!session.game){
+    session.busy=true;session.lastStep=at;
+    try{await runTransaction(sim,game=>game||createFishingGame(clock(),Math.floor(Math.random()*1000000)),{applyLocally:false});}
+    catch(error){if(session.round===round)fail(error);}finally{session.busy=false;}
+    return;
+   }
+   const game=session.game;
+   if(game.phase!=='playing'||clock()<game.startsAt){session.lastStep=at;return;}
+   const dt=Math.min(.2,(at-session.lastStep)/1000);session.lastStep=at;
+   const next={...advanceFishing(game,a.dir,b.dir,dt),updatedAt:clock()};
+   // Only A writes this state. Firebase preserves write order, so a transaction
+   // round trip is unnecessary for every frame. Cap in-flight writes to avoid
+   // building an unbounded queue on a slow or interrupted connection.
+   session.game=next;session.pendingWrites++;emit();
+   void set(sim,{...next,updatedAt:serverTimestamp()})
+    .catch(error=>{if(session.round===round)fail(error);})
+    .finally(()=>{session.pendingWrites--;});
   }
+
   try{
    await disconnect.remove();check();await set(visitor,{connection:connectionId});check();
    session.stops.push(onValue(ref(database,`${path}/fishingVisitors`),snap=>{session.visitors=snap.val()||{};emit();},fail));
@@ -62,7 +76,7 @@ export function installFishingNetwork(context){
     }
    }
    check();const t=result.snapshot.val();if(!result.committed&&t?.a!==uid&&t?.b!==uid)throw Error('This pond is busy. Please try again shortly.');
-   session.table=t;session.ready=true;watchRound(t);emit();timer=setInterval(pump,120);
+   session.table=t;session.ready=true;watchRound(t);emit();timer=setInterval(pump,50);
    return {setDirection(value){session.dir=session.online&&[-1,0,1].includes(value)?value:0;void writeInput();},
     async retry(){const t=session.table;if(!session.online||!alive()||!['caught','escaped'].includes(session.game?.phase))throw Error('Both players need to be connected to retry.');const round=crypto.randomUUID();await runTransaction(tableRef,current=>current?.round===t.round?{...current,round}:undefined,{applyLocally:false});},close};
   }catch(error){await close();throw error;}

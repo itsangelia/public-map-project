@@ -14,10 +14,15 @@ const {chromium}=require('playwright');const {spawn}=require('node:child_process
  if(uid==='a')await page.screenshot({path:'previews/fishing-online-matching.png'});
  await page.evaluate(()=>{current.table.b='b';current.visitors.b=true;current.inputs={a:{dir:0,ready:true,at:clock},b:{dir:0,ready:true,at:clock}};current.game={x:180,y:265,fishX:180,fishY:180,targetX:180,targetY:180,progress:.2,phase:'playing',seq:0,startsAt:clock+3000,updatedAt:clock};receive(current)});
  assert.equal(await frame.locator('.arrow').first().isDisabled(),true,'countdown blocks input');
- await page.evaluate(()=>{clock+=3100;current.game.updatedAt=clock;current.inputs.a.at=clock;current.inputs.b.at=clock;receive(current)});
+ assert.equal(await frame.locator('#fishing-countdown').isVisible(),true);assert.match(await frame.locator('#fishing-countdown').textContent(),/3$/);
+ if(uid==='a')await page.screenshot({path:'previews/fishing-online-countdown.png'});
+ await page.evaluate(()=>{clock+=1000;receive(current)});assert.match(await frame.locator('#fishing-countdown').textContent(),/2$/);
+ await page.evaluate(()=>{clock+=1000;receive(current)});assert.match(await frame.locator('#fishing-countdown').textContent(),/1$/);
+ await page.evaluate(()=>{clock+=1100;current.game.updatedAt=clock;current.inputs.a.at=clock;current.inputs.b.at=clock;receive(current)});
  await frame.locator('.arrow:enabled').first().waitFor();assert.equal(await frame.locator('.arrow').first().textContent(),uid==='a'?'↑':'←');assert.equal(await frame.locator('.role:enabled').count(),0,'cannot swap axes');
  await frame.locator('.arrow').last().focus();await page.keyboard.down(uid==='a'?'ArrowDown':'ArrowRight');await page.waitForFunction(()=>directions.at(-1)===1);await page.keyboard.up(uid==='a'?'ArrowDown':'ArrowRight');await page.waitForFunction(()=>directions.at(-1)===0);
  if(uid==='a')await page.screenshot({path:'previews/fishing-online-a.png'});else await page.screenshot({path:'previews/fishing-online-b.png'});
+ await page.evaluate(()=>{clock+=2000;receive(current)});assert.equal(await frame.locator('.arrow').first().isDisabled(),false,'ordinary latency does not release held controls');
  await page.evaluate(()=>{clock+=2000;receive(current)});assert.equal(await frame.locator('.arrow').first().isDisabled(),true,'stale shared state pauses controls');
  await page.evaluate(()=>{current.game.phase='escaped';current.game.progress=0;current.game.updatedAt=clock;current.inputs.a.at=clock;current.inputs.b.at=clock;receive(current)});
  assert.equal(await frame.locator('.result').isVisible(),true);assert.equal(await frame.locator('.result h2').textContent(),'The fish got away');

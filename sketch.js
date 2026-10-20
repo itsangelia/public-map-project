@@ -273,6 +273,8 @@ async function setup() {
 // =====================================================
 
 function draw() {
+  // The opaque fishing panel owns animation while open; skip the covered map.
+  if (window.fishingSpot?.isOpen()) return;
   updateTouchControls();
   if (page === 'display') {
     drawPublicDisplay();

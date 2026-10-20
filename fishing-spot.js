@@ -6,7 +6,7 @@
  let frame=null;
  const entry=document.createElement('button');entry.id='fishing-spot-entry';entry.hidden=true;entry.setAttribute('aria-label','Open Fish Together');
  Object.assign(entry.style,{position:'fixed',zIndex:'11',background:'transparent',border:'0',padding:'0',borderRadius:'30%',touchAction:'manipulation'});
- entry.onclick=()=>{if(!near||frame||page!=='map'||window.wishingTree?.isOpen()||window.drinkShop?.isOpen())return;stopMovement();frame=document.createElement('iframe');frame.title='Fish Together';frame.src=new URL('fishing-game.html',base).href;Object.assign(frame.style,{position:'fixed',inset:'0',width:'100%',height:'100dvh',border:'0',zIndex:'100',background:'#eee5d2'});document.body.append(frame);updateTouchControls();};
+ entry.onclick=()=>{if(!near||frame||page!=='map'||window.wishingTree?.isOpen()||window.drinkShop?.isOpen())return;near=false;entry.hidden=true;stopMovement();frame=document.createElement('iframe');frame.title='Fish Together';frame.src=new URL('fishing-game.html',base).href;Object.assign(frame.style,{position:'fixed',inset:'0',width:'100%',height:'100dvh',border:'0',zIndex:'100',background:'#eee5d2'});document.body.append(frame);updateTouchControls();};
  document.body.append(entry);
  let glow=null,emphasis=0,lastFrame=performance.now(),near=false;
  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');

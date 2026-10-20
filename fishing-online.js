@@ -5,6 +5,8 @@
  const waiting=document.createElement('section');waiting.id='fishing-match';waiting.innerHTML='<h2>Fish together</h2><div class="match-pair"><article><h3 id="fish-a-name">You</h3><div class="match-square" id="fish-a-avatar">?</div></article><span>＋</span><article><h3 id="fish-b-name">Waiting…</h3><div class="match-square" id="fish-b-avatar">?</div></article></div><p id="fish-match-status" role="status">Finding a partner…</p><button id="fish-match-retry" hidden>Try again</button>';
  document.querySelector('.roles').after(waiting);
  const style=document.createElement('style');style.textContent=`#fishing-match{margin:auto 0;padding:24px 12px;background:#f3e7d2;border:3px solid #654936;border-radius:15px;text-align:center}#fishing-match h2{font:700 22px Georgia;margin:0 0 24px}.match-pair{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:center}.match-pair h3{font:700 15px Georgia;margin:0 0 9px;overflow-wrap:anywhere}.match-square{aspect-ratio:1;border:3px solid #75583f;border-radius:10px;background:#e7d8bd;display:grid;place-items:center;overflow:hidden;font:45px Georgia;color:#a58a78}.match-square img{width:90%;height:90%;object-fit:contain;transform:scale(1.8)}#fish-match-status{font-size:14px;margin:22px 0 4px}#fish-match-retry{padding:10px 20px;border:2px solid #654936;border-radius:10px;background:#c8998c}.role:disabled{cursor:default;opacity:1}.arrow:disabled{opacity:.6;cursor:default}`;document.head.append(style);
+ const countdownBadge=document.createElement('div');countdownBadge.id='fishing-countdown';countdownBadge.hidden=true;countdownBadge.setAttribute('role','status');countdownBadge.setAttribute('aria-label','Starting countdown');document.querySelector('.board').append(countdownBadge);
+ const countdownStyle=document.createElement('style');countdownStyle.textContent='#fishing-countdown{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);min-width:104px;padding:13px 22px;text-align:center;border:3px solid #6c5942;border-radius:20px;background:#f8eed9ed;color:#594834;font:bold 64px Georgia,serif;pointer-events:none}#fishing-countdown small{display:block;font:14px Georgia,serif;margin-bottom:5px}@media(max-height:650px){#fishing-countdown{font-size:48px;min-width:85px}}';document.head.append(countdownStyle);
  document.querySelector('.preview').hidden=true;
  const portraits={};
  const player=uid=>Object.entries(host.mapNetwork?.state.players||{}).find(([key])=>key.startsWith(uid+'/'))?.[1];
@@ -17,9 +19,11 @@
   waiting.hidden=!!paired;document.querySelector('.board').hidden=!paired;document.querySelector('.controls').hidden=!paired;document.querySelector('.roles').hidden=!paired;
   portrait('a',member?t.a:uid);portrait('b',member?t.b:null);
   const ready=!!(t?.b&&snapshot.visitors[t.a]&&snapshot.visitors[t.b]),inputs=snapshot?.inputs||{};
-  const fresh=t&&inputs[t.a]?.ready&&inputs[t.b]?.ready&&now()-inputs[t.a].at<1500&&now()-inputs[t.b].at<1500;
+  const fresh=t&&inputs[t.a]?.ready&&inputs[t.b]?.ready&&now()-inputs[t.a].at<2500&&now()-inputs[t.b].at<2500;
   const countdown=g?Math.max(0,Math.ceil((g.startsAt-now())/1000)):0;
-  const enabled=paired&&snapshot.online&&ready&&fresh&&g?.phase==='playing'&&!countdown&&now()-g.updatedAt<1600&&!lastError;
+  countdownBadge.hidden=!(paired&&snapshot.online&&ready&&g?.phase==='playing'&&countdown>0);
+  if(!countdownBadge.hidden)countdownBadge.innerHTML='<small>Get ready</small>'+countdown;
+  const enabled=paired&&snapshot.online&&ready&&fresh&&g?.phase==='playing'&&!countdown&&now()-g.updatedAt<3000&&!lastError;
   document.querySelectorAll('.role').forEach(button=>{button.disabled=true;const seat=button.dataset.role;button.firstChild.textContent=(player(seat==='a'?t?.a:t?.b)?.nickname||'Player '+seat.toUpperCase())+' · '+(seat==='a'?'↕':'↔');});
   document.querySelectorAll('.arrow').forEach(button=>{button.disabled=!enabled;});
   if(!enabled){release();if(sentDirection!==0){controller?.setDirection(0);sentDirection=0;}}
@@ -50,8 +54,8 @@
   draw(!!g&&Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius);
   view();
  }
- let frameId;
- function paint(){if(disposed)return;const g=snapshot?.game;if(g){for(const [key,target]of [['float',{x:g.x,y:g.y}],['fish',{x:g.fishX,y:g.fishY}]]){state[key].x+=(target.x-state[key].x)*.35;state[key].y+=(target.y-state[key].y)*.35;}draw(Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius);}document.getElementById('status').textContent=statusMessage;const next=controlsEnabled?(direction||0):0;if(next!==sentDirection){controller?.setDirection(next);sentDirection=next;}frameId=requestAnimationFrame(paint);}
+ let frameId,lastPaint=performance.now();
+ function paint(){if(disposed)return;const at=performance.now(),dt=Math.min(.1,(at-lastPaint)/1000),blend=1-Math.exp(-dt/.065);lastPaint=at;const g=snapshot?.game;if(g){for(const [key,target]of [['float',{x:g.x,y:g.y}],['fish',{x:g.fishX,y:g.fishY}]]){state[key].x+=(target.x-state[key].x)*blend;state[key].y+=(target.y-state[key].y)*blend;}draw(Math.hypot(g.x-g.fishX,g.y-g.fishY)<=settings.catchRadius);}document.getElementById('status').textContent=statusMessage;const next=controlsEnabled?(direction||0):0;if(next!==sentDirection){controller?.setDirection(next);sentDirection=next;}frameId=requestAnimationFrame(paint);}
  async function connect(){lastError='';document.getElementById('fish-match-retry').hidden=true;try{abort.abort();await controller?.close();controller=null;abort=new AbortController();const next=await host.fishingNetwork.open(receive,report,abort.signal);if(disposed)await next.close();else controller=next;}catch(error){report(error);}}
  document.getElementById('fish-match-retry').onclick=connect;
  const close=e=>{e.preventDefault();host.fishingSpot.close();};document.querySelector('.back').onclick=close;document.querySelector('.map').onclick=close;
