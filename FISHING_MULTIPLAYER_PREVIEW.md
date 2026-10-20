@@ -58,3 +58,7 @@ Local browser checks cover immediate input response without a new server snapsho
 ## Requested difficulty adjustment
 
 Catch radius is 39.6 (36 × 1.10); target relocation takes 3.5 seconds; missed alignment loses 0.04 progress per second. Opening progress remains 0.2, aligned gain remains 0.1/sec and movement speed stays 115. The simulation encodes the remaining relocation interval on the existing 0..2.8 wire clock (decrement scaled by 2.8/3.5), retaining compatibility with deployed validation. Presentation converts it back to seconds for extrapolation. No Firebase rule update is required.
+
+## Transparent catch sprites and names
+
+Five separate transparent sprites replace the photo-background viewports. Background removal was performed with the image tool using the selected art as reference; all originals remain in the repository. Success reveals now show Lotus Fish, Goofy Toothy, Bigmouth or Purrmaid; the escaped fish is Smug Finn. Selection still uses the shared round hash, so naming/art is identical for both participants. Difficulty and network behavior are unchanged.

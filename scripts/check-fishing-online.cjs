@@ -31,8 +31,8 @@ const {chromium}=require('playwright');const {spawn}=require('node:child_process
   const reveals=new Set();
   for(let i=0;reveals.size<4&&i<40;i++){
    await page.evaluate(i=>{current.table.round='art-'+i;current.game={...current.game,phase:'caught',progress:1,seq:10,updatedAt:clock};receive(current)},i);
-   const art=frame.locator('.catch-art'),variant=await art.getAttribute('data-catch');reveals.add(variant);
-   const href=await art.locator('image').getAttribute('href');const asset=await page.request.get('http://127.0.0.1:8191/generated/site/releases/'+release+'/'+href);assert.equal(asset.status(),200,'catch artwork is in immutable release');
+   const art=frame.locator('.catch-art'),variant=await art.getAttribute('data-catch');reveals.add(variant);assert.equal(await frame.locator('.result h2').textContent(),['Lotus Fish','Goofy Toothy','Bigmouth','Purrmaid'][Number(variant)],'shared catch has its fish name');
+   const href=await art.locator('img').getAttribute('src');const asset=await page.request.get('http://127.0.0.1:8191/generated/site/releases/'+release+'/'+href);assert.equal(asset.status(),200,'catch artwork is in immutable release');
    await page.waitForTimeout(80);await page.screenshot({path:'previews/fishing-catch-'+variant+'.png'});
   }
   assert.equal(reveals.size,4,'all four successful catches can be revealed');
