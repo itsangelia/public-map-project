@@ -94,6 +94,7 @@ function drawDrink(){
  document.getElementById('stage-note').textContent=base?(flavor?`${flavor.name} + ${base.name}`:base.name):'Something lovely starts here.';
 }
 function render(){
+ if(finished)document.getElementById('result-title').textContent=selected(1).name+' '+selected(0).name;
  document.getElementById('app').classList.toggle('finished',finished);
  document.querySelectorAll('.player').forEach((player,index)=>{const active=!finished&&stages[step].owner===index;player.classList.toggle('active',active);player.querySelector('.player-status').textContent=finished?'Made together':active?'Your turn':'Up next'});
  const progress=document.querySelector('.steps');progress.replaceChildren();
