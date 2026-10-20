@@ -274,7 +274,7 @@ async function setup() {
 
 function draw() {
   // The opaque fishing panel owns animation while open; skip the covered map.
-  if ((window.fishingSpot?.isOpen() || window.sharedPiano?.isOpen())) return;
+  if (window.fishingSpot?.isOpen()) return;
   updateTouchControls();
   if (page === 'display') {
     drawPublicDisplay();
@@ -1938,7 +1938,7 @@ function updateCamera() {
 
   cameraY =
     playerY -
-    height / 2;
+    height * (1 - (window.sharedPiano?.coveredFraction() || 0)) / 2;
 
 
   let maxCameraX =

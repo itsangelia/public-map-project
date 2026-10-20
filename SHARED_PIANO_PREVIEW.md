@@ -4,14 +4,14 @@
 
 - Approved sign-free wooden piano icon, on the existing east stage (original map x1210/y435), width135/height126 before the existing 1.6 world scale. Original map art is untouched.
 - Three rows of seven round diatonic keys: C3–B5, low/middle/high 1–7, no semitones or scoring. Synthesized decaying harmonic tones use Web Audio; no external samples are fetched.
-- One performer per room, anyone else can listen. The authenticated owner gets a 12-second lease renewed about every five seconds. Explicit Finish, closing the panel and backgrounding release it; lost presence or expiry permits takeover.
+- One performer per room, anyone else can listen. The authenticated owner gets an eight-second inactivity lease renewed only by an actual note. Explicit Finish, closing the panel and backgrounding release it; lost presence or expiry permits takeover.
 - Joined phone users hear live notes across the map after a user gesture unlocks audio. Distant notes are softer, panel notes full level. A remembered mute toggle remains available in the panel. Public display starts muted.
 - Events older than the listener's subscription are skipped. Local note echoes use the same event ID and are not played twice. Short tones cannot stick indefinitely; voice count is capped.
 - Background music is not included: the user has not selected a recording. No audio is fabricated as a claimed user-selected soundtrack.
 
 ## Architecture and limits
 
-`piano-session.js` contains lease decisions and pitch mapping. `piano-network.js` reuses the existing Firebase app/auth/room, watches the lease and at most 32 recent note events, and sends only key/time/session events. `piano-audio.js` synthesizes tones and handles gesture/mute/distance. `shared-piano.js` owns the responsive modal and 21-key controls. `piano-spot.js` follows the approved proximity glow/breathing pattern. Small modal guards prevent simultaneous map movement or overlapping activity panels.
+`piano-session.js` contains lease decisions and pitch mapping. `piano-network.js` reuses the existing Firebase app/auth/room, watches the lease and at most 32 recent note events, and sends only key/time/session events. `piano-audio.js` synthesizes tones and handles gesture/mute/distance. `shared-piano.js` owns the responsive in-map keyboard panel and 21-key controls. `piano-spot.js` follows the approved proximity glow/breathing pattern. Small modal guards prevent simultaneous map movement or overlapping activity panels.
 
 Each note sounds immediately for the performer and on arrival for remote listeners; this is casual live listening, not sample-accurate ensemble synchronization. Do not replay delayed notes after reconnection. Successful note writes are removed after ten seconds while the page remains alive. A page closed immediately after a note may leave residual database events; the read limit and timestamp gate prevent replay, but archival retention is not a scheduled server cleanup. Mobile browsers may require an additional sound-button tap, and headphone/device output has not been physically tested here.
 
@@ -37,3 +37,11 @@ Replace the textured piano with the user-approved flat icon. Scale both map dime
 ## Mobile sound recovery
 
 Request a playback audio session where supported, resume both suspended and Safari-interrupted contexts, and enable sound explicitly on Start playing even if the prior session was muted. A current note may wait up to350ms for audio recovery; older notes are never replayed. Clear speaker/mute icons replace the ambiguous musical-note slash. A compressor and higher master gain improve audibility with bounded polyphony. Browser checks measure a non-zero real-time audio graph signal, while a unit fixture exercises Safari interrupted state and saved mute recovery. These checks do not confirm physical iPhone speaker output. No database rule changes.
+
+## In-map keyboard and eight-second inactivity
+
+The user requested controls on the map instead of a full-screen activity page. The keyboard is now a compact bottom sheet, with no repeated piano illustration; the live p5 scene continues behind it. The camera uses the uncovered map area to keep the avatar/stage above the sheet. Movement remains locked while the controls are open, and closing restores the regular camera/joystick.
+
+A claim now expires after8000ms. Only a valid note renews that deadline; the former periodic keep-alive is removed. Once expired, a guarded transaction releases the seat and the local panel becomes a listener, with a short explanation. Any other user can claim an expired seat even if the former performer’s browser is frozen. Expiry callbacks verify current ownership, token and deadline inside the transaction so they cannot remove a newer claim or renewed seat. Existing Firebase rules already allow these shorter deadlines; no rule publication is needed.
+
+Controlled-service checks cover ownership at7999ms, expiry at8000ms, new performer takeover and renewal from an actual note. Browser checks cover unchanged URL, visible uncovered map and continuing map rendering while the keyboard is open. Sound generation and audio recovery are unchanged.

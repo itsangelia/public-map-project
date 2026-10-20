@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm');const {buildSync}=require('esbuild');const scope={};vm.runInNewContext(buildSync({entryPoints:['piano-session.js'],bundle:true,format:'iife',globalName:'piano',write:false}).outputFiles[0].text,scope);const {claimPiano,PIANO_MIDI}=scope.piano;
 test('one active performer, safe release by expiry or missing presence, 21 diatonic pitches',()=>{
  const players={a:{first:{}},b:{second:{}}},seat=claimPiano(null,'a','first','A','token-a',1000,players);
- assert.equal(seat.until,13000);assert.equal(claimPiano(seat,'b','second','B','token-b',1100,players),undefined);
+ assert.equal(seat.until,9000);assert.equal(claimPiano(seat,'b','second','B','token-b',1100,players),undefined);
  assert.equal(claimPiano(seat,'a','other-tab','A','token-c',1100,players),undefined);
  assert.equal(claimPiano(seat,'b','second','B','token-b',13000,players).uid,'b');
  delete players.a.first;assert.equal(claimPiano(seat,'b','second','B','token-b',1200,players).uid,'b');

@@ -17,5 +17,9 @@ test('two independent piano clients compete for one seat and share live notes wi
  await b.api.note(3);assert.equal(b.events.length,1,'listener cannot play');
  h.time+=1600;const c=client('c');intervals.forEach(f=>f());assert.equal(c.events.length,0,'late join does not replay old notes');
  await a.api.release();await b.api.claim();assert.equal(b.api.isOwner,true);assert.equal(a.api.isOwner,false);h.time+=50;await b.api.note(20);assert.equal(c.events.length,1);assert.equal(c.events[0].detail.key,20);
- b.document.hidden=true;await b.handlers.visibilitychange();await new Promise(r=>setImmediate(r));assert.equal(b.api.isOwner,false,'backgrounding releases the seat');assert.deepEqual(errors,[]);
+ b.document.hidden=true;await b.handlers.visibilitychange();await new Promise(r=>setImmediate(r));assert.equal(b.api.isOwner,false,'backgrounding releases the seat');// Eight seconds with no notes releases only the seat, not map membership.
+ await a.api.claim();const firstDeadline=a.api.seat.until;h.time=firstDeadline-1;intervals.forEach(f=>f());assert.equal(a.api.isOwner,true,'still owns at 7.999 seconds');
+ h.time=firstDeadline;intervals.forEach(f=>f());await new Promise(r=>setImmediate(r));assert.equal(a.api.isOwner,false);assert.equal(a.api.seat,null);assert.equal(a.api.releaseReason,'idle');
+ b.document.hidden=false;await b.api.claim();h.time+=7000;await b.api.note(4);const extended=b.api.seat.until;assert.equal(extended,h.time+8000,'a note resets the eight-second deadline');h.time=extended-1;intervals.forEach(f=>f());assert.equal(b.api.isOwner,true);h.time=extended;intervals.forEach(f=>f());await new Promise(r=>setImmediate(r));assert.equal(b.api.isOwner,false);
+ assert.deepEqual(errors,[]);
 });
