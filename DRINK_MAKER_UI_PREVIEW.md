@@ -34,3 +34,7 @@ Run `python3 scripts/deploy-drink-maker-preview.py`. It publishes only `preview/
 Updated the isolated preview to the approved muted illustrated counter style: upright ingredient cards, dusty pink/cream controls, wooden scene and an unbranded dynamic SVG cup. The background is embedded so each immutable HTML preview remains self-contained. All twelve choices and alternating A/B/A/B steps remain locally interactive. No Firebase, matching or production map changes.
 
 Validation: four portrait sizes (320×568 through 430×932), visible confirmation controls, no cup logo, selection guards, all 81 recipes, completion/reset, no runtime errors. This validates the local interface only; independent devices are not connected in this preview.
+
+## Ingredient visibility refinement
+
+Preserved the approved background and existing selection cards. Drink rendering now keeps distinct base textures after adding any flavor: outlined bubbles for sparkling water, cream ribbons for milk tea, and large crushed-ice shapes with a rough surface for slush. Muted pink/green/ochre palettes distinguish flavors; larger round pearls, angular coconut jelly and grooved red beans distinguish toppings. A low foam layer, tall ice-cream scoop and whole lemon wheel distinguish finishes. No cup logo was added. All 81 combinations are checked for base, topping and finish layers, alongside existing responsive UI checks. See `previews/drink-maker-comparison.png` for three actual rendered recipes.

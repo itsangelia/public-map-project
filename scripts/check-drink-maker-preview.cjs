@@ -41,6 +41,8 @@ const assert=require('node:assert/strict');
     choices.splice(0,4,a.id,b.id,c.id,d.id);step=3;finished=true;render();
     if(document.getElementById('result-title').textContent!==b.name+' '+a.name)throw Error('incorrect result title');
     if(document.querySelectorAll('#recipe span').length!==4)throw Error('missing ingredient');
+    const texture={'sparkling':'sparkling-bubbles','milk-tea':'milk-ribbons','slush':'crushed-ice'}[a.id];
+    for(const layer of [texture,c.id,d.id])if(!document.querySelector('[data-layer="'+layer+'"]'))throw Error('missing visible ingredient layer '+layer);
     if(!document.getElementById('drink-illustration').getAttribute('aria-label').includes(d.name))throw Error('missing decoration');
     count++;
    }return count;
