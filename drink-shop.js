@@ -4,7 +4,7 @@
   const base = new URL('.', document.currentScript.src);
   const sprite = new Image();
   sprite.src = new URL('drink-shop.png', base).href;
-  const shop = { x: 275 * 1.6, y: 150 * 1.6, width: 234 * 1.6, height: 234 * 1.6 };
+  const shop = { x: 260 * 1.6, y: 150 * 1.6, width: 258 * 1.6, height: 234 * 1.6 };
   let proximityGlow = null;
   let emphasis = 0;
   let lastFrame = performance.now();

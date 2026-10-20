@@ -2,8 +2,8 @@
 
 The user approved the pink-awning drink-shop icon and its placement near the northwest cafe, with the same proximity glow and breathing emphasis as the wishing tree. This phase adds the icon and cue only. Two-player drink selection and its entry interface remain a subsequent phase.
 
-- Source artwork position: center `(275, 150)`, size `234 × 234` pixels, multiplied by the existing `1.6` world scale.
-- The user requested a larger shop; dimensions are 30% larger than the initial preview, keeping the original center so the cup roof remains visible below the phone header.
+- Source artwork position: center `(260, 150)`, size `258 × 234` pixels, multiplied by the existing `1.6` world scale.
+- The user requested a larger shop; dimensions are 30% larger than the initial preview, keeping sufficient vertical clearance below the phone header. A later requested adjustment widens the shop by about 10% and moves its center 15 artwork pixels left.
 - Asset: `drink-shop.png`, copied from the approved generated image; original map and avatar files are unchanged.
 - Rendering: `drink-shop.js`, called before the wishing tree and players in map and display views.
 - Cue: same 230-world-unit approach radius, 160ms easing, cached warm outline, 3.5% enlargement with 0.8% breathing variation, trunk/base anchoring and reduced-motion handling as the approved wishing-tree rendering. It has no added instruction text or hand pointer.
