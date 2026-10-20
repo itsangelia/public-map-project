@@ -45,3 +45,9 @@ The user requested controls on the map instead of a full-screen activity page. T
 A claim now expires after8000ms. Only a valid note renews that deadline; the former periodic keep-alive is removed. Once expired, a guarded transaction releases the seat and the local panel becomes a listener, with a short explanation. Any other user can claim an expired seat even if the former performer’s browser is frozen. Expiry callbacks verify current ownership, token and deadline inside the transaction so they cannot remove a newer claim or renewed seat. Existing Firebase rules already allow these shorter deadlines; no rule publication is needed.
 
 Controlled-service checks cover ownership at7999ms, expiry at8000ms, new performer takeover and renewal from an actual note. Browser checks cover unchanged URL, visible uncovered map and continuing map rendering while the keyboard is open. Sound generation and audio recovery are unchanged.
+
+## Spacing, occupied notice and playing cue
+
+Add20px above Finish playing and12px above the key grid, keeping note buttons separate from exit actions. When another performer owns the live seat, opening the piano shows only a compact name notice and close action. The grid is hidden and remote notes no longer animate listener keys; live listening remains unchanged. An ownership change while the panel is already open also converts it to the notice. Closing a listener notice does not release the performer.
+
+A live occupied seat adds a restrained piano sway and two rising notes on the map, with the existing warm glow. Reduced-motion mode retains static notes/glow. The cue follows the shared lease and disappears on finish/expiry. Audio, database fields/rules and the eight-second inactivity window are unchanged. Browser checks cover action/key separation, direct occupied opening, no listener highlights, preserving the performer when closing, and shared playing-cue state.

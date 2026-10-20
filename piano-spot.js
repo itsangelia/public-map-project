@@ -29,14 +29,21 @@
    const x=spot.x-cameraX,y=spot.y-cameraY;
    near=!displayMode&&page==='map'&&!window.wishingTree?.isOpen()&&!(window.drinkShop?.isOpen()||window.sharedPiano?.isOpen())&&!opened()&&!window.fishingSpot?.isOpen()
     &&Math.hypot(playerX-spot.x,playerY-(spot.y+spot.height/2-55))<=230;
+   const seat=window.pianoNetwork?.seat,playing=!!seat&&seat.until>(window.mapNetwork?.now()||Date.now());
+   entry.dataset.playing=String(playing);
    const now=performance.now(),elapsed=Math.min(100,now-lastFrame);lastFrame=now;
-   emphasis+=((near?1:0)-emphasis)*(1-Math.exp(-elapsed/160));
+   emphasis+=((near||playing?1:0)-emphasis)*(1-Math.exp(-elapsed/160));
    const pulse=reducedMotion.matches?0:Math.sin(now/430),scale=1+emphasis*(.035+pulse*.008);
    const drawWidth=spot.width*scale,drawHeight=spot.height*scale,left=x-drawWidth/2,top=y+spot.height/2-drawHeight;
    const context=drawingContext;context.save();
    if(glow&&emphasis>.01){context.globalAlpha=emphasis*(reducedMotion.matches?.85:.8+pulse*.15);context.drawImage(glow,left-40*scale,top-40*scale,glow.width*scale,glow.height*scale);context.globalAlpha=1;}
    context.shadowColor='rgba(255,245,188,.6)';context.shadowBlur=5;
-   context.drawImage(sprite,left,top,drawWidth,drawHeight);context.restore();
+   const anchorY=y+spot.height/2;
+   context.translate(x,anchorY);
+   if(playing&&!reducedMotion.matches)context.rotate(Math.sin(now/240)*.012);
+   context.drawImage(sprite,left-x,top-anchorY,drawWidth,drawHeight);context.restore();
+   if(playing){context.save();context.shadowBlur=0;context.fillStyle='#80603c';context.font='bold 25px Georgia';context.textAlign='center';for(let i=0;i<2;i++){const phase=reducedMotion.matches?.35:(now/1600+i*.5)%1;context.globalAlpha=reducedMotion.matches?.8:Math.sin(phase*Math.PI)*.85;context.fillText(i?'♫':'♪',x+(i?1:-1)*drawWidth*.42,top+drawHeight*.24-phase*35);}context.restore();}
+
    entry.hidden=displayMode||page!=='map'||opened()||!!window.fishingSpot?.isOpen()||!!window.wishingTree?.isOpen()||!!(window.drinkShop?.isOpen()||window.sharedPiano?.isOpen());
    if(!entry.hidden){const bounds=document.querySelector('main canvas')?.getBoundingClientRect();if(bounds){Object.assign(entry.style,{left:`${bounds.left+left*bounds.width/width}px`,top:`${bounds.top+top*bounds.height/height}px`,width:`${drawWidth*bounds.width/width}px`,height:`${drawHeight*bounds.height/height}px`});entry.disabled=!near;}}
 
