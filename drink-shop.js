@@ -4,7 +4,7 @@
   const base = new URL('.', document.currentScript.src);
   const sprite = new Image();
   sprite.src = new URL('drink-shop.png', base).href;
-  const shop = { x: 275 * 1.6, y: 150 * 1.6, width: 180 * 1.6, height: 180 * 1.6 };
+  const shop = { x: 275 * 1.6, y: 150 * 1.6, width: 234 * 1.6, height: 234 * 1.6 };
   let proximityGlow = null;
   let emphasis = 0;
   let lastFrame = performance.now();
@@ -35,7 +35,7 @@
       if (!sprite.complete || !sprite.naturalWidth) return;
       const x = shop.x - cameraX, y = shop.y - cameraY;
       const active = !displayMode && page === 'map' && !window.wishingTree?.isOpen()
-        && Math.hypot(playerX - shop.x, playerY - (shop.y + 70)) <= 230;
+        && Math.hypot(playerX - shop.x, playerY - (shop.y + shop.height / 2 - 74)) <= 230;
       const now = performance.now();
       const elapsed = Math.min(100, now - lastFrame);
       lastFrame = now;
