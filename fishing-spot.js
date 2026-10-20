@@ -2,7 +2,7 @@
 (() => {
  const base=new URL('.',document.currentScript.src);
  const sprite=new Image();
- const spot={x:350*1.6,y:690*1.6,width:280*1.6,height:233*1.6};
+ const spot={x:350*1.6,y:690*1.6,width:252*1.6,height:209.7*1.6};
  let glow=null,emphasis=0,lastFrame=performance.now(),near=false;
  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
  sprite.onload=()=>{
