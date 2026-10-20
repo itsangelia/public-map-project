@@ -27,6 +27,18 @@ const {chromium}=require('playwright');const {spawn}=require('node:child_process
  await page.evaluate(()=>{current.game.phase='escaped';current.game.progress=0;current.game.updatedAt=clock;current.inputs.a.at=clock;current.inputs.b.at=clock;receive(current)});
  assert.equal(await frame.locator('.result').isVisible(),true);assert.equal(await frame.locator('.result h2').textContent(),'The fish got away!');
  await frame.locator('.again').click();assert.equal(await frame.locator('.result').isVisible(),false);assert.equal(await frame.locator('.meter').getAttribute('aria-valuenow'),'20');
- await frame.locator('.back').click();assert.equal(await page.evaluate(()=>closedFishing),true);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.close();
+ if(uid==='a'){
+  const reveals=new Set();
+  for(let i=0;reveals.size<4&&i<40;i++){
+   await page.evaluate(i=>{current.table.round='art-'+i;current.game={...current.game,phase:'caught',progress:1,seq:10,updatedAt:clock};receive(current)},i);
+   const art=frame.locator('.catch-art'),variant=await art.getAttribute('data-catch');reveals.add(variant);
+   const href=await art.locator('image').getAttribute('href');const asset=await page.request.get('http://127.0.0.1:8191/generated/site/releases/'+release+'/'+href);assert.equal(asset.status(),200,'catch artwork is in immutable release');
+   await page.waitForTimeout(80);await page.screenshot({path:'previews/fishing-catch-'+variant+'.png'});
+  }
+  assert.equal(reveals.size,4,'all four successful catches can be revealed');
+  await page.evaluate(()=>{current.table.round='escaped-art';current.game.phase='escaped';current.game.progress=0;receive(current)});
+  assert.equal(await frame.locator('.catch-art').getAttribute('data-catch'),'escaped');await page.waitForTimeout(80);await page.screenshot({path:'previews/fishing-escaped-art.png'});
+ }
+ await frame.locator(uid==='a'?'.map':'.back').click();assert.equal(await page.evaluate(()=>closedFishing),true);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.close();
  }assert.deepEqual(errors,[]);console.log('PASS square matching, countdown, assigned vertical/horizontal controls, hold/release, pause, shared failure/retry and map return at 320/390px. Controlled transport only.');
  }finally{await browser.close();server.kill()}})().catch(e=>{console.error(e);process.exitCode=1});
