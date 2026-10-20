@@ -7,9 +7,17 @@ test('shared fishing opening, split axes and bounded deterministic movement',()=
  assert.equal(next.x,45);assert.equal(next.y,390);assert.ok(next.targetX>=55&&next.targetX<=285);assert.ok(next.targetY>=60&&next.targetY<=380);
  assert.equal(JSON.stringify(advanceFishing(start,0,0,.1)),JSON.stringify(advanceFishing(start,0,0,.1)));
 });
-test('eight seconds aligned succeeds, four seconds missed fails, terminal state freezes',()=>{
+test('eight seconds aligned succeeds, five seconds missed fails, terminal state freezes',()=>{
  const aligned=()=>({...createFishingGame(0),x:180,y:180,moveIn:100});let g=aligned();
  for(let i=0;i<79;i++)g=advanceFishing(g,0,0,.1);assert.equal(g.phase,'playing');g=advanceFishing(g,0,0,.1);assert.equal(g.phase,'caught');assert.equal(g.progress,1);assert.equal(advanceFishing(g,1,1,.1),g);
- g=createFishingGame(0);g.moveIn=100;for(let i=0;i<40;i++)g=advanceFishing(g,0,0,.1);assert.equal(g.phase,'escaped');assert.equal(g.progress,0);assert.equal(advanceFishing(g,-1,-1,.1),g);
- g=aligned();g=advanceFishing(g,0,0,.1);g={...g,x:45};g=advanceFishing(g,0,0,.1);assert.ok(Math.abs(g.progress-.205)<1e-8);
+ g=createFishingGame(0);g.moveIn=100;for(let i=0;i<50;i++)g=advanceFishing(g,0,0,.1);assert.equal(g.phase,'escaped');assert.equal(g.progress,0);assert.equal(advanceFishing(g,-1,-1,.1),g);
+ g=aligned();g=advanceFishing(g,0,0,.1);g={...g,x:45};g=advanceFishing(g,0,0,.1);assert.ok(Math.abs(g.progress-.206)<1e-8);
+});
+
+test('requested 10 percent wider target and 3.5 second relocation retain deployed wire bounds',()=>{
+ let g={...createFishingGame(0),x:219,y:180};
+ let next=advanceFishing(g,0,0,.1);assert.ok(next.progress>g.progress,'39-unit offset is inside widened 39.6 radius');
+ next=advanceFishing({...g,x:220},0,0,.1);assert.ok(next.progress<g.progress,'40-unit offset remains outside');
+ g={...createFishingGame(0),progress:1};for(let i=0;i<34;i++){g=advanceFishing(g,0,0,.1);assert.equal(g.targetX,180);assert.ok(g.moveIn>=0&&g.moveIn<=2.8);}
+ g=advanceFishing(g,0,0,.101);assert.notEqual(g.targetX,180);assert.equal(g.moveIn,2.8);
 });

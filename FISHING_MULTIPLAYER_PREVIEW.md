@@ -54,3 +54,7 @@ The target is now ripples; the float ends at the waterline. Progress, collision 
 Host physics runs at 20 Hz independently of 10 Hz checkpoints, with at most three outstanding writes. A long acknowledgment stall pauses physics. The local assigned axis responds before network acknowledgment, then reconciles; remote movement and the known fish trajectory are projected briefly between snapshots. Presentation cannot award progress or choose outcomes. Terminal results wait for acknowledgment and are written once, avoiding a duplicate terminal write rejected by the existing rules. No rule update is needed.
 
 Local browser checks cover immediate input response without a new server snapshot and unchanged progress, in addition to countdown, retry and stale-state pause. Node checks cover bounded projection, round resets and continued host physics during delayed acknowledgments. All four success reveals and the failure art load in the built immutable release and were checked in the browser. Actual mobile smoothness still requires device review.
+
+## Requested difficulty adjustment
+
+Catch radius is 39.6 (36 × 1.10); target relocation takes 3.5 seconds; missed alignment loses 0.04 progress per second. Opening progress remains 0.2, aligned gain remains 0.1/sec and movement speed stays 115. The simulation encodes the remaining relocation interval on the existing 0..2.8 wire clock (decrement scaled by 2.8/3.5), retaining compatibility with deployed validation. Presentation converts it back to seconds for extrapolation. No Firebase rule update is required.

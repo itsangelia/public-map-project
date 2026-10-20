@@ -16,7 +16,7 @@
    dt=clamp(dt,0,.05);const g=this.game,v=this.visual;
    const playing=enabled&&g.phase==='playing';
    const ahead=playing?clamp((time-this.receivedAt)/1000+this.cadence*.5,0,.3):0;
-   const fishAhead=Math.min(ahead,Math.max(0,g.moveIn));
+   const fishAhead=Math.min(ahead,Math.max(0,g.moveIn*3.5/2.8));
    const blend=1-Math.exp(-dt/.065);
    const target={x:clamp(g.x+horizontal*115*ahead,45,305),y:clamp(g.y+vertical*115*ahead,45,390)};
    const fishX=g.targetX+(g.fishX-g.targetX)*Math.exp(-8*fishAhead);
