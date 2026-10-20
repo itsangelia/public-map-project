@@ -1,4 +1,4 @@
-# Drink shop map placement preview
+# Drink shop map placement
 
 The user approved the pink-awning drink-shop icon and its placement near the northwest cafe, with the same proximity glow and breathing emphasis as the wishing tree. This phase adds the icon and cue only. Two-player drink selection and its entry interface remain a subsequent phase.
 
@@ -9,7 +9,17 @@ The user approved the pink-awning drink-shop icon and its placement near the nor
 - Cue: same 230-world-unit approach radius, 160ms easing, cached warm outline, 3.5% enlargement with 0.8% breathing variation, trunk/base anchoring and reduced-motion handling as the approved wishing-tree rendering. It has no added instruction text or hand pointer.
 - Existing authentication, player synchronization, chat, wishing-tree behavior, blessings and Firebase rules are unchanged.
 
-## Review and deployment
+## Approved production promotion
+
+The user approved the current icon size, leftward placement and promotion to production on 2026-10-20 (Australia/Perth). The approved immutable release is `ab81af9580087887`. Publish the same release files using `python3 scripts/deploy-pages.py` after validation; production remains in the `campus` room. The standalone drink-test preview remains separate. No Firebase configuration or data changes are required.
+
+Backups before promotion are `backup-before-drink-shop-map-2026-10-20` (source) and `backup-site-before-drink-shop-map-2026-10-20` (deployment). The previously saved standalone stable archives and tags remain unchanged. A pushed commit is not evidence of a completed GitHub Pages deployment; verify the corresponding Pages run before claiming the live website has updated.
+
+Production display: https://itsangelia.github.io/public-map-project/?mode=display&room=campus
+
+Production phone: https://itsangelia.github.io/public-map-project/?room=campus
+
+## Future isolated review and deployment
 
 Build with `npm run build`, then publish only the isolated preview with `python3 scripts/deploy-drink-shop-preview.py`. Do not use the production deployment script before user approval. The helper adds only preview entries and immutable release assets, asserts production index is unchanged, and keeps the QR pointed at the exact same preview release. Use `room=drink-test` on the display and phones. No new Firebase setup is required.
 
