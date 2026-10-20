@@ -1,10 +1,22 @@
 // Approved drink-shop artwork overlaid near the existing northwest cafe.
-// This phase adds placement and the existing proximity cue, not game mechanics.
+// The game panel is isolated; movement and map presence continue in the parent.
 (() => {
   const base = new URL('.', document.currentScript.src);
   const sprite = new Image();
   sprite.src = new URL('drink-shop.png', base).href;
   const shop = { x: 260 * 1.6, y: 150 * 1.6, width: 258 * 1.6, height: 234 * 1.6 };
+  let frame = null, near = false;
+  const entry = document.createElement('button');
+  entry.id='drink-shop-entry';entry.hidden=true;entry.setAttribute('aria-label','Open Drink Together');
+  Object.assign(entry.style,{position:'fixed',zIndex:'11',background:'transparent',border:'0',padding:'0',borderRadius:'25%',touchAction:'manipulation'});
+  entry.onclick=()=>{
+    if(!near||frame||page!=='map'||window.wishingTree?.isOpen())return;
+    stopMovement();
+    frame=document.createElement('iframe');frame.title='Drink Together';frame.src=new URL('drink-maker.html',base).href;
+    Object.assign(frame.style,{position:'fixed',inset:'0',width:'100%',height:'100dvh',border:'0',zIndex:'100',background:'#ecdfcb'});
+    document.body.append(frame);updateTouchControls();
+  };
+  document.body.append(entry);
   let proximityGlow = null;
   let emphasis = 0;
   let lastFrame = performance.now();
@@ -31,11 +43,14 @@
     }
   };
   window.drinkShop = {
+    isOpen:()=>!!frame,
+    close(){frame?.contentWindow?.disposeDrinkMaker?.();frame?.remove();frame=null;stopMovement();updateTouchControls();},
     draw() {
       if (!sprite.complete || !sprite.naturalWidth) return;
       const x = shop.x - cameraX, y = shop.y - cameraY;
       const active = !displayMode && page === 'map' && !window.wishingTree?.isOpen()
         && Math.hypot(playerX - shop.x, playerY - (shop.y + shop.height / 2 - 74)) <= 230;
+      near=active;
       const now = performance.now();
       const elapsed = Math.min(100, now - lastFrame);
       lastFrame = now;
@@ -57,6 +72,9 @@
       context.shadowBlur = 5;
       context.drawImage(sprite, left, top, drawWidth, drawHeight);
       context.restore();
+      entry.hidden=displayMode||page!=='map'||!!frame||!!window.wishingTree?.isOpen();
+      if(!entry.hidden){const bounds=document.querySelector('main canvas')?.getBoundingClientRect();if(bounds){Object.assign(entry.style,{left:`${bounds.left+left*bounds.width/width}px`,top:`${bounds.top+top*bounds.height/height}px`,width:`${drawWidth*bounds.width/width}px`,height:`${drawHeight*bounds.height/height}px`});entry.disabled=!near;}}
+
     }
   };
 })();

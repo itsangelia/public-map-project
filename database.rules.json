@@ -82,6 +82,51 @@
               ".validate": "newData.isBoolean() && newData.val() === true"
             }
           }
+        },
+        "drinkVisitors": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          "$uid": {
+            ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['connection'])",
+            "connection": {
+              ".validate": "newData.isString() && root.child('rooms').child($room).child('players').child(auth.uid).child(newData.val()).exists()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "drinkTable": {
+          ".read": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/)",
+          ".write": "auth != null && $room.matches(/^[a-zA-Z0-9_-]{1,40}$/) && newData.exists() && root.child('rooms').child($room).child('drinkVisitors').child(auth.uid).exists() && (((!data.exists() || !root.child('rooms').child($room).child('drinkVisitors').child(data.child('a').val()).exists() || (data.child('b').exists() && !root.child('rooms').child($room).child('drinkVisitors').child(data.child('b').val()).exists())) && (newData.child('a').val() === auth.uid && !newData.child('b').exists() && newData.child('step').val() === 0)) || (newData.child('round').val() === data.child('round').val() && newData.child('a').val() === data.child('a').val() && !data.child('b').exists() && newData.child('b').val() === auth.uid && auth.uid !== data.child('a').val() && data.child('step').val() === 0 && newData.child('step').val() === 0 && root.child('rooms').child($room).child('drinkVisitors').child(data.child('a').val()).exists()) || (newData.child('round').val() === data.child('round').val() && newData.child('a').val() === data.child('a').val() && data.child('b').exists() && newData.child('b').val() === data.child('b').val() && root.child('rooms').child($room).child('drinkVisitors').child(data.child('a').val()).exists() && root.child('rooms').child($room).child('drinkVisitors').child(data.child('b').val()).exists() && data.child('step').val() < 4 && newData.child('step').val() === data.child('step').val() + 1 && ((data.child('step').val() % 2 === 0 && auth.uid === data.child('a').val()) || (data.child('step').val() % 2 === 1 && auth.uid === data.child('b').val()))))",
+          ".validate": "newData.hasChildren(['round','a','step']) && (newData.child('step').val() === 0 || (newData.child('b').exists() && ((newData.child('step').val() === 1 && newData.hasChildren(['c0'])) || (newData.child('step').val() === 2 && newData.hasChildren(['c0','c1'])) || (newData.child('step').val() === 3 && newData.hasChildren(['c0','c1','c2'])) || (newData.child('step').val() === 4 && newData.hasChildren(['c0','c1','c2','c3'])))))",
+          "round": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"
+          },
+          "a": {
+            ".validate": "newData.isString()"
+          },
+          "b": {
+            ".validate": "newData.isString() && newData.val() !== newData.parent().child('a').val()"
+          },
+          "step": {
+            ".validate": "newData.isNumber() && (newData.val() === 0 || newData.val() === 1 || newData.val() === 2 || newData.val() === 3 || newData.val() === 4)"
+          },
+          "$other": {
+            ".validate": false
+          },
+          "c0": {
+            ".validate": "newData.isString() && (newData.val() === 'sparkling' || newData.val() === 'milk-tea' || newData.val() === 'slush') && newData.parent().child('step').val() > 0 && (!data.exists() || newData.val() === data.val())"
+          },
+          "c1": {
+            ".validate": "newData.isString() && (newData.val() === 'strawberry' || newData.val() === 'matcha' || newData.val() === 'mango') && newData.parent().child('step').val() > 1 && (!data.exists() || newData.val() === data.val())"
+          },
+          "c2": {
+            ".validate": "newData.isString() && (newData.val() === 'pearls' || newData.val() === 'jelly' || newData.val() === 'red-bean') && newData.parent().child('step').val() > 2 && (!data.exists() || newData.val() === data.val())"
+          },
+          "c3": {
+            ".validate": "newData.isString() && (newData.val() === 'foam' || newData.val() === 'ice-cream' || newData.val() === 'lemon') && newData.parent().child('step').val() > 3 && (!data.exists() || newData.val() === data.val())"
+          }
         }
       }
     }

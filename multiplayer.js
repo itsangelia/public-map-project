@@ -1,3 +1,4 @@
+import { installDrinkNetwork } from './drink-network.js';
 import { initializeApp } from 'firebase/app';
 import { initializeAuth, inMemoryPersistence, signInAnonymously } from 'firebase/auth';
 import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp, query, orderByChild, limitToLast } from 'firebase/database';
@@ -299,4 +300,5 @@ async function initFirebaseRetry() {
   document.getElementById('join-qr')?.remove();
   await init();
 }
+installDrinkNetwork(() => ({database,user,room,connectionId,state}));
 init().catch(fail);
