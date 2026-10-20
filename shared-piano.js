@@ -9,7 +9,7 @@
   const claim=panel.querySelector('#piano-claim');claim.textContent=own?'Finish playing':live?'Someone is playing':'Start playing';claim.disabled=claiming||live&&!own;
   panel.querySelectorAll('#piano-keys button').forEach(b=>b.disabled=!own);
  }
- async function play(key){if(!window.pianoNetwork?.isOwner)return;await window.mapPianoAudio?.unlock();try{await window.pianoNetwork.note(key);}catch(e){error=e.message;view();}}
+ async function play(key){if(!window.pianoNetwork?.isOwner)return;try{void window.mapPianoAudio?.unlock().catch(()=>{});await window.pianoNetwork.note(key);}catch(e){error=e.message;view();}}
  const api=window.sharedPiano={isOpen:()=>!!panel,
   open(){
    if(panel)return;error='';stopMovement();panel=document.createElement('section');panel.id='shared-piano';panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','Shared piano');
@@ -17,7 +17,7 @@
    document.body.append(panel);
    for(let i=0;i<21;i++){const key=document.createElement('button');key.type='button';key.dataset.key=i;key.setAttribute('aria-label',['Low','Middle','High'][Math.floor(i/7)]+' note '+(i%7+1));key.innerHTML=(i%7+1)+(i<7?'<small class="low">•</small>':i>=14?'<small class="high">•</small>':'');key.onpointerdown=e=>{e.preventDefault();void play(i);};key.onclick=e=>{if(e.detail===0)void play(i);};panel.querySelector('#piano-keys').append(key);}
    panel.querySelector('#piano-close').onclick=()=>api.close();
-   panel.querySelector('#piano-claim').onclick=async()=>{if(claiming)return;claiming=true;error='';view();try{await window.mapPianoAudio?.unlock();if(window.pianoNetwork.isOwner)await window.pianoNetwork.release();else await window.pianoNetwork.claim();}catch(e){error=/permission/i.test(e.code||'')?'The host needs to publish the piano rules.':e.message;}finally{claiming=false;view();}};
+   panel.querySelector('#piano-claim').onclick=async()=>{if(claiming)return;claiming=true;error='';view();try{if(window.pianoNetwork.isOwner)await window.pianoNetwork.release();else{await window.mapPianoAudio?.enable();await window.pianoNetwork.claim();}}catch(e){error=/permission/i.test(e.code||'')?'The host needs to publish the piano rules.':e.message;}finally{claiming=false;view();}};
    unsubscribe=window.pianoNetwork.subscribe(view,e=>{error=/permission/i.test(e.code||'')?'The host needs to publish the piano rules.':e.message;view();});updateTouchControls();panel.querySelector('#piano-close').focus();view();
   },
   close(){if(!panel)return;unsubscribe?.();unsubscribe=null;panel.remove();panel=null;void window.pianoNetwork.release().catch(()=>{});stopMovement();updateTouchControls();}

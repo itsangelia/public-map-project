@@ -33,3 +33,7 @@ Device review: publish the additive rules, open the preview display in room `pia
 ## Approved icon revision
 
 Replace the textured piano with the user-approved flat icon. Scale both map dimensions by1.15 (155.25 ×144.9 original map units) while retaining center x1210/y435. No networking, pitch mapping, permission or interaction behavior changes.
+
+## Mobile sound recovery
+
+Request a playback audio session where supported, resume both suspended and Safari-interrupted contexts, and enable sound explicitly on Start playing even if the prior session was muted. A current note may wait up to350ms for audio recovery; older notes are never replayed. Clear speaker/mute icons replace the ambiguous musical-note slash. A compressor and higher master gain improve audibility with bounded polyphony. Browser checks measure a non-zero real-time audio graph signal, while a unit fixture exercises Safari interrupted state and saved mute recovery. These checks do not confirm physical iPhone speaker output. No database rule changes.
