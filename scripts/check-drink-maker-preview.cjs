@@ -27,7 +27,7 @@ const assert=require('node:assert/strict');
     await page.locator('#next').click();
     if(index<3)assert.equal(await page.locator('#next').isDisabled(),true);
    }
-   assert.equal(await page.locator('#result-title').textContent(),'Made together!');
+   assert.equal(await page.locator('#result-title').textContent(),'Mango Milk Tea');
    assert.equal(await page.locator('#recipe').count(),0);
    assert.equal(await page.locator('#back-to-map').textContent(),'Back to map →');
    assert.match(await page.locator('#back-to-map').getAttribute('href'),/room=campus/);
@@ -45,7 +45,7 @@ const assert=require('node:assert/strict');
    let count=0;
    for(const a of stages[0].options)for(const b of stages[1].options)for(const c of stages[2].options)for(const d of stages[3].options){
     choices.splice(0,4,a.id,b.id,c.id,d.id);step=3;finished=true;render();
-    if(document.getElementById('result-title').textContent!=='Made together!')throw Error('incorrect result title');
+    if(document.getElementById('result-title').textContent!==b.name+' '+a.name)throw Error('incorrect result title');
     if(document.getElementById('recipe'))throw Error('ingredient summary should be removed');
     if(document.querySelector('#drink-illustration ellipse[cy="289"]'))throw Error('cup shadow remains');
     if(document.querySelector('#drink-illustration path[d="m165 88 20-57"]'))throw Error('straw remains');

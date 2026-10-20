@@ -42,3 +42,5 @@ Preserved the approved background and existing selection cards. Drink rendering 
 ## Simplified completion screen
 
 Removed the drink ground shadow and all straws (including option illustrations). Completion enlarges the drink and replaces the restart action with a direct Back to map link. The final screen uses a generic completion heading and no ingredient names or recipe chips. Checked all 81 recipes, four phone sizes, enlarged cup, visible return control, and absence of straws/shadow/summary. Production remains unchanged.
+
+The completion heading now shows the flavor + base drink name, as requested (for example, Strawberry Milk Tea). Ingredient summaries remain removed. All recipe names and portrait layouts pass the preview checks.
