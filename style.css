@@ -15,7 +15,7 @@ canvas { display: block; }
   color: #303A68; touch-action: none; user-select: none; -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent; cursor: grab;
 }
-#movement-controls[hidden], #light-action[hidden] { display: none; }
+#movement-controls[hidden] { display: none; }
 #movement-controls:focus-visible { outline: 3px solid #7C89D9; outline-offset: 4px; }
 #movement-controls.is-dragging { cursor: grabbing; }
 .joystick-thumb {
@@ -32,7 +32,6 @@ canvas { display: block; }
 .joystick-direction.right { right: 11px; top: calc(50% - 4px); transform: rotate(135deg); }
 .joystick-direction.down { bottom: 11px; left: calc(50% - 4px); transform: rotate(225deg); }
 .joystick-direction.left { left: 11px; top: calc(50% - 4px); transform: rotate(-45deg); }
-#light-action { position: absolute; bottom: 20%; left: 25%; width: 50%; font-size: 16px; min-height: 44px; border: 2px solid #303A68; border-radius: 14px; background: #FFF8F1; color: #303A68; font-weight: bold; touch-action: manipulation; }
 
 #connection-status { position: fixed; left: 8px; bottom: 4px; background: #FFF8F1; color: #303A68; font: 12px Arial; padding: 4px 8px; border-radius: 6px; z-index: 5; }
 #join-qr { position: fixed; right: 16px; top: 16px; background: white; border-radius: 12px; padding: 12px; color: #303A68; text-align: center; font: 16px Arial; max-width: 190px; }

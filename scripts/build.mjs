@@ -39,7 +39,7 @@ html = html.replace(configTag, configTag + `<script>window.PUBLIC_MAP_CONFIG.pub
 await writeFile('generated/site/index.html', html);
 await writeFile(`generated/site/${entryName}`, html);
 await writeFile('generated/site/.nojekyll', '');
-for (const file of ['p5.js', 'map draft.png', '男角色.png', '女角色.png', '购物袋.png', 'light icon.png']) {
+for (const file of ['p5.js', 'map draft.png', '男角色.png', '女角色.png', '购物袋.png']) {
   await copyFile(file, `generated/site/${file}`);
 }
 console.log(`Built immutable release ${release}`);

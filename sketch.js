@@ -1,6 +1,6 @@
 // =====================================================
 // CAMPUS SOCIAL MAP
-// EXPLORABLE MAP + STREETLIGHT GAME ENTRANCE
+// SHARED EXPLORABLE CAMPUS MAP
 // p5.js v2
 // =====================================================
 
@@ -15,7 +15,6 @@ let page = "login";
 let characterImages = [];
 
 let mapImage;
-let lightIcon;
 
 let selectedCharacter = 0;
 let hoverCharacter = -1;
@@ -67,32 +66,6 @@ let keysDown = {
   up: false,
   down: false
 };
-
-
-// =====================================================
-// STREETLIGHT GAME INTERACTION POINT
-// =====================================================
-
-let lightGameSpot = {
-
-  // RIGHT / UPPER PART OF MAP
-  // NOT IN THE CENTRE
-  x: 1750,
-  y: 520,
-
-  // Width only.
-  // Height will automatically follow
-  // the ORIGINAL image ratio.
-  width: 180,
-
-  // Distance needed to activate
-  interactionRadius: 155
-};
-
-
-let nearLightGame = false;
-
-let lightPulse = 0;
 
 
 // =====================================================
@@ -218,14 +191,6 @@ async function setup() {
 
 
   // ===================================================
-  // STREETLIGHT ICON
-  // ===================================================
-
-  lightIcon =
-    await loadImage("light icon.png");
-
-
-  // ===================================================
   // WORLD SIZE
   // ===================================================
 
@@ -296,7 +261,6 @@ function draw() {
 
     updateCamera();
 
-    checkLightGameDistance();
 
     if (window.mapNetwork) window.mapNetwork.move(playerX, playerY);
     drawMapPage();
@@ -304,12 +268,6 @@ function draw() {
   }
 
 
-  // STREETLIGHT GAME
-  else if (page === "lightGame") {
-
-    drawStreetlightGame();
-
-  }
 
 }
 
@@ -555,43 +513,9 @@ function setupKeyboardControls() {
         }
 
 
-        // =================================================
-        // ENTER STREETLIGHT GAME
-        // =================================================
-
-        else if (
-          event.key === "e" ||
-          event.key === "E"
-        ) {
-
-          if (nearLightGame) {
-
-            event.preventDefault();
-
-            enterStreetlightGame();
-
-          }
-
-        }
 
       }
 
-
-      // =================================================
-      // STREETLIGHT GAME
-      // =================================================
-
-      else if (page === "lightGame") {
-
-        if (event.key === "Escape") {
-
-          event.preventDefault();
-
-          exitStreetlightGame();
-
-        }
-
-      }
 
     }
 
@@ -1291,33 +1215,6 @@ function selectNextCharacter() {
 
 function mousePressed() {
 
-
-  // ===================================================
-  // STREETLIGHT GAME
-  // ===================================================
-
-  if (
-    page === "lightGame"
-  ) {
-
-    if (
-      mouseX > 180 &&
-      mouseX < 420 &&
-      mouseY > 765 &&
-      mouseY < 830
-    ) {
-
-      exitStreetlightGame();
-
-    }
-
-
-    return;
-
-  }
-
-
-  // ===================================================
   // MAP
   // ===================================================
 
@@ -1510,7 +1407,6 @@ function drawMapPage() {
   window.pianoSpot?.draw();
   window.drinkShop?.draw();
   window.wishingTree?.draw();
-  drawLightGameSpot();
 
 
   // ===================================================
@@ -1537,22 +1433,6 @@ function drawMapPage() {
 
 
   // ===================================================
-  // INTERACTION PROMPT
-  // ===================================================
-
-  if (
-    nearLightGame
-  ) {
-
-    push();
-    const uiScale = width / 600;
-    translate(width / 2, height - 900 * uiScale);
-    scale(uiScale);
-    translate(-width / 2, 0);
-    drawLightGamePrompt();
-    pop();
-
-  }
 
 }
 
@@ -1644,15 +1524,6 @@ function drawMapHeader() {
 
 function drawMapControls() {
 
-  // Hide this panel while interaction prompt is open.
-
-  if (
-    nearLightGame
-  ) {
-
-    return;
-
-  }
 
 
   push();
@@ -1976,752 +1847,6 @@ function updateCamera() {
 
 
 // =====================================================
-// STREETLIGHT GAME SPOT
-// =====================================================
-
-function drawLightGameSpot() {
-
-  if (
-    !lightIcon
-  ) {
-
-    return;
-
-  }
-
-
-  // ===================================================
-  // WORLD -> SCREEN
-  // ===================================================
-
-  let screenX =
-    lightGameSpot.x -
-    cameraX;
-
-
-  let screenY =
-    lightGameSpot.y -
-    cameraY;
-
-
-  // ===================================================
-  // KEEP ORIGINAL IMAGE RATIO
-  // ===================================================
-
-  let iconWidth =
-    lightGameSpot.width;
-
-
-  let iconHeight =
-    iconWidth *
-    (
-      lightIcon.height /
-      lightIcon.width
-    );
-
-
-  // ===================================================
-  // DON'T DRAW IF FAR OFFSCREEN
-  // ===================================================
-
-  if (
-    screenX < -250 ||
-    screenX > width + 250 ||
-    screenY < -250 ||
-    screenY > height + 250
-  ) {
-
-    return;
-
-  }
-
-
-  push();
-
-
-  imageMode(
-    CENTER
-  );
-
-
-  // ===================================================
-  // PULSE
-  // ===================================================
-
-  lightPulse +=
-    0.05;
-
-
-  let pulse =
-    sin(
-      lightPulse
-    );
-
-
-  // ===================================================
-  // GLOW WHEN NEAR
-  // ===================================================
-
-  if (
-    nearLightGame
-  ) {
-
-    noStroke();
-
-
-    fill(
-      255,
-      219,
-      105,
-      45
-    );
-
-
-    let glowWidth =
-      iconWidth +
-      40 +
-      pulse * 8;
-
-
-    let glowHeight =
-      iconHeight +
-      40 +
-      pulse * 8;
-
-
-    ellipse(
-      screenX,
-      screenY,
-      glowWidth,
-      glowHeight
-    );
-
-  }
-
-
-  // ===================================================
-  // ICON
-  // ===================================================
-
-  let displayWidth =
-    iconWidth;
-
-
-  let displayHeight =
-    iconHeight;
-
-
-  // Slight animation while keeping ratio.
-
-  if (
-    nearLightGame
-  ) {
-
-    let scaleAmount =
-      1.03 +
-      pulse * 0.01;
-
-
-    displayWidth *=
-      scaleAmount;
-
-
-    displayHeight *=
-      scaleAmount;
-
-  }
-
-
-  image(
-    lightIcon,
-    screenX,
-    screenY,
-    displayWidth,
-    displayHeight
-  );
-
-
-  // ===================================================
-  // SMALL ! MARKER
-  // ===================================================
-
-  if (
-    !nearLightGame
-  ) {
-
-    let markerX =
-      screenX +
-      displayWidth *
-      0.36;
-
-
-    let markerY =
-      screenY -
-      displayHeight *
-      0.36;
-
-
-    fill(
-      255
-    );
-
-
-    stroke(
-      COLORS.navy
-    );
-
-
-    strokeWeight(
-      3
-    );
-
-
-    ellipse(
-      markerX,
-      markerY,
-      32,
-      32
-    );
-
-
-    noStroke();
-
-
-    fill(
-      COLORS.navy
-    );
-
-
-    textAlign(
-      CENTER,
-      CENTER
-    );
-
-
-    textStyle(
-      BOLD
-    );
-
-
-    textSize(
-      15
-    );
-
-
-    text(
-      "!",
-      markerX,
-      markerY - 1
-    );
-
-  }
-
-
-  pop();
-
-}
-
-
-// =====================================================
-// CHECK PLAYER DISTANCE TO STREETLIGHT
-// =====================================================
-
-function checkLightGameDistance() {
-
-  let distanceToLight =
-    dist(
-      playerX,
-      playerY,
-      lightGameSpot.x,
-      lightGameSpot.y
-    );
-
-
-  nearLightGame =
-    distanceToLight <
-    lightGameSpot.interactionRadius;
-
-}
-
-
-// =====================================================
-// STREETLIGHT INTERACTION PROMPT
-// =====================================================
-
-function drawLightGamePrompt() {
-
-  push();
-
-
-  let boxWidth =
-    390;
-
-
-  let boxHeight =
-    105;
-
-
-  let boxX =
-    width / 2 -
-    boxWidth / 2;
-
-
-  let boxY =
-    745;
-
-
-  // BOX
-
-  noStroke();
-
-
-  fill(
-    255,
-    252
-  );
-
-
-  rect(
-    boxX,
-    boxY,
-    boxWidth,
-    boxHeight,
-    22
-  );
-
-
-  // TITLE
-
-  fill(
-    COLORS.navy
-  );
-
-
-  textAlign(
-    CENTER
-  );
-
-
-  textStyle(
-    BOLD
-  );
-
-
-  textSize(
-    17
-  );
-
-
-  text(
-    "BROKEN STREETLIGHT",
-    width / 2,
-    boxY + 31
-  );
-
-
-  // DESCRIPTION
-
-  fill(
-    COLORS.textGrey
-  );
-
-
-  textStyle(
-    NORMAL
-  );
-
-
-  textSize(
-    13
-  );
-
-
-  text(
-    "A two-player cooperative game",
-    width / 2,
-    boxY + 55
-  );
-
-
-  // E
-
-  fill(
-    COLORS.navy
-  );
-
-
-  textStyle(
-    BOLD
-  );
-
-
-  textSize(
-    14
-  );
-
-
-  text(
-    "Press E to play",
-    width / 2,
-    boxY + 81
-  );
-
-
-  pop();
-
-}
-
-
-// =====================================================
-// ENTER STREETLIGHT GAME
-// =====================================================
-
-function enterStreetlightGame() {
-
-  stopMovement();
-
-
-  page =
-    "lightGame";
-
-  fitCanvasToScreen();
-
-
-  console.log(
-    "Entered Streetlight Game"
-  );
-
-}
-
-
-// =====================================================
-// EXIT STREETLIGHT GAME
-// =====================================================
-
-function exitStreetlightGame() {
-
-  stopMovement();
-
-
-  page =
-    "map";
-
-  fitCanvasToScreen();
-
-
-  updateCamera();
-
-
-  console.log(
-    "Returned to public map"
-  );
-
-}
-
-
-// =====================================================
-// STREETLIGHT GAME PAGE
-// =====================================================
-
-function drawStreetlightGame() {
-
-  background(
-    "#EEF2FF"
-  );
-
-
-  // ===================================================
-  // TOP BAR
-  // ===================================================
-
-  noStroke();
-
-
-  fill(
-    255
-  );
-
-
-  rect(
-    20,
-    20,
-    560,
-    82,
-    18
-  );
-
-
-  fill(
-    COLORS.navy
-  );
-
-
-  textAlign(
-    LEFT
-  );
-
-
-  textStyle(
-    BOLD
-  );
-
-
-  textSize(
-    21
-  );
-
-
-  text(
-    "STREETLIGHT REPAIR",
-    42,
-    52
-  );
-
-
-  fill(
-    COLORS.textGrey
-  );
-
-
-  textStyle(
-    NORMAL
-  );
-
-
-  textSize(
-    13
-  );
-
-
-  text(
-    "Two-player cooperative game",
-    42,
-    77
-  );
-
-
-  // ===================================================
-  // STREETLIGHT IMAGE
-  // KEEP ORIGINAL RATIO
-  // ===================================================
-
-  if (
-    lightIcon
-  ) {
-
-    let gameIconWidth =
-      280;
-
-
-    let gameIconHeight =
-      gameIconWidth *
-      (
-        lightIcon.height /
-        lightIcon.width
-      );
-
-
-    imageMode(
-      CENTER
-    );
-
-
-    image(
-      lightIcon,
-      width / 2,
-      330,
-      gameIconWidth,
-      gameIconHeight
-    );
-
-  }
-
-
-  // ===================================================
-  // WAITING PANEL
-  // ===================================================
-
-  noStroke();
-
-
-  fill(
-    255
-  );
-
-
-  rect(
-    85,
-    510,
-    430,
-    175,
-    24
-  );
-
-
-  fill(
-    COLORS.navy
-  );
-
-
-  textAlign(
-    CENTER
-  );
-
-
-  textStyle(
-    BOLD
-  );
-
-
-  textSize(
-    21
-  );
-
-
-  text(
-    "WAITING FOR A PARTNER",
-    width / 2,
-    555
-  );
-
-
-  // LOADING DOTS
-
-  let dots =
-    floor(
-      frameCount /
-      30
-    ) %
-    4;
-
-
-  let loadingText =
-    "";
-
-
-  for (
-    let i = 0;
-    i < dots;
-    i++
-  ) {
-
-    loadingText +=
-      "• ";
-
-  }
-
-
-  fill(
-    COLORS.purple
-  );
-
-
-  textSize(
-    27
-  );
-
-
-  text(
-    loadingText,
-    width / 2,
-    600
-  );
-
-
-  fill(
-    COLORS.textGrey
-  );
-
-
-  textStyle(
-    NORMAL
-  );
-
-
-  textSize(
-    14
-  );
-
-
-  text(
-    "Another player needs to join this game.",
-    width / 2,
-    638
-  );
-
-
-  // ===================================================
-  // BACK BUTTON
-  // ===================================================
-
-  noStroke();
-
-
-  fill(
-    COLORS.navy
-  );
-
-
-  rect(
-    180,
-    765,
-    240,
-    65,
-    18
-  );
-
-
-  fill(
-    COLORS.white
-  );
-
-
-  textAlign(
-    CENTER,
-    CENTER
-  );
-
-
-  textStyle(
-    BOLD
-  );
-
-
-  textSize(
-    16
-  );
-
-
-  text(
-    "BACK TO MAP",
-    width / 2,
-    797
-  );
-
-
-  fill(
-    COLORS.textGrey
-  );
-
-
-  textStyle(
-    NORMAL
-  );
-
-
-  textSize(
-    12
-  );
-
-
-  text(
-    "or press ESC",
-    width / 2,
-    855
-  );
-
-}
-
 // Responsive presentation keeps the original 600 x 900 artwork coordinates.
 function syncControlViewport() {
   const viewport = window.visualViewport;
@@ -2785,7 +1910,6 @@ const JOYSTICK_SETTINGS = { deadZone: 0.15, thumbTravel: 0.32 };
 const joystickInput = { x: 0, y: 0, pointerId: null };
 let touchPanel;
 let joystickThumb;
-let lightAction;
 
 function resetJoystick() {
   const pointerId = joystickInput.pointerId;
@@ -2848,13 +1972,6 @@ function setupTouchControls() {
     touchPanel.addEventListener(type, release);
   }
   document.querySelector('main').appendChild(touchPanel);
-  lightAction = document.createElement('button');
-  lightAction.id = 'light-action';
-  lightAction.textContent = 'Enter streetlight';
-  lightAction.addEventListener('click', () => {
-    if (page === 'map' && nearLightGame) enterStreetlightGame();
-  });
-  document.querySelector('main').appendChild(lightAction);
   const reset = () => stopMovement();
   window.addEventListener('blur', reset);
   if (window.visualViewport) {
@@ -2872,7 +1989,6 @@ function updateTouchControls() {
   if (touchPanel) touchPanel.hidden = !mapControlsVisible;
   if (window.mapChat) window.mapChat.setVisible(mapControlsVisible);
   if (!mapControlsVisible && joystickInput.pointerId !== null) resetJoystick();
-  if (lightAction) lightAction.hidden = !mapControlsVisible || !nearLightGame;
 }
 
 
@@ -2914,7 +2030,6 @@ function drawPublicDisplay() {
   window.pianoSpot?.draw();
   window.drinkShop?.draw();
   window.wishingTree?.draw();
-  drawLightGameSpot();
   drawRemotePlayers();
   pop();
 }

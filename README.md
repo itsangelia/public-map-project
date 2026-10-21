@@ -1,7 +1,7 @@
 # Multiplayer Public Map
 
-The original p5.js artwork, character assets and streetlight entrance are preserved.
-Streetlight repair is a placeholder, not a working cooperative game.
+The original p5.js map artwork and character assets are preserved.
+The unused streetlight repair entrance and placeholder were removed at the user’s request; decorative lamps remain part of the map artwork.
 
 ## Local development
 
@@ -91,7 +91,7 @@ connection and are not a full moderation or abuse-prevention system.
 Validate with two phones and a separate display: send text and reactions in both
 directions, confirm the correct avatar has the bubble, wait for bubble expiry,
 and confirm joystick/keyboard control still works. Message input must not trigger
-movement or streetlight shortcuts. Check Chinese IME input on a real iPhone and
+movement shortcuts. Check Chinese IME input on a real iPhone and
 Android phone. User text is displayed as text, never HTML.
 
 ## Versioned releases and connection recovery
