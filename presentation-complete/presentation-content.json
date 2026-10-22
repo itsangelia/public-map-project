@@ -1,0 +1,137 @@
+[
+  {
+    "slide": 1,
+    "title": "Shared Campus",
+    "time": "0:00–0:15",
+    "seconds": 15,
+    "en": "Hello, I’m presenting Shared Campus, a multiplayer campus map that offers small, low-pressure ways for people to connect through their phones and a public display.",
+    "zh": "大家好，今天展示的是 Shared Campus：一个希望降低初次交流压力的多人校园地图。参与者用自己的手机加入，在公共大屏上看见彼此，并选择一个简短的共同活动。",
+    "cue": "介绍项目，不要逐个列举功能。填上你的名字。"
+  },
+  {
+    "slide": 2,
+    "title": "A small invitation to connect",
+    "time": "0:15–0:35",
+    "seconds": 20,
+    "en": "My primary focus is connection, particularly between international students who do not yet know each other. A shared action can make the first interaction easier. Playful outcomes support joy, while wishes invite reflection. These are design intentions, not measured social outcomes.",
+    "zh": "核心社会目标是连接，特别是不熟悉彼此的国际学生之间的第一次互动。我没有要求陌生人先开口聊天，而是提供可以共同完成的小事。趣味结果带来快乐，许愿树提供表达与反思的空间。这些是设计目标，不代表已经测量并证明能改善孤独感或归属感。",
+    "cue": "清楚说出 Connection 是主要焦点；不要把设计动机说成调研结论。"
+  },
+  {
+    "slide": 3,
+    "title": "One shared place. Your own way in.",
+    "time": "0:35–0:50",
+    "seconds": 15,
+    "en": "Visitors scan a QR code, choose a nickname and avatar, then explore. Each phone follows its own player; the public screen shows the shared world. One short encounter is designed to fit within about two minutes.",
+    "zh": "入口流程很简单：扫码、选择昵称和角色、进入地图。公共大屏让参与者看见彼此，手机则跟随自己的角色。第一次简短互动以约两分钟内为目标。参与者可以合作、留言许愿、听琴，也可以先观察。",
+    "cue": "指出“两分钟”指一次简短参与，不是要求在两分钟内体验完全部地图。"
+  },
+  {
+    "slide": 4,
+    "title": "Meet, speak and leave a little hope",
+    "seconds": 30,
+    "en": "Players choose from three characters and see each other moving independently. Chat appears above their heads and clears after five seconds. At the wishing tree, anyone can hang a wish. Others see a short, swaying preview, open the full note with its nickname and date, and add a blessing.",
+    "zh": "玩家选择三种角色，在同一地图里独立移动、看见彼此。聊天气泡显示在头顶，5秒后消失。许愿树支持挂愿望；其他人可看简短摆动预览，点开完整内容、昵称与日期，并送上祝福。",
+    "cue": "强调聊天与许愿是两种不同的表达：即时交流与保留在树上的留言。纸条仅预览4–5个英文词；每人对同一愿望祝福一次。",
+    "time": "0:50–1:20"
+  },
+  {
+    "slide": 5,
+    "title": "Two ways to make something together",
+    "seconds": 30,
+    "en": "The drink shop matches two named players. They alternate four choices, with three options at each stage, then receive the same named drink. Fishing requires a different cooperation: one player moves the float vertically, the other horizontally. Staying over the ripples builds progress. Success reveals one of four named fish; failure offers another try.",
+    "zh": "饮品店匹配两名显示昵称的玩家，四道程序轮流选择，每道三个选项，共同得到同一杯有名字的饮品。钓鱼则由一人控制上下、一人控制左右，对准涟漪积累进度。成功随机获得四种有名字的鱼之一，失败可以重试。",
+    "cue": "饮品：基底/风味/配料/装饰，81种组合。钓鱼：倒计时后开始，20%初始进度，对准+10%/秒，偏离−4%/秒，降至0失败。目标3.5秒换位，容错范围扩大10%。",
+    "time": "1:20–1:50"
+  },
+  {
+    "slide": 6,
+    "title": "One performer. A shared audience.",
+    "seconds": 25,
+    "en": "The piano stays within the map. One person plays twenty-one keys while others listen. A moving icon signals the performance, and tapping an occupied piano shows the performer’s name. After eight seconds without a note, the seat becomes available. Muting, clear exits and proximity cues let visitors choose how much to participate.",
+    "zh": "钢琴以地图内面板打开。一人演奏21个音键，其他人聆听。图标动态提示正在演奏；点击被占用的钢琴会显示演奏者昵称。8秒不按音符自动让位。静音、明确退出与靠近提示支持不同参与程度。",
+    "cue": "地图仍可见；旁观者不会打开同步键盘。靠近活动入口会出现提醒。说明观看、听琴也属于参与方式。",
+    "time": "1:50–2:15"
+  },
+  {
+    "slide": 7,
+    "title": "See the experience in use",
+    "time": "2:15–3:30",
+    "seconds": 75,
+    "en": "This short film shows how people enter the shared space and move from noticing each other to participating together.",
+    "zh": "这段短片展示参与者如何进入共享空间，并从注意到彼此，走向共同参与。",
+    "cue": "播放你实拍的75秒展示视频。当前文件没有嵌入真实参与者视频，必须替换此页占位。不要朗读拍摄分镜。"
+  },
+  {
+    "slide": 8,
+    "title": "A live moment of cooperation",
+    "time": "3:30–4:30",
+    "seconds": 60,
+    "en": "Now I’ll demonstrate the drink activity with two phones. Each person makes alternating choices, and both receive the drink they created together.",
+    "zh": "现在用两台手机现场演示饮品制作。两人轮流选择，最后共同得到制作完成的饮品。",
+    "cue": "提前让两台手机加入 showcase 房间并到饮品店附近。进入匹配→A选基底→B选风味→A选配料→B选装饰→同时展示同一饮品结果→返回地图。控制在60秒内。"
+  },
+  {
+    "slide": 9,
+    "title": "The six Social UX principles in practice",
+    "time": "4:30–5:15",
+    "seconds": 45,
+    "en": "Here I use the course’s six principles. Sensory Feedback appears in piano sound. Embodied Interaction connects dragging to movement. Social Dynamics comes from shared presence and split roles. Resilience and Motivation shaped easier fishing and retry. Proactivity and Clarity appear in proximity glow and turn messages. Ethics and Inclusion informed temporary identities, mute and clear exits. The lectures’ CSCW perspective explains the shared roles; affordances and signifiers explain how people discover actions. However, phone and network requirements still exclude some visitors.",
+    "zh": "这里使用课堂中六项原则。感官反馈体现在钢琴声音；具身互动体现在拖动与移动的对应；社会动态来自共同在场与角色分工；韧性与动机促成更宽松的钓鱼和重试；主动引导与清晰性体现在靠近发光及轮次提示；伦理与包容影响了临时身份、静音和退出设计。课件的CSCW视角帮助解释共享角色，affordances和signifiers解释人们怎样发现可做的事。不过，手机和网络要求仍会排除部分访客。",
+    "cue": "六项名称已核实：Session 2 PDF第6页、Session 3 PDF第8页；Session 5第6–7页也列出同一框架。CSCW来自Session 2第8页；affordances/signifiers来自Session 5第10页。具身互动仅是手机触控与映射，不要夸大为全身沉浸；未实现触觉反馈。伦理设计不等于全面可访问，公共昵称与愿望仍需隐私、内容和可访问性反思。"
+  },
+  {
+    "slide": 10,
+    "title": "A campus that feels inviting",
+    "time": "5:15–5:30",
+    "seconds": 15,
+    "en": "A familiar illustrated campus provides the narrative setting. Soft colours, consistent icons, proximity glow and sound connect the different activities into one welcoming place.",
+    "zh": "体验没有使用线性剧情，而是把熟悉的校园作为叙事框架。暖色、插画角色和统一活动图标营造友好的氛围。靠近时发光的入口引导探索；饮品、意外的鱼和音乐带来小小的感官回报，公共大屏则把个人行动呈现在同一个场景里。",
+    "cue": "结合截图说明视觉和声音怎样服务体验，不只说“好看”。"
+  },
+  {
+    "slide": 11,
+    "title": "Refinement came from specific problems",
+    "time": "5:30–5:55",
+    "seconds": 25,
+    "en": "My initial concept used cultural prompts, shared visuals and tokens. I kept the connection goal, but moved to free exploration and short activities without tokens. Device feedback shaped clearer multiplayer presence, thirty-five percent phone zoom, gentler fishing and the piano’s automatic release.",
+    "zh": "最初概念提出文化相关提示、共享视觉结果和代币。最终版本保留连接目标，但改为可探索地图与短活动，没有加入代币。设备反馈促成更清楚的共同在场、更大的手机视角与更宽松的钓鱼。钢琴变为地图上的操作面板，8秒无音符后自动让位；未使用的路灯占位被移除。",
+    "cue": "初始概念依据Social Interactive.pptx第5、7、8页：日常生活/文化提示、共享地图、代币想法。若该文件不是正式A1提交版，展示前与提交版核对；不宣称这些是导师要求改动。技术迭代依据开发记录和设备反馈，不虚构正式访谈或观众人数。"
+  },
+  {
+    "slide": 12,
+    "title": "Technology supports the social experience",
+    "time": "5:55–6:15",
+    "seconds": 20,
+    "en": "p5.js renders the world, Firebase shares state, and GitHub Pages hosts it. Checks included simulated clients, browsers and actual phone feedback. Reliable internet and a recorded fallback remain necessary for exhibition.",
+    "zh": "原有p5.js项目仍然是基础。Firebase同步玩家位置和活动状态，GitHub Pages托管页面。手机负责个人操作，大屏提供共同视角。开发检查包括独立模拟客户端与浏览器测试；实际手机测试也在修复后确认了iPhone出声。展览时仍需准备稳定网络、充足电量和录像备份。",
+    "cue": "不要把26项自动测试说成26位用户；不要声称在所有设备、所有网络环境下都稳定。"
+  },
+  {
+    "slide": 13,
+    "title": "A complete prototype — with honest limits",
+    "time": "6:15–6:45",
+    "seconds": 30,
+    "en": "People can watch, listen, leave a wish or cooperate. The value is in these small invitations. I used generative AI for parts of the code, debugging, artwork and presentation, then selected, tested and refined its outputs. Next, I would observe whether unfamiliar participants can begin an interaction independently, rather than adding more activities.",
+    "zh": "最终体验提供不同程度的社交投入：观看、聆听、留下愿望，或共同合作。价值不在功能数量，而在这些功能创造的小邀请。我在部分代码、调试、活动素材及演示准备中使用了生成式AI，再进行选择、测试与调整。下一步更值得观察不熟悉的参与者是否能独立开始有意义的互动，而不是继续堆加功能。",
+    "cue": "务必核实并补齐AI来源、导师批准和单元允许范围。不要把AI辅助内容宣称为完全独立编写或手绘。"
+  },
+  {
+    "slide": 14,
+    "title": "Thank you",
+    "time": "6:45–6:55",
+    "seconds": 10,
+    "en": "Thank you. I’d like to invite you to try the map together.",
+    "zh": "谢谢，欢迎大家一起体验这个地图。",
+    "cue": "参考资料页保留在屏幕上；不逐条朗读参考文献。"
+  },
+  {
+    "slide": 15,
+    "title": "Submission checklist",
+    "time": "APPENDIX — do not present",
+    "seconds": 0,
+    "en": "",
+    "zh": "",
+    "cue": "备查页，不计入课堂展示。按brief还需封面、独立development documentation PDF、MP4及SharePoint可访问链接；这套PPT不替代过程文档。"
+  }
+]
