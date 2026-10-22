@@ -1,0 +1,10 @@
+﻿asset_or_media,use,known_source,action_before_submission
+Prototype screenshots,"PPT1,5,7","Controlled browser screenshots from project repository,2026",Do not describe as participant-study evidence
+map draft.png,Map background,User-supplied; original creator not documented,"Confirm creator,original source and usage rights"
+男角色.png / 女角色.png / 购物袋.png,Avatars,User-supplied; original creator not documented,"Confirm creator,original source and usage rights"
+drink-shop.png / fishing-spot.png / shared-piano.png / wishing-tree.png,Activity icons,AI-generated/refined during project development,"Declare tool,use and subsequent selection/refinement"
+Fish originals / cut-outs,Catch results,Some user-supplied; AI-assisted extraction/background removal; other fish generated,Record original sources and AI steps
+Live piano tones,Audio,Synthesized by project Web Audio implementation,Declare code assistance; no external music recording claimed
+Course PDFs,Assignment and rubric,User-supplied course materials,Add course-author/year if supplied
+Six Social UX principles,Theory,"Session2 p6;Session3 p8;Session5 slides6–7, supplied course materials",Exact labels verified;retain lecture citations
+Showcase video,PPT7,Not supplied,Record real participant interaction;insert before presentation
