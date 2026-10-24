@@ -1,0 +1,10 @@
+﻿Issue / observation,Revision documented,Evidence status / next check
+A second phone or display did not show another player,Reviewed independent presence and shared player state,Development reports include failures and later confirmations;attach actual multi-device evidence
+Small phone character and excessive empty space,Fuller map view;35% zoom;20% slower movement,User reported approval;compare real before/after screens
+Drink option changes looked too similar,Requested clearer ingredient differences within approved style,Attach two actual ingredient states;do not invent a quantitative improvement
+Fishing movement felt jerky,Movement smoothing and response refinements,Reports describe partial improvement;do not claim all network latency eliminated
+Fishing felt too difficult,10% larger range;3.5s target interval;4%/s loss,User requested settings and later approved;new timed performance study not recorded
+iPhone keys changed colour without sound,Audio activation/recovery changes,Device feedback confirmed sound after changes;no claim of universal compatibility
+Piano controls too near exit / idle player occupied seat,Raised controls;on-map panel;8s idle release,Attach current implementation and recorded feedback
+Wish preview showed full sentence,Shortened preview;kept full text on open note,Attach actual preview/full-note comparison
+Final exhibition encounter duration,Intended join-and-one-activity route around two minutes,Timed route including matching remains to be recorded
