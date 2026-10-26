@@ -1,0 +1,119 @@
+[
+  {
+    "page": 1,
+    "title": "From the A1 Prototype to a Shared Experience",
+    "en": "The final A1 proposal established Shared Campus Map as a low-pressure opportunity for interaction among international and culturally diverse university students. Its research synthesis identified limited opportunities to engage beyond familiar social circles, rather than assuming that international students lacked friendships. Shared play was proposed as a reason for unfamiliar participants to notice and respond to one another.\n\nA1 had already developed the concept from prompt-based participation into an explorable map with avatars and shared activities. It also included a single-user p5.js prototype testing nickname entry, three avatar choices, confirmation and keyboard movement. However, QR connection, phone control, real-time multiplayer and shared activities remained unimplemented.\n\nA2 therefore concentrated on realising this proposed experience across separate devices. The existing prototype developed into a connected map with chat, shared wishes, collaborative drink-making, cooperative fishing and a shared piano. The principal progression was from a locally playable prototype to a shared system in which participants could see, respond to and influence one another.",
+    "zh": "以正式A1为基准：社会问题是跨越熟悉圈子的互动机会有限，不是“国际学生没有朋友”。提示到地图的概念转变已在A1完成；A2的核心进展是单人原型到真实多人共享体验。删除代币与A2改变文化提示方向的旧表述。",
+    "evidence": "A1第14页单人原型与最终多人地图并排；小表列A1已实现和A2实现。A1第8页可作概念演变的小图，不标成A2阶段。",
+    "caption": "Figure 1. Progression from the single-user A1 prototype to a multi-device experience with shared player presence and activities.",
+    "source": "Zhao, A. (n.d.). Shared Campus Map: A Playful Shared Experience for Cross-Cultural Connection [A1 exhibition concept], pp. 2–4, 8, 10, 14. Supplied as Social Interactive2.pdf."
+  },
+  {
+    "page": 2,
+    "title": "Extending the A1 Technical Prototype",
+    "en": "A1’s technical exploration tested a single-user interaction flow: entering a nickname, selecting one of three avatars, confirming entry and moving through the map with arrow keys. This established the local interaction before the multiplayer system was developed. A2 retained the p5.js foundation while extending input and shared data across devices.\n\nThe phone now follows its own character, while the public display provides an overview of the campus. Firebase Realtime Database synchronises player positions and activity data, and GitHub Pages provides the web entry point used by the QR code. This implements the public-screen and personal-phone arrangement proposed in A1, informed by its analysis of MMM Ball’s browser-based participation.\n\nActivities introduced further synchronisation requirements. Drink-making needs a common turn sequence and recipe; fishing combines separate directional inputs; the piano requires a single performer state. Messages and wishes must also reach other participants. The technical development therefore extended beyond map navigation to maintaining agreement between individual controls and shared outcomes.",
+    "zh": "A1已完成昵称、三角色、确认与键盘移动；A2扩展为手机输入、二维码和共享状态。公共屏与手机分工不是A2临时改变；MMM Ball已在A1为浏览器参与提供参考。",
+    "evidence": "A1第14页原型流程→A2两手机/Firebase/公共大屏结构图；选一段真实共享状态代码。",
+    "caption": "Figure 2. The local A1 interaction flow was extended through phone input, QR access and synchronised player and activity data.",
+    "source": "Formal A1 PDF, pp. 6, 10, 14; project source; p5.js, Firebase Realtime Database and GitHub Pages documentation."
+  },
+  {
+    "page": 3,
+    "title": "Resolving Multi-Device Visibility Problems",
+    "en": "Multi-device checks revealed a recurring problem: a second phone could enter the map without seeing the first player, and the public display sometimes showed only one participant. A connection status alone was therefore insufficient evidence that the shared experience was functioning.\n\nThese failures affected the distinction established in A1 between occupying the same space and responding to other participants. Participants needed to recognise one another before they could communicate or cooperate. Development consequently returned to the joining process, room state and independent player connections. The resulting implementation maintains distinct player identities and connection records so that separate phones can control separate characters.\n\nChecks compared movement and player visibility across two phones and the public display. Later feedback confirmed successful shared presence, although similar problems had reappeared after earlier checks. This made repeated verification necessary when reviewing subsequent versions. The criterion for a working map became more specific: each player needed to join, retain independent control and remain visible on another device. This was more meaningful than relying on a successful page load or connection label.",
+    "zh": "事实是多人不可见曾反复出现。说明检查方法与当前结构，但不编造已证实的单一根因或永久稳定结论。",
+    "evidence": "早期缺失角色画面、后期独立玩家画面和简短检查流程。旧图不存在则用真实记录，不制作假旧截图。",
+    "caption": "Figure 3. Player visibility was assessed across separate devices, including independent movement and the public display’s received state.",
+    "source": "Formal A1 PDF, pp. 8, 10, 14; multiplayer implementation and recorded device feedback. No recruited-participant study is claimed."
+  },
+  {
+    "page": 4,
+    "title": "Mobile Viewport and Movement Refinement",
+    "en": "Moving beyond A1’s keyboard-based prototype required a usable portrait phone view. Early mobile layouts allocated insufficient space to the map. A substantial blank area remained below the scene, the character appeared small, and the map did not extend behind the virtual controls. This reduced the usable presentation area on a portrait screen.\n\nThe layout was revised so that the map fills the available view and the joystick overlays the scene. The phone view was enlarged by 35%, followed by a 20% reduction in movement speed. These adjustments responded to the small character scale and the perceived speed of movement within the closer view. The public display retained its overview, allowing the two screen types to serve different purposes.\n\nThe revision involved a trade-off between local detail and surrounding context. A closer view improves character visibility but displays less of the campus at once. The selected scale reflects development trials and feedback rather than a measured optimum. This stage demonstrated the importance of checking the complete phone layout, including controls and unused space, rather than evaluating the map image independently.",
+    "zh": "参数有真实记录；可说明调整依据，不把它们写成已经通过正式可用性研究的最优数值。",
+    "evidence": "等比例手机前后对比，标地图边界、角色比例及控制区。",
+    "caption": "Figure 4. The mobile revision increased the map’s screen coverage and character scale while retaining controls within the scene.",
+    "source": "Formal A1 PDF, pp. 11–12, 14; phone-layout iterations and recorded device feedback."
+  },
+  {
+    "page": 5,
+    "title": "Developing the A1 Visual Direction",
+    "en": "A1 established a soft fantasy-game direction through pastel colours, chibi characters and illustrated 2D environments. The existing campus and character artwork provided the starting point for A2. New activity entrances needed to remain recognisable while fitting this established setting.\n\nSeveral early generated options appeared overly saturated or detailed, leading to revisions towards softer colours, simpler forms and clearer outlines. Evaluation also considered each image within the map. The drink shop was enlarged, widened and repositioned; the fishing entrance used two rods and a lighter water surface without visible fish; the piano entrance was developed without a wooden sign.\n\nThese decisions developed the proposed visual direction through actual assets and placement. The campus functions as a setting for exploration rather than a fixed storyline. Familiar locations give activities context, while consistent proximity effects indicate opportunities to interact. The environment, responsive entrances and piano sound connect separate activities within one shared place, helping participants recognise both the setting and the actions available within it.",
+    "zh": "明确柔和奇幻游戏风、粉彩与chibi角色已在A1第9页提出。A2写实际素材选择、删改、地图比例和接近效果，不声称从零提出统一画风。",
+    "evidence": "A1第9页moodboard局部＋真实图标前后版本＋最终地图位置检查。字体/色值若未逐项验证，不声称严格照搬A1色板和字体。",
+    "caption": "Figure 5. The A1 visual direction was developed through activity-image revisions, map placement and consistent interaction cues.",
+    "source": "Formal A1 PDF, pp. 9, 14; asset iterations and map-placement records. Original artwork and AI-assisted media require separate attribution."
+  },
+  {
+    "page": 6,
+    "title": "Communication Through Chat and Shared Wishes",
+    "en": "Chat and the wishing tree provide different forms of expression within the map. Typed messages appear above characters and disappear after five seconds, supporting immediate communication without leaving persistent speech bubbles over the scene.\n\nThe wishing tree retains a message for later discovery. Participants can write and hang a wish, then open notes contributed by others. The full note displays the message, nickname and date within a framed-paper layout developed from a game message-board reference. A blessing button provides a response without requiring another written message.\n\nA further revision addressed the visibility of other people’s wishes. Gentle movement and a short text preview were added to encourage exploration. The initial preview revealed too much of the message, so it was shortened to approximately four or five English words. The resulting interaction separates discovery from reading: the tree offers a hint, while opening the note reveals the full contribution. This creates a clearer reason to select a note and respond to its author.",
+    "zh": "预览是一个交互设计问题：吸引发现，但不在树上显示整句。游戏参考图如使用须补来源。",
+    "evidence": "聊天、短预览、完整纸条与祝福的流程图。",
+    "caption": "Figure 6. Short previews introduce shared wishes, while the opened note provides the full message and a simple response.",
+    "source": "Formal A1 PDF, pp. 8, 10, for proposed shared activities; chat/wishing-tree implementation and development records. The message-board reference requires separate attribution if reproduced."
+  },
+  {
+    "page": 7,
+    "title": "Collaborative Drink-Making and Visible Choices",
+    "en": "The drink activity develops A1’s proposal for short shared play by distributing four decisions between two participants. After matching, players alternate through the base, flavour, topping and decoration stages. Each stage offers three options, producing 81 possible recipe combinations. Both players contribute to the same named result rather than completing separate recipes.\n\nThe interface was refined to make this contribution visible. Early feedback indicated that ingredient selections did not produce sufficiently distinct changes in the drink. Revisions therefore focused on clearer visual differences while retaining the selected colour palette and upright choice cards. A “Your turn” notification identifies the active participant and supports the handover between decisions.\n\nThe completion screen was simplified by enlarging the finished drink, retaining its name and providing a direct return to the map. Cup logos, straws and the bottom shadow were removed from the visual treatment. The shared result gives both participants a visible record of their combined decisions. The activity creates a reason for cooperation without requiring competition or a predefined conversation.",
+    "zh": "说明轮流决策怎样形成共同结果，以及视觉差异为何影响玩家理解贡献。",
+    "evidence": "匹配→轮次提示→明显的选项变化→共同结果。",
+    "caption": "Figure 7. Alternating turns and visible ingredient changes communicate each participant’s contribution to the shared drink.",
+    "source": "Formal A1 PDF, pp. 5, 8, 10; drink-maker implementation and feedback. The particular four-stage recipe was developed during A2."
+  },
+  {
+    "page": 8,
+    "title": "Cooperative Fishing: Responsiveness and Difficulty",
+    "en": "Fishing requires continuous coordination through divided controls. One participant controls vertical movement and the other horizontal movement. Both influence one float, which must align with moving ripples to increase shared progress. Neither participant controls both axes independently.\n\nDevelopment feedback identified two separate issues: jerky movement and excessive difficulty. Movement was refined to improve visual continuity. The challenge settings were then adjusted by increasing the target range by 10%, extending target changes to 3.5-second intervals and reducing progress loss to 4% per second. Progress begins at 20%, increases by 10% per second when aligned and ends in failure if it reaches zero.\n\nThe visual presentation was also revised. Ripples replaced the visible fish, and the float was shown partly submerged. Successful completion reveals one of four named fish, while failure presents a static escape result. These choices preserve the catch as a shared reveal. Separating responsiveness from difficulty was important: a more forgiving challenge could reduce frustration, but could not resolve synchronisation or rendering problems by itself.",
+    "zh": "这是有实质分析的迭代页。明确卡顿与难度分开处理，不把数值调整当技术修复。",
+    "evidence": "分轴控制、涟漪浮标、参数表、成功/失败反馈。",
+    "caption": "Figure 8. Separate revisions addressed movement continuity, challenge tolerance and the shared catch reveal.",
+    "source": "Formal A1 PDF, pp. 5, 8, 10; fishing implementation and recorded adjustments; GRDE2053 Session 2, pp. 8, 10."
+  },
+  {
+    "page": 9,
+    "title": "Shared Piano: Audio, Occupancy and Access",
+    "en": "The piano extends participation to both performance and listening. One player occupies the instrument and uses a 21-key interface arranged in three rows. Other players can listen after enabling sound. An occupancy notice identifies the performer, while the activity icon responds visually during use.\n\nTechnical checks exposed a difference between visual and auditory feedback. On an iPhone, keys changed colour without producing sound. Database permissions and browser audio activation required separate attention. Following these changes, device feedback confirmed audible playback. The issue demonstrated why a visible response could not establish that the complete interaction was working.\n\nThe piano was subsequently presented as a panel within the map, retaining the surrounding shared environment. The keyboard was moved further from the exit control to reduce accidental selection. Other players receive an occupied notice rather than a duplicate keyboard. An eight-second inactivity release also prevents an idle session from holding the instrument indefinitely. Together, these revisions clarify the performer’s role and improve access to a shared resource.",
+    "zh": "写权限与音频是不同问题；iPhone结果只限已有设备记录。地图内面板、退出间距和让位机制有具体设计依据。",
+    "evidence": "旧问题记录、地图内面板、占用提示与活动图标。",
+    "caption": "Figure 9. The piano combines on-map controls, audible feedback, occupancy information and an inactivity release.",
+    "source": "Formal A1 PDF, pp. 5, 10, for shared play; piano implementation and iPhone feedback; MDN Web Audio API documentation."
+  },
+  {
+    "page": 10,
+    "title": "Testing Evidence and Responses to Feedback",
+    "en": "A1 tested the local joining and navigation flow. A2 extended these checks to separate devices and shared activities, using repeated device checks and feedback recorded during production. Checks examined whether separate phones controlled distinct characters, whether messages reached another player, whether activity states agreed and whether piano audio was audible on an iPhone.\n\nThe findings required different responses. Missing players directed attention to shared presence; silent keys required audio checks; unclear ingredient changes required stronger visual feedback. These examples show why functionality and interaction clarity needed to be reviewed separately. A system could accept an input without communicating its effect adequately.\n\nSome problems reappeared after earlier checks, making repeated verification important as new activities were introduced. The accompanying table records observed issues, revisions and reported outcomes. These records document development testing rather than an independent audience study. They support specific claims about the versions checked, but do not establish universal reliability or social impact. Further evaluation should use the exhibition environment and unfamiliar participants, including the time required to join, match and complete an activity.",
+    "zh": "这页解释证据性质和反馈怎样影响修改。不能把你自己的设备反馈写成招募观众研究，或补写没有记录的导师意见。",
+    "evidence": "问题—修改—复测证据表，并列两三项真实截图或记录。",
+    "caption": "Figure 10. Development findings are linked to specific revisions and reported re-checks, with further exhibition evaluation identified separately.",
+    "source": "Formal A1 PDF, p. 14; development/device feedback and available implementation records. Distinguish developer checks from independent audience research."
+  },
+  {
+    "page": 11,
+    "title": "Developing the Six Social UX Principles",
+    "en": "A1 identified Social Dynamics and Proactivity & Clarity as particularly important. A2 developed these intentions through implemented interactions and device feedback.\n\nSensory Feedback. Piano sound extends A1’s visual selection and movement feedback. The iPhone audio issue demonstrated the need to check the audible response independently.\n\nEmbodied Interaction. Phone-based movement and activity controls realise the proposed personal-controller role, although embodiment remains mediated through a touchscreen.\n\nSocial Dynamics. Alternating drink choices and divided fishing controls give both participants influence over one outcome. This develops A1’s distinction between co-presence and meaningful shared play, relating to the course’s discussion of computer-supported cooperative work.\n\nResilience & Motivation. Revised fishing settings and retry make the task more forgiving while retaining coordination.\n\nProactivity & Clarity. QR entry, proximity effects and turn notifications communicate where and how to participate, acting as signifiers.\n\nEthics & Inclusion. The non-human avatar option identified in A1 was retained. Sound control, exits and piano release further support choice and access. Phone ownership, connectivity, language, visual controls and public messages remain inclusion and privacy concerns.",
+    "zh": "六原则在A1第15页已有预期应用；A2回顾它们怎样通过实现和测试发展。补回A1对非人类购物袋角色的包容性理由，但它是保留项，不说A2首次增加。名称按课堂原名，序号差异不当成概念变化。",
+    "evidence": "六格对比A1意图→A2实现；购物袋角色、轮次/靠近提示、分轴钓鱼、钢琴声音与让位可配小图。",
+    "caption": "Figure 11. A1’s proposed Social UX applications were developed through specific A2 interactions and evaluated against remaining barriers.",
+    "source": "Formal A1 PDF, p. 15; GRDE2053 Session 2, pp. 6, 8, 10; Session 3, p. 8; Session 5, slides 6–11."
+  },
+  {
+    "page": 12,
+    "title": "Evaluation Against the A1 Design Criteria",
+    "en": "A1 defined the experience as low-pressure, spontaneous, shared, playful and socially meaningful. The final prototype addresses these criteria through browser entry, optional activities and several ways to participate. Visitors can exchange messages, contribute a wish, coordinate a task or listen to another player. Each activity gives participants a potential reason to notice or respond to someone else.\n\nThe central evaluation question remains whether shared play leads to meaningful interaction between unfamiliar participants. Successful synchronisation or task completion cannot establish this alone. Observation would be needed to examine how players encounter one another, understand their roles and communicate during or after an activity. This follows A1’s social intention of creating an opportunity for connection without guaranteeing friendship.\n\nA1 also proposed a public display with a nearby standing area and personal-phone control. Exhibition preparation must test this arrangement with the actual network and devices. The intended route of joining and completing one activity aims for approximately two minutes, including matching, but requires timed rehearsal. Phone activity screens must also be visible during demonstration, with a recorded fallback for connection failures.",
+    "zh": "删除“文化提示在A2被弱化”这一错误比较。按正式A1第4页设计准则和第10页社会意图评估：能否给陌生人自然回应的理由，仍需参与者观察，不保证友谊。展场分工也已在A1第13页规划。",
+    "evidence": "A1设计准则—A2机制—仍待观察三列表；附A1第13页空间图与最终设备布置。",
+    "caption": "Figure 12. The final prototype is evaluated against A1’s design criteria, with social outcomes and exhibition conditions identified for further testing.",
+    "source": "Formal A1 PDF, pp. 4, 10, 13; final implementation/development record; A2 brief, pp. 2–4."
+  },
+  {
+    "page": 13,
+    "title": "AI Use and Design Authorship",
+    "en": "Generative AI assisted code development, debugging, iteration planning and written drafting. Image-generation tools also supported selected activity images and refinements. The existing map and character assets were retained as separately supplied artwork.\n\nMy contribution involved establishing the social direction, defining activity rules, evaluating visual options and specifying revisions in response to device feedback. Recorded decisions include rejecting overly saturated images, clarifying ingredient changes, adjusting fishing difficulty and retaining the piano within the map. These examples identify how assisted outputs were selected and adapted to the project’s requirements.\n\nThis document was also prepared with AI assistance. Its descriptions must be checked against the implemented prototype and supported by appropriate evidence. Asset records need to distinguish supplied, generated and refined material, with original sources and permissions identified separately. Tutor approval for AI use and the required declaration remain to be verified before submission. Clear attribution is necessary to distinguish the tools used from the design decisions and refinement undertaken during development.",
+    "zh": "正式陈述AI用途与个人贡献。审批、来源仍未知，不掩盖也不擅自说已获批；提交前按实际状态更新。",
+    "evidence": "选一组输出—反馈—整合的真实案例，附工具/素材登记。",
+    "caption": "Figure 13. Design authorship is documented through the selection, adaptation and integration of assisted outputs.",
+    "source": "A2 brief, pp. 3, 5; project development and asset records. Formal A1 authorship is visible on its cover; original asset licences and AI approval remain separate matters."
+  }
+]
