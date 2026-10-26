@@ -1,0 +1,161 @@
+from pathlib import Path
+import json,re
+from docx import Document
+from docx.shared import Inches,Pt
+O=Path('/workspace/development-documentation-academic')
+old=json.loads(Path('/workspace/development-documentation-rewritten/page-content.json').read_text())
+D=[]
+def add(title,en,zh,evidence,caption,source):D.append(dict(page=len(D)+1,title=title,en=en,zh=zh,evidence=evidence,caption=caption,source=source))
+add('Concept Development and Project Direction',
+'''Shared Campus developed from a proposal addressing barriers to initial interaction among international students. The proposed experience combined a public display, phone-based entry, personal avatars, free exploration and cooperative activities. These elements established the direction for the final prototype.
+
+The development phase translated this structure into a functioning shared map with chat, a wishing tree, collaborative drink-making, cooperative fishing and a shared piano. Each activity offers a different form of participation, from leaving a message to coordinating an action with another player. Connection remains the primary social focus, supported by playful outcomes and opportunities for personal expression.
+
+A significant change concerned the original cultural prompts and proposed token system. Tokens were not implemented, and direct questions about everyday cultural experiences became less prominent. The final design places greater emphasis on initiating contact through shared activities. This preserves the intention to encourage connection, while changing how explicitly the experience invites cultural exchange.''',
+'这一页明确延续与变化：A1已有共享地图、手机加入、自由探索和合作，不把它们包装为A2新增。用“文化提示变得较间接”分析概念变化。',
+'初始概念第5/7页与最终地图并排；标记Retained / Developed / Not implemented。',
+'Figure 1. Comparison between the initial proposal and final prototype, showing continuity in the shared-map structure and changes in the activities.',
+'Initial concept: Social Interactive.pptx, slides 2, 5, 7–8. The relationship to the formal A1 submission requires confirmation.')
+add('Technical Development and Shared System Structure',
+'''Development began with the existing p5.js map and character assets. The main technical task was to connect individual devices to a common world while maintaining a suitable view for each screen. The phone follows its own character, whereas the public display provides an overview of the shared campus.
+
+Firebase Realtime Database synchronises player positions and activity data. GitHub Pages provides the web entry point used by the QR code. This browser-based arrangement allows participants to join without downloading an application. World coordinates remain shared even when the phone and display use different camera views.
+
+The introduction of activities extended the synchronisation requirements. Drink-making requires a shared turn sequence and recipe; fishing combines separate directional inputs; the piano requires a single performer state. Wishes and messages also need to reach other participants. The technical structure therefore supports both individual control and shared outcomes. Its effectiveness depends on agreement between devices, rather than on the appearance of an isolated screen.''',
+'重点是技术如何支撑体验。手机视角与世界数据分开；不要写成技术安装说明。',
+'手机—Firebase—公共大屏结构图，加真实数据结构或少量关键代码。',
+'Figure 2. Shared world data connects individual phone controls with the public display; camera views remain specific to each device.',
+'Project source and implementation records; p5.js, Firebase Realtime Database and GitHub Pages documentation.')
+add('Resolving Multi-Device Visibility Problems',
+'''Multi-device checks revealed a recurring problem: a second phone could enter the map without seeing the first player, and the public display sometimes showed only one participant. A connection status alone was therefore insufficient evidence that the shared experience was functioning.
+
+These failures affected the project’s central social condition. Participants needed to recognise one another before they could communicate or cooperate. Development consequently returned to the joining process, room state and independent player connections. The resulting implementation maintains distinct player identities and connection records so that separate phones can control separate characters.
+
+Checks compared movement and player visibility across two phones and the public display. Later feedback confirmed successful shared presence, although similar problems had reappeared after earlier checks. This made repeated verification necessary when reviewing subsequent versions. The criterion for a working map became more specific: each player needed to join, retain independent control and remain visible on another device. This was more meaningful than relying on a successful page load or connection label.''',
+'事实是多人不可见曾反复出现。说明检查方法与当前结构，但不编造已证实的单一根因或永久稳定结论。',
+'早期缺失角色画面、后期独立玩家画面和简短检查流程。旧图不存在则用真实记录，不制作假旧截图。',
+'Figure 3. Player visibility was assessed across separate devices, including independent movement and the public display’s received state.',
+'Multiplayer implementation and recorded development/device feedback. These checks are distinct from an independent audience study.')
+add('Mobile Viewport and Movement Refinement',
+'''The early phone layout allocated insufficient space to the map. A substantial blank area remained below the scene, the character appeared small, and the map did not extend behind the virtual controls. This reduced the usable presentation area on a portrait screen.
+
+The layout was revised so that the map fills the available view and the joystick overlays the scene. The phone view was enlarged by 35%, followed by a 20% reduction in movement speed. These adjustments responded to the small character scale and the perceived speed of movement within the closer view. The public display retained its overview, allowing the two screen types to serve different purposes.
+
+The revision involved a trade-off between local detail and surrounding context. A closer view improves character visibility but displays less of the campus at once. The selected scale reflects development trials and feedback rather than a measured optimum. This stage demonstrated the importance of checking the complete phone layout, including controls and unused space, rather than evaluating the map image independently.''',
+'参数有真实记录；可说明调整依据，不把它们写成已经通过正式可用性研究的最优数值。',
+'等比例手机前后对比，标地图边界、角色比例及控制区。',
+'Figure 4. The mobile revision increased the map’s screen coverage and character scale while retaining controls within the scene.',
+'Phone-layout iterations and development feedback; final interface implementation.')
+add('Visual Refinement and Experiential Setting',
+'''The existing illustrated campus established the visual context for the activities. New entrances needed to remain recognisable while fitting the map and characters. Several early image options appeared overly saturated or detailed, leading to revisions towards softer colours, simpler forms and clearer outlines.
+
+Evaluation also considered each image within the map. The drink shop was enlarged, widened and repositioned; the fishing entrance used two rods and a lighter water surface without visible fish; the piano entrance was developed without a wooden sign. These changes addressed both stylistic consistency and the scale of the objects within their surroundings.
+
+The campus functions as a setting for exploration rather than a fixed storyline. Familiar locations give the activities context, while consistent proximity effects indicate opportunities to interact. The illustrated environment, responsive entrances and piano sound connect separate activities within one place. Their role is experiential as well as decorative: they help participants notice where an activity belongs and how it relates to the shared map.''',
+'补足老师要求的氛围和体验设计：校园是叙事场景，不编造线性剧情。视觉调整说明依据及场景作用。',
+'两三组真实图标迭代＋地图中的最终位置。来源中区分已有素材、生成图与参考图。',
+'Figure 5. Activity entrances were refined in relation to the campus setting, including colour, detail, scale, placement and proximity cues.',
+'Asset iterations and map-placement records. Original map/avatar provenance and individual AI-assisted asset sources require separate attribution.')
+add('Communication Through Chat and Shared Wishes',
+'''Chat and the wishing tree provide different forms of expression within the map. Typed messages appear above characters and disappear after five seconds, supporting immediate communication without leaving persistent speech bubbles over the scene.
+
+The wishing tree retains a message for later discovery. Participants can write and hang a wish, then open notes contributed by others. The full note displays the message, nickname and date within a framed-paper layout developed from a game message-board reference. A blessing button provides a response without requiring another written message.
+
+A further revision addressed the visibility of other people’s wishes. Gentle movement and a short text preview were added to encourage exploration. The initial preview revealed too much of the message, so it was shortened to approximately four or five English words. The resulting interaction separates discovery from reading: the tree offers a hint, while opening the note reveals the full contribution. This creates a clearer reason to select a note and respond to its author.''',
+'预览是一个交互设计问题：吸引发现，但不在树上显示整句。游戏参考图如使用须补来源。',
+'聊天、短预览、完整纸条与祝福的流程图。',
+'Figure 6. Short previews introduce shared wishes, while the opened note provides the full message and a simple response.',
+'Chat and wishing-tree implementation; preview/blessing development records. The original message-board reference requires attribution if reproduced.')
+add('Collaborative Drink-Making and Visible Choices',
+'''The drink activity distributes four decisions between two participants. After matching, players alternate through the base, flavour, topping and decoration stages. Each stage offers three options, producing 81 possible recipe combinations. Both players contribute to the same named result rather than completing separate recipes.
+
+The interface was refined to make this contribution visible. Early feedback indicated that ingredient selections did not produce sufficiently distinct changes in the drink. Revisions therefore focused on clearer visual differences while retaining the selected colour palette and upright choice cards. A “Your turn” notification identifies the active participant and supports the handover between decisions.
+
+The completion screen was simplified by enlarging the finished drink, retaining its name and providing a direct return to the map. Cup logos, straws and the bottom shadow were removed from the visual treatment. The shared result gives both participants a visible record of their combined decisions. The activity creates a reason for cooperation without requiring competition or a predefined conversation.''',
+'说明轮流决策怎样形成共同结果，以及视觉差异为何影响玩家理解贡献。',
+'匹配→轮次提示→明显的选项变化→共同结果。',
+'Figure 7. Alternating turns and visible ingredient changes communicate each participant’s contribution to the shared drink.',
+'Drink-maker implementation and recorded feedback on visual differences and result-screen refinement.')
+add('Cooperative Fishing: Responsiveness and Difficulty',
+'''Fishing requires continuous coordination through divided controls. One participant controls vertical movement and the other horizontal movement. Both influence one float, which must align with moving ripples to increase shared progress. Neither participant controls both axes independently.
+
+Development feedback identified two separate issues: jerky movement and excessive difficulty. Movement was refined to improve visual continuity. The challenge settings were then adjusted by increasing the target range by 10%, extending target changes to 3.5-second intervals and reducing progress loss to 4% per second. Progress begins at 20%, increases by 10% per second when aligned and ends in failure if it reaches zero.
+
+The visual presentation was also revised. Ripples replaced the visible fish, and the float was shown partly submerged. Successful completion reveals one of four named fish, while failure presents a static escape result. These choices preserve the catch as a shared reveal. Separating responsiveness from difficulty was important: a more forgiving challenge could reduce frustration, but could not resolve synchronisation or rendering problems by itself.''',
+'这是有实质分析的迭代页。明确卡顿与难度分开处理，不把数值调整当技术修复。',
+'分轴控制、涟漪浮标、参数表、成功/失败反馈。',
+'Figure 8. Separate revisions addressed movement continuity, challenge tolerance and the shared catch reveal.',
+'Fishing implementation and recorded adjustments; GRDE2053 Session 2, pp. 8, 10, for cooperation and forgiving interaction.')
+add('Shared Piano: Audio, Occupancy and Access',
+'''The piano extends participation to both performance and listening. One player occupies the instrument and uses a 21-key interface arranged in three rows. Other players can listen after enabling sound. An occupancy notice identifies the performer, while the activity icon responds visually during use.
+
+Technical checks exposed a difference between visual and auditory feedback. On an iPhone, keys changed colour without producing sound. Database permissions and browser audio activation required separate attention. Following these changes, device feedback confirmed audible playback. The issue demonstrated why a visible response could not establish that the complete interaction was working.
+
+The piano was subsequently presented as a panel within the map, retaining the surrounding shared environment. The keyboard was moved further from the exit control to reduce accidental selection. Other players receive an occupied notice rather than a duplicate keyboard. An eight-second inactivity release also prevents an idle session from holding the instrument indefinitely. Together, these revisions clarify the performer’s role and improve access to a shared resource.''',
+'写权限与音频是不同问题；iPhone结果只限已有设备记录。地图内面板、退出间距和让位机制有具体设计依据。',
+'旧问题记录、地图内面板、占用提示与活动图标。',
+'Figure 9. The piano combines on-map controls, audible feedback, occupancy information and an inactivity release.',
+'Piano implementation and iPhone device feedback; MDN Web Audio API documentation.')
+add('Testing Evidence and Responses to Feedback',
+'''Development was informed by repeated device checks and feedback recorded during production. Checks examined whether separate phones controlled distinct characters, whether messages reached another player, whether activity states agreed and whether piano audio was audible on an iPhone.
+
+The findings required different responses. Missing players directed attention to shared presence; silent keys required audio checks; unclear ingredient changes required stronger visual feedback. These examples show why functionality and interaction clarity needed to be reviewed separately. A system could accept an input without communicating its effect adequately.
+
+Some problems reappeared after earlier checks, making repeated verification important as new activities were introduced. The accompanying table records observed issues, revisions and reported outcomes. These records document development testing rather than an independent audience study. They support specific claims about the versions checked, but do not establish universal reliability or social impact. Further evaluation should use the exhibition environment and unfamiliar participants, including the time required to join, match and complete an activity.''',
+'这页解释证据性质和反馈怎样影响修改。不能把你自己的设备反馈写成招募观众研究，或补写没有记录的导师意见。',
+'问题—修改—复测证据表，并列两三项真实截图或记录。',
+'Figure 10. Development findings are linked to specific revisions and reported re-checks, with further exhibition evaluation identified separately.',
+'Development/device feedback and available implementation records. No recruited-participant study is claimed.')
+add('Reflection Through the Six Principles for Social UX',
+'''Sensory Feedback. Piano sound provides an audible response alongside visible key changes. The iPhone audio issue demonstrated the need to check both forms of feedback.
+
+Embodied Interaction. Touch controls connect physical input to character and activity movement. This remains a limited form of embodiment mediated through a phone screen.
+
+Social Dynamics. Alternating drink decisions and divided fishing controls allow both participants to influence a shared outcome. Fishing makes coordination necessary, relating to the course’s discussion of computer-supported cooperative work.
+
+Resilience & Motivation. More forgiving fishing settings and retry support experimentation without requiring immediate success.
+
+Proactivity & Clarity. Proximity effects and turn notifications act as signifiers, indicating available actions and the participant currently responsible for acting.
+
+Ethics & Inclusion. Sound control, clear exits and piano release support choice and fair access. However, phone ownership, connectivity, language and visual controls remain participation barriers. Public messages also raise privacy and moderation concerns. These limitations prevent the prototype from being described as fully accessible.''',
+'保留六项准确名称；关联理论要落到具体机制。反思并非声称六项都已充分解决。',
+'六格配真实细节；正文旁加入课堂引用。',
+'Figure 11. The course framework is used to reflect on specific design decisions and unresolved participation barriers.',
+'GRDE2053 Session 2, pp. 6, 8, 10; Session 3, p. 8; Session 5, slides 6–11. Theory is discussed through these supplied lectures.')
+add('Critical Evaluation and Exhibition Preparation',
+'''The final prototype supports several levels of involvement: recognising other players, exchanging messages, contributing a wish, coordinating a task or listening to a performance. Activities remain optional, allowing participants to select a short encounter rather than complete a fixed sequence.
+
+The relationship to cultural exchange requires further consideration. The initial proposal directly invited participants to share everyday experiences. The final activities provide opportunities for first contact, but do not necessarily lead to discussion of cultural backgrounds. The project’s technical completion therefore does not establish an improvement in belonging. Participant observation would be needed to examine whether interaction continues beyond the task and whether unfamiliar players choose to communicate.
+
+Exhibition preparation must address both access and presentation. The intended route of joining and completing one activity aims for approximately two minutes, including matching, but still requires timed rehearsal. A reachable QR link, suitable network, charged devices and a clear public display are essential. Phone activity screens also need to be visible during demonstration, with a recorded fallback available for connection failures.''',
+'提出真实局限和具体下一步。两分钟是设计目标，展场条件和正式参与者研究尚不能写为已完成。',
+'最终地图、设备布置图、简短参与路径与待实测项。',
+'Figure 12. Exhibition planning considers the short participation route, device access and visibility of individual activity screens.',
+'Initial concept and project development record; A2 brief, pp. 2–4.')
+add('AI Use and Design Authorship',
+'''Generative AI assisted code development, debugging, iteration planning and written drafting. Image-generation tools also supported selected activity images and refinements. The existing map and character assets were retained as separately supplied artwork.
+
+My contribution involved establishing the social direction, defining activity rules, evaluating visual options and specifying revisions in response to device feedback. Recorded decisions include rejecting overly saturated images, clarifying ingredient changes, adjusting fishing difficulty and retaining the piano within the map. These examples identify how assisted outputs were selected and adapted to the project’s requirements.
+
+This document was also prepared with AI assistance. Its descriptions must be checked against the implemented prototype and supported by appropriate evidence. Asset records need to distinguish supplied, generated and refined material, with original sources and permissions identified separately. Tutor approval for AI use and the required declaration remain to be verified before submission. Clear attribution is necessary to distinguish the tools used from the design decisions and refinement undertaken during development.''',
+'正式陈述AI用途与个人贡献。审批、来源仍未知，不掩盖也不擅自说已获批；提交前按实际状态更新。',
+'选一组输出—反馈—整合的真实案例，附工具/素材登记。',
+'Figure 13. Design authorship is documented through the selection, adaptation and integration of assisted outputs.',
+'A2 brief, pp. 3, 5; project development and asset records. Approval and original media provenance are not assumed verified.')
+(O/'page-content.json').write_text(json.dumps(D,ensure_ascii=False,indent=2))
+# The English file is layout copy; preparation notes remain in the companion document.
+for bilingual,name in [(False,'Development-content-EN.docx'),(True,'Development-content-EN-ZH.docx')]:
+ doc=Document();doc.sections[0].top_margin=doc.sections[0].bottom_margin=Inches(.7)
+ doc.styles['Normal'].font.name='Arial';doc.styles['Normal'].font.size=Pt(10 if bilingual else 11)
+ for i,p in enumerate(D):
+  if i:doc.add_page_break()
+  doc.add_heading(f"{p['page']:02d}  {p['title']}",0)
+  for para in p['en'].split('\n\n'):doc.add_paragraph(para)
+  if i==10:doc.add_paragraph('Course sources: GRDE2053, Session 2, pp. 6, 8, 10; Session 3, p. 8; Session 5, slides 6–11.',style='Caption')
+  if bilingual:
+   doc.add_heading('中文说明与证据安排（不放入英文正文）',2);doc.add_paragraph(p['zh']);doc.add_paragraph('配图：'+p['evidence']);doc.add_paragraph(p['caption']);doc.add_paragraph('来源依据：'+p['source'])
+ doc.save(O/name)
+md='# Shared Campus — Development Documentation\n\n'
+for p in D:md+=f"## {p['page']:02d}. {p['title']}\n\n{p['en']}\n\n"
+(O/'Development-content-EN.md').write_text(md)
+print('13 content pages;',sum(len(re.findall(r"\b[\w’–-]+\b",p['en'])) for p in D),'English words.')
