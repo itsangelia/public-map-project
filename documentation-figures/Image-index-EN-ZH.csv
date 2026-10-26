@@ -1,0 +1,51 @@
+﻿Page,Section,Image file,Suggested English caption,Evidence type
+1,starting-point,01-starting-point/01-starting-prototype-A1-page14.png,"Starting single-user prototype,as documented in the submitted proposal.",Actual submitted A1 page14
+1,starting-point,01-starting-point/02-fishing-map-overview.png,The integrated map and its activity entrances.,"Existing repository interface capture;controlled/local evidence,not participant research"
+2,firebase-and-entry,02-firebase-and-entry/01-01-firebase-config-crop.png,Firebase client configuration with project identifiers redacted.,Actual project asset or redacted source;not console evidence
+2,firebase-and-entry,02-firebase-and-entry/02-02-system-structure.png,Client authentication and shared-room data flow.,"Implementation diagram,not a screenshot"
+2,firebase-and-entry,02-firebase-and-entry/03-join-qr.png,QR entry for the approved fixed-version campus room.,Functional QR generated from the known approved entry
+2,firebase-and-entry,02-firebase-and-entry/04-01-firebase-source.png,Anonymous authentication and access-rule source excerpts.,Actual project asset or redacted source;not console evidence
+3,shared-presence,03-shared-presence/01-map-two-demo-avatars.png,Current interface displaying two independent example avatars.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+4,phone-navigation,04-phone-navigation/01-join-screen.png,Nickname entry and three avatar choices.,Current source join-screen capture
+4,phone-navigation,04-phone-navigation/02-map-two-demo-avatars.png,"Phone map,overhead names and virtual joystick.",New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+4,phone-navigation,04-phone-navigation/03-piano-stage-phone.png,Phone approach view near the stage.,"Existing repository interface capture;controlled/local evidence,not participant research"
+5,chat,05-chat/01-chat-panel.png,"Room chat input,recent messages and four quick reactions.",New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+5,chat,05-chat/02-chat-bubble.png,Speech displayed above the example sender.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+5,chat,05-chat/03-chat-bubble-expired.png,The same interface after the example speech exceeds the five-second display age.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+6,activity-entrances,06-activity-entrances/01-wishing-tree.png,Wishing-tree entrance artwork.,Actual project asset or redacted source;not console evidence
+6,activity-entrances,06-activity-entrances/02-drink-shop.png,Drink-shop entrance artwork.,Actual project asset or redacted source;not console evidence
+6,activity-entrances,06-activity-entrances/03-fishing-spot.png,Fishing entrance artwork.,Actual project asset or redacted source;not console evidence
+6,activity-entrances,06-activity-entrances/04-shared-piano.png,Piano entrance artwork.,Actual project asset or redacted source;not console evidence
+6,activity-entrances,06-activity-entrances/05-fishing-map-overview.png,Entrance placement in the shared map.,"Existing repository interface capture;controlled/local evidence,not participant research"
+7,wish-contribution,07-wish-contribution/01-wish-tree-board.png,Shared-tree interface with a short note preview.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+7,wish-contribution,07-wish-contribution/02-wish-compose.png,Wish editor retaining the example nickname.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+7,wish-contribution,07-wish-contribution/03-wish-read.png,"Opened note with full text,nickname,date and blessing control.",New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+8,wish-discovery-blessing,08-wish-discovery-blessing/01-wish-tree-board.png,The brief preview leaves the full wish inside the opened note.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+8,wish-discovery-blessing,08-wish-discovery-blessing/02-wish-read.png,A note before the example blessing.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+8,wish-discovery-blessing,08-wish-discovery-blessing/03-wish-blessed.png,The interface after an example blessing updates the count.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+9,drink-development,09-drink-development/01-drink-maker-matching.png,Two-player matching with square portraits and names.,"Existing repository interface capture;controlled/local evidence,not participant research"
+9,drink-development,09-drink-development/02-drink-maker-your-turn.png,Turn notification and recipe selection.,"Existing repository interface capture;controlled/local evidence,not participant research"
+9,drink-development,09-drink-development/03-drink-maker-comparison.png,Existing visual comparison of drink states.,"Existing repository interface capture;controlled/local evidence,not participant research"
+9,drink-development,09-drink-development/04-drink-maker-online-finished.png,Enlarged shared drink result.,"Existing repository interface capture;controlled/local evidence,not participant research"
+10,fishing-controls,10-fishing-controls/01-fishing-online-matching.png,Fishing partner-matching interface.,"Existing repository interface capture;controlled/local evidence,not participant research"
+10,fishing-controls,10-fishing-controls/02-fishing-online-countdown.png,Countdown before the shared task.,"Existing repository interface capture;controlled/local evidence,not participant research"
+10,fishing-controls,10-fishing-controls/03-fishing-online-a.png,Vertical control role and shared progress.,"Existing repository interface capture;controlled/local evidence,not participant research"
+10,fishing-controls,10-fishing-controls/04-fishing-online-b.png,Horizontal control role.,"Existing repository interface capture;controlled/local evidence,not participant research"
+11,fishing-results,11-fishing-results/01-fishing-catch-0.png,Lotus Fish result.,"Existing repository interface capture;controlled/local evidence,not participant research"
+11,fishing-results,11-fishing-results/02-fishing-catch-1.png,Goofy Toothy result.,"Existing repository interface capture;controlled/local evidence,not participant research"
+11,fishing-results,11-fishing-results/03-fishing-catch-2.png,Bigmouth result.,"Existing repository interface capture;controlled/local evidence,not participant research"
+11,fishing-results,11-fishing-results/04-fishing-catch-3.png,Purrmaid result.,"Existing repository interface capture;controlled/local evidence,not participant research"
+11,fishing-results,11-fishing-results/05-fishing-escaped-art.png,Escape-result artwork.,"Existing repository interface capture;controlled/local evidence,not participant research"
+11,fishing-results,11-fishing-results/06-fishing-escaped-cutout.png,Final escape-fish cut-out.,Actual project asset or redacted source;not console evidence
+12,piano-development,12-piano-development/01-piano-stage-phone.png,Approaching the piano on the map.,"Existing repository interface capture;controlled/local evidence,not participant research"
+12,piano-development,12-piano-development/02-piano-playing.png,In-map keyboard and performer controls.,"Existing repository interface capture;controlled/local evidence,not participant research"
+12,piano-development,12-piano-development/03-piano-busy.png,Occupied notice instead of a listener keyboard.,"Existing repository interface capture;controlled/local evidence,not participant research"
+13,integration-and-release,13-integration-and-release/01-fishing-map-overview.png,Integrated map used as a reference during regression checks.,"Existing repository interface capture;controlled/local evidence,not participant research"
+13,integration-and-release,13-integration-and-release/02-join-qr.png,The fixed-version room entry used for deployment consistency.,"Functional QR,not a deployment-success screenshot"
+14,social-ux-reflection,14-social-ux-reflection/01-piano-playing.png,Sensory feedback and on-map instrument controls.,"Existing repository interface capture;controlled/local evidence,not participant research"
+14,social-ux-reflection,14-social-ux-reflection/02-drink-maker-your-turn.png,Clear turn ownership and shared decision-making.,"Existing repository interface capture;controlled/local evidence,not participant research"
+14,social-ux-reflection,14-social-ux-reflection/03-fishing-online-a.png,Divided controls and cooperative progress.,"Existing repository interface capture;controlled/local evidence,not participant research"
+14,social-ux-reflection,14-social-ux-reflection/04-wish-blessed.png,A lightweight response to a shared contribution.,New current-interface capture;controlled transport and fictional Demo A/B data;not live Firebase evidence
+15,final-evaluation,15-final-evaluation/01-fishing-map-overview.png,Final map context for evaluating the complete experience.,"Existing repository interface capture;controlled/local evidence,not participant research"
+15,final-evaluation,15-final-evaluation/02-drink-maker-online-finished.png,Shared creation result.,"Existing repository interface capture;controlled/local evidence,not participant research"
+15,final-evaluation,15-final-evaluation/03-fishing-catch-3.png,Shared activity completion feedback.,"Existing repository interface capture;controlled/local evidence,not participant research"
