@@ -1,0 +1,44 @@
+{
+  "source": "Project source excerpts; not Firebase Console",
+  "joinUrl": "https://itsangelia.github.io/public-map-project/campus-f3cd85c8e3d0eaa9.html?room=campus",
+  "qrModules": 41,
+  "authExcerptLines": [
+    244,
+    245,
+    255,
+    258
+  ],
+  "images": [
+    "01-firebase-source.png",
+    "02-system-structure.png",
+    "03-real-join-entry.png"
+  ],
+  "liveConsoleAccess": false,
+  "additionalImages": [
+    "01-firebase-config-crop.png",
+    "join-qr.png"
+  ],
+  "websiteReachability": "Not verified: environment proxy blocked HEAD request",
+  "dimensions": {
+    "01-firebase-source.png": [
+      2700,
+      1725
+    ],
+    "02-system-structure.png": [
+      2700,
+      1725
+    ],
+    "03-real-join-entry.png": [
+      2700,
+      1800
+    ],
+    "01-firebase-config-crop.png": [
+      1480,
+      1328
+    ],
+    "join-qr.png": [
+      900,
+      900
+    ]
+  }
+}
