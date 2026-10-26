@@ -1,0 +1,228 @@
+# Shared Campus Map — Development Documentation
+
+## 01. Development Starting Point and Priorities｜开发起点与推进重点
+
+The project began with a single-user p5.js prototype containing the campus map, nickname entry, three avatar options and keyboard movement. The initial proposal established a low-pressure shared experience for international and culturally diverse students. Development focused on turning that intention into a working interaction between phones and a public display.
+
+项目从单人p5.js原型开始，已有校园地图、昵称输入、三种角色及键盘移动。初始提案确定了面向国际学生和多元文化学生的低压力共享体验。开发的重点，是将这一意图转化为手机与公共大屏之间实际运行的互动。
+
+The work progressed through linked stages: establishing online access and shared presence; adapting movement to phones; adding communication; developing the wishing tree, drink shop, fishing and piano; and checking the combined experience before release. Each activity introduced requirements that the original map did not address, including persistent contributions, alternating turns, divided controls and exclusive use of a shared instrument.
+
+工作分为相互关联的阶段：建立在线入口与共享在场，调整手机移动操作，加入交流，再发展许愿树、饮品店、钓鱼和钢琴，最后在发布前检查整合后的体验。每项活动都引入原地图未涉及的要求，包括保留贡献、轮流决策、分工控制，以及共享乐器的独占使用。
+
+Development did not follow a simple sequence of completed features. Multiplayer visibility problems returned as the project grew, and interface changes required further device checks. The process therefore involved repeated movement between new interactions and the foundations they depended on. The following pages document those decisions, revisions and checks.
+
+开发并非按功能完成后便不再回头的线性顺序推进。随着项目扩展，多人可见性问题曾再次出现，界面调整也需要重新进行设备检查。因此，过程在新交互与它们依赖的基础功能之间反复推进。以下页面记录这些决定、修改与检查。
+
+## 02. Establishing Online Access and Player Identity｜建立在线入口与玩家身份
+
+The first technical stage connected the existing map to Firebase. A web application was registered, Anonymous Authentication was enabled, and a Realtime Database was created. The client configuration included the database URL so the browser could connect to the intended shared data. Database rules defined which player and activity records could be read or changed.
+
+首个技术阶段将已有地图连接到Firebase。项目注册了Web应用、启用匿名身份验证并创建实时数据库。客户端配置包含数据库地址，使浏览器能够连接到预定共享数据；数据库规则则规定哪些玩家与活动记录可以被读取或修改。
+
+Anonymous authentication provided a temporary identity without a visible account-registration process. Connection-specific records separated each browser connection, while nicknames and the male, female or shopping-bag avatar identified players visually. A public HTTPS entry hosted through GitHub Pages allowed phones to join from the display’s QR code. The room parameter needed to remain consistent across the display and phones. The joining page combines nickname entry, avatar selection and confirmation before the character appears on the shared map.
+
+匿名身份验证提供临时身份，不需要可见的账号注册流程。每条浏览器连接采用独立记录，昵称以及男性、女性或购物袋角色则提供视觉识别。GitHub Pages托管的公开HTTPS入口让手机可以通过大屏二维码加入；大屏与手机需要使用一致的房间参数。加入页将昵称输入、角色选择及确认结合，之后角色才出现在共享地图。
+
+This setup established the distinction between a local preview and the deployed shared experience. Loading artwork in one browser was insufficient: a successful entry also required authentication, database access and receipt of the shared room. These became explicit conditions for reviewing the joining flow.
+
+这一配置明确了本地预览与已部署共享体验的区别。单个浏览器能够加载图像仍不够；成功加入还要求身份验证、数据库访问以及共享房间数据接收。这些条件成为检查加入流程的具体标准。
+
+## 03. Investigating Missing Players and First-Join Failures｜排查玩家缺失与首次加入失败
+
+Repeated device checks showed that a phone could display the map while another player remained absent. At times, the public display reported only one player even though two phones had entered. Connection labels and player counts helped identify the discrepancy, but could not establish that shared presence was working.
+
+反复设备检查发现，手机可能显示地图，却看不到其他玩家。有时两台手机都已进入，公共大屏仍只报告一名玩家。连接标签与玩家数帮助发现差异，但不能证明共享在场已经正常运行。
+
+One documented failure was reproduced with the real Firebase SDK under a stalled browser-storage condition resembling an iOS webview. Authentication could remain pending while the old interface still opened a local map. The revised implementation uses in-memory authentication and waits for both an acknowledged player write and a shared room read containing that player before completing entry. A failed first join remains visible on the joining screen.
+
+其中一个有记录的故障使用真实Firebase SDK复现：在类似iOS内嵌浏览器的存储阻塞条件下，身份验证可能一直等待，而旧界面仍打开本地地图。修改后采用内存身份状态，并在完成进入前等待玩家记录获得写入确认、共享房间读取中也包含该玩家。首次加入失败时，用户留在加入界面并看到反馈。
+
+This addressed a specific failure rather than proving a single cause for every historical disappearance. Independent connection records, room consistency and reconnection handling were also reviewed. Verification required two phones to move distinct characters while both phones and the public display received them. Reconnection republishes the latest known position; removal after network loss is not assumed to be immediate.
+
+这解决的是一个具体故障，不能据此认定所有历史缺失都只有同一原因。独立连接记录、房间一致性及重连处理也经过检查。验证要求两台手机分别移动不同角色，同时双方手机与大屏都能接收。重连会重新发布最近位置，而断网后的角色移除不应被假设为即时发生。
+
+## 04. Adapting Navigation to the Phone Screen｜调整手机导航与角色呈现
+
+The phone required its own view of the shared world. The camera follows the local character while the public display retains the map overview. Movement updates shared world coordinates, rather than moving an independent copy of the scene. A virtual joystick provides touch input, and overhead nicknames identify nearby players. The joystick supports directional dragging at a controlled speed, and the camera stops at map boundaries rather than exposing space outside the artwork.
+
+手机需要对共享世界使用自己的视角。镜头跟随本地角色，公共大屏保留地图全景。移动更新共享世界坐标，而不是移动一份独立场景。虚拟摇杆提供触控输入，头顶昵称用于识别附近玩家。摇杆支持以受控速度按方向拖动，镜头在地图边界停止，避免显示画面之外的区域。
+
+Early screenshots revealed a small character and excessive empty space below the map. The scene ended above much of the joystick, making the active area feel unnecessarily restricted. The layout was revised to fill the available phone viewport, placing the controls over the map. After visual trials, the view was enlarged by 35% and movement speed reduced by 20%.
+
+早期截图显示角色偏小，地图下方存在过多空白。场景在摇杆上方就已结束，使实际活动区域显得受到不必要限制。布局随后调整为填满可用手机视区，并将控件叠加在地图上。经过视觉试用，视角放大35%，移动速度降低20%。
+
+Further adjustments brought nicknames and chat bubbles closer to the character’s head. These changes refined spatial relationships without requiring a new shared-data model. Joystick release, lost focus and opening an activity stop held movement, while closing the activity restores normal map control. Navigation was therefore checked as a complete sequence of moving, entering, interacting and returning.
+
+后续又将昵称和聊天气泡适度移近角色头顶。这些调整优化了空间关系，无需更换共享数据模型。松开摇杆、失去焦点或打开活动时会停止持续移动；关闭活动后恢复地图控制。因此，导航按移动、进入、互动和返回的完整过程检查。
+
+## 05. Implementing and Verifying Room Chat｜实现并验证房间聊天
+
+Chat was added after shared movement to allow players to address one another directly. The phone’s chat control opens a panel with text input, recent messages and four quick reactions: wave, smile, thumbs-up and heart. Opening the panel stops held movement so typing does not leave the character travelling through the map. Text input is limited to 80 characters; quick reactions use the same sending path as typed messages.
+
+聊天在共享移动之后加入，使玩家能够直接回应彼此。手机聊天入口打开包含文字输入、近期消息和四种快捷反应的面板：挥手、微笑、点赞与爱心。打开面板会停止持续移动，避免输入时角色继续在地图上行走。文字输入限制为80个字符，快捷反应与输入消息使用同一发送路径。
+
+Messages use the same room and player identity as movement. Other clients receive the sender’s speech state, and the corresponding character displays a bubble for five seconds. The public display presents bubbles without a chat input panel. The phone keeps up to 30 recent messages in the current page session; the database holds each connection’s latest speech state, not a permanent chat archive.
+
+消息与移动使用相同房间及玩家身份。其他客户端接收发送者的发言状态，对应角色显示五秒气泡。公共大屏只呈现气泡，不提供聊天输入面板。手机保留当前页面会话中最多30条近期消息；数据库保留每条连接最近一次发言状态，而不是永久聊天档案。
+
+Early feedback included missing text and renewed player-visibility problems. The acceptance check therefore covered the whole path: two players join, both remain visible, a message reaches the other phone, and the bubble disappears after five seconds. Input length, send feedback and a brief cooldown support controlled use. Rendering messages as text avoids interpreting participant input as HTML.
+
+早期反馈包括文字未显示以及玩家可见性问题再次出现。因此，验收检查覆盖完整路径：两人加入并保持可见，消息到达另一台手机，气泡在五秒后消失。输入长度、发送反馈与短暂冷却支持有序使用。消息按文本渲染，避免把参与者输入解释为HTML。
+
+## 06. Developing Activity Entrances Within the Map｜在地图内发展活动入口
+
+The existing map and characters established the visual context for each new activity. Several initial image options appeared too detailed, saturated or stylistically distant from the scene. Revisions used simpler shapes, softer colours and clear outlines, with each image reviewed in place rather than only as a standalone illustration.
+
+已有地图和角色为新增活动提供了视觉背景。部分初版图像细节过多、饱和度过高，或与场景风格不一致。修改采用更简洁的形态、柔和配色和清晰描边，并在地图中检查图像，而不只判断独立插画。
+
+The wishing-tree entrance was placed over the central plaza tree and labelled in English. The hand prompt was removed while the proximity effect remained. The drink shop was enlarged, widened and moved slightly left. Fishing developed into a lighter pond with two rods and no visible fish. The sign-free piano was positioned on the existing stage and enlarged by 15%.
+
+许愿树入口覆盖中央广场大树，并采用英文标注。手势提示被移除，但保留靠近效果。饮品店放大、加宽并略向左移；钓鱼入口发展为浅色水面、两根鱼竿且不显示鱼；无木牌的钢琴放在已有舞台，并放大15%。
+
+Consistent approach cues make the entrances recognisable as interactive objects. Their placement also gives the activities a context within the campus. Clicking opens the relevant interaction, while close and return controls lead back to the shared map. The environment provides continuity between activities without requiring a fixed storyline.
+
+一致的靠近提示让这些入口容易被识别为可交互物件。位置安排也使活动在校园中具有相应背景。点击打开对应交互，关闭和返回控件则回到共享地图。环境为各活动提供连续性，无需固定剧情。
+
+## 07. Building the Wishing-Tree Contribution Flow｜建立许愿树的贡献流程
+
+The wishing tree developed from a visible map entrance into a shared contribution system. Approaching the central tree activates its cue; selecting it opens a phone-sized interface. The composer retains the joined player’s nickname, accepts a wish and provides a “Hang wish” action. This links the contribution to the identity already used in the map. A 160-character limit and counter bound the contribution.
+
+许愿树从可见地图入口发展为共享贡献系统。接近中央大树会激活提示，点击后打开适合手机的界面。编辑器保留已加入玩家的昵称，接收愿望，并提供“Hang wish”操作，将贡献与地图中已有身份关联。160字符限制及计数器限定贡献长度。
+
+Submitted wishes appear as hanging notes that other players can open. The opened note uses a framed-paper layout based on the supplied game message-board reference, showing the full text, author nickname and date. A total count and page controls support browsing when there are more notes than the current tree view can display. Wishes remain available after their author leaves, separating contribution storage from temporary player presence.
+
+提交后的愿望以悬挂纸条出现，其他玩家能够打开。完整纸条参考提供的游戏留言板，采用带边框纸张布局，显示全文、作者昵称与日期。愿望总数和翻页控件支持浏览当前树画面无法一次容纳的更多内容。作者离开后，愿望仍可保留，贡献内容的存储与临时玩家在场状态分开处理。
+
+Development moved through a visual preview before integrating shared data. The tree’s position, artwork and mobile layout were reviewed separately from whether another client could read the same wish. Entry, writing, hanging, reading and returning were checked as one flow. This separated the appearance of a completed interface from the operation of a shared contribution. Players can close an individual note, continue browsing or return to the map through the tree’s back control.
+
+开发先经过视觉预览，再整合共享数据。大树位置、素材与手机布局分别检查，不与另一客户端能否读到同一愿望混为一谈。进入、填写、挂上、阅读和返回按一条流程检查，区分界面外观完成与共享贡献实际运行。玩家可以关闭单张纸条、继续浏览，或通过许愿树返回控件回到地图。
+
+## 08. Encouraging Wish Discovery and Adding Blessings｜完善愿望发现与祝福回应
+
+Once shared wishes were working, the next concern was whether visitors had a reason to open someone else’s note. Short previews and gentle swaying were added. The first previews exposed too much of the sentence, leading to several reductions before settling on a brief opening of up to approximately five English words. The complete message remains inside the opened note.
+
+共享愿望运行后，下一问题是访客为何愿意打开他人纸条。为此加入简短预览和轻微摆动。初版预览透露过多句子内容，经过多次缩减，最终采用最多约五个英文词的简短开头，完整内容保留在打开的纸条内。
+
+The blessing interaction then provided a response without requiring another message. “May it come true” records a blessing and updates the shared count. The implementation limits each anonymous identity to one blessing per wish; it is not a permanent real-person identity system. The selected note displays the shared count and the current identity’s blessing state, with duplicate submissions blocked.
+
+祝福交互随后提供了无需另写文字的回应方式。“May it come true”记录祝福并更新共享数量。实现限制每个匿名身份对同一愿望祝福一次，但它不是永久的真实个人身份系统。所选纸条显示共享数量和当前身份的祝福状态，并阻止重复提交。
+
+The button initially reported that blessings were unavailable because the corresponding database rules needed publication. This showed that deploying an interface did not automatically make a new shared operation available. Rules, client code and the published version needed to agree. Later review confirmed the response worked. Wish reading, blessing feedback and return to the map were then checked alongside existing player visibility and chat.
+
+按钮最初提示祝福不可用，需要发布相应数据库规则。这说明，部署界面并不会自动启用新的共享操作，规则、客户端代码和发布版本需要一致。后续检查确认回应可以使用，随后将愿望阅读、祝福反馈及返回地图，与原有玩家可见性和聊天一并检查。
+
+## 09. Developing the Cooperative Drink Activity｜发展合作饮品活动
+
+The drink activity was developed around four alternating decisions. Two players match through square avatar portraits with names above them, then choose Base, Flavour, Topping and Finish in A/B/A/B order. Each stage has three options: sparkling water, milk tea or slush; strawberry, matcha or mango; pearls, coconut jelly or red bean; and milk foam, ice cream or a lemon slice. This produces 81 recipe combinations. The first player waits for a partner; only the participant whose turn is active can confirm the next choice.
+
+饮品活动围绕四次轮流决策发展。两名玩家通过上方显示名字的方形头像匹配，再以A/B/A/B顺序选择基底、风味、配料和装饰。各阶段分别有三选一：气泡水/奶茶/冰沙，草莓/抹茶/芒果，珍珠/椰果/红豆，以及奶盖/冰激凌/柠檬片，共81种配方组合。首位玩家等待搭档，只有当前轮到的参与者能够确认下一次选择。
+
+The counter interface was reviewed visually before online turns were integrated. Feedback identified changes between ingredients that were too subtle. Revisions made selections more distinguishable while retaining the selected muted style and upright cards. A brief “Your turn” notification clarifies control. Shared turns use committed recipe changes so both phones receive the same result. The counter supports one pair per room; a further visitor receives a busy message, and partner loss blocks further choices.
+
+柜台界面先进行视觉检查，再接入联机轮次。反馈指出不同原料的变化过于细微，因此修改增强选择差异，同时保留低饱和风格和端正卡片。简短“Your turn”提示明确操作权，共享轮次采用已确认的配方变化，使两台手机获得同一结果。每个房间的柜台支持一组双人组合，额外访客会看到忙碌提示；搭档离开时，后续选择会被阻止。
+
+The result was enlarged, named and simplified to “Back to map”, with no repeated ingredient list, cup logo, straw or ground shadow. A later alignment issue was traced to the drink graphic’s inherited maximum width, which shifted its visual centre; filling the stage corrected it. These revisions addressed cooperation, visible feedback and presentation rather than only adding recipe options. The completion also identifies the two makers, and both phones show the same named drink.
+
+完成页放大并命名成品，简化为“Back to map”，不重复原料清单，也不使用杯身标志、吸管或地面阴影。后来的歪斜问题追溯到饮品图形继承的最大宽度限制，其使视觉中心偏移，改为填满展示区后得到纠正。这些修改涉及合作、可见反馈和呈现，而不仅是增加配方选项。完成页还标明两位制作者，两台手机显示同一杯有名字的饮品。
+
+## 10. Fishing Synchronisation and Challenge Tuning｜钓鱼同步与挑战调整
+
+Fishing introduced continuous cooperation rather than discrete turns. Matching identifies two players, followed by a central countdown. One controls vertical movement and the other horizontal movement of a shared float. Both must coordinate its position over a moving target to build progress. Both players see matching nicknames and portraits, but receive only their assigned directional controls beside the same pond and progress state. One pair occupies the pond; an additional visitor receives a busy message and retry option.
+
+钓鱼引入持续合作，而不是离散轮次。匹配识别两名玩家后进入中央倒计时；一人控制上下，另一人控制左右，共同操纵浮标。双方需要协调位置，对准会移动的目标来积累进度。双方看到匹配昵称和头像，但在相同池塘与进度状态旁，只获得各自分配的方向控制。一个池塘由一组双人占用，额外访客看到忙碌提示及重试入口。
+
+The initial online version felt jerky, and the countdown was not sufficiently visible. A central countdown restored the preparation cue. Movement development separated ongoing simulation from periodic network checkpoints, while the presentation layer responds to local input and smooths received positions. Shared state still determines progress and outcomes; visual prediction does not independently decide success. Controls pause when partner readiness or fresh shared state is missing, rather than presenting a solo local round as continuing online play.
+
+初版联机表现卡顿，倒计时也不够明显。中央倒计时恢复了准备提示。移动处理将持续模拟与周期网络同步分开，显示层则及时回应本地输入，并平滑接收的位置。进度和结果仍由共享状态决定，视觉预测不会独立判断成功。缺少搭档就绪或足够新的共享状态时，控制会暂停，而不会把单人的本地运行呈现为仍在继续的联机游戏。
+
+Difficulty was addressed separately. Progress starts at 20%, gains 10% per aligned second and fails at zero. The target tolerance increased by 10%, its movement interval extended to 3.5 seconds, and misalignment loss reduced from 5% to 4% per second. Reaching 100% completes the catch. These adjustments made coordination more forgiving without presenting lower difficulty as a solution to network responsiveness.
+
+难度另行处理。进度从20%开始，对准时每秒增加10%，降至零失败。判定容错扩大10%，目标换位间隔延长到3.5秒，偏离时进度下降由每秒5%降到4%。达到100%完成捕获。这些调整让配合更宽松，但不把降低难度当作网络响应问题的解决方法。
+
+## 11. Fishing Presentation, Assets and Shared Results｜钓鱼画面、素材与共同结果
+
+The pond presentation changed after the control system was established. A visible fish was replaced by ripples, leaving the catch to be revealed after success. The float was revised to appear partly submerged, keeping the interaction visually connected to the water.
+
+控制系统建立后，池塘呈现继续调整。可见的鱼被涟漪取代，捕获对象留到成功后揭晓；浮标修改为部分浸入水中，使交互在视觉上与水面相连。
+
+The result images were selected through several design and upload attempts. Supplied artwork and generated options were reviewed together, then cut-outs and remaining image borders were refined. The four successful results were named Lotus Fish, Goofy Toothy, Bigmouth and Purrmaid. Failure uses Smug Finn and “The fish got away!”, without a separate escape animation.
+
+结果图像经历多次设计与上传尝试。提供的素材与生成选项一起评估，随后完善抠图和残留边缘。四种成功结果命名为Lotus Fish、Goofy Toothy、Bigmouth和Purrmaid；失败使用Smug Finn及“The fish got away!”，不另加逃走动画。
+
+Both phones use the same round identity to select the reveal, so a visually random catch remains consistent for the pair. The result displays the fish image and name, with retry or return controls. This stage connected a shared game outcome to a readable and stylistically consistent presentation. The additional artwork served the end of the interaction rather than increasing the complexity of the controls.
+
+两台手机使用相同回合标识选择揭晓结果，使看似随机的捕获对双方保持一致。结算显示鱼图与名字，并提供重试或返回控件。这一阶段将共享游戏结果连接到清楚且风格一致的呈现；新增素材服务于交互结尾，没有增加操作复杂度。
+
+## 12. Piano Audio, In-Map Controls and Fair Use｜钢琴音频、地图内操作与公平使用
+
+The piano was designed for one performer and an audience. Its three rows of seven numbered keys provide 21 notes. Other joined players can listen across the map after enabling sound; distance changes volume, and a mute control remains available. “Start playing” claims the instrument, while finish and close actions release it. Web Audio synthesises the tones rather than playing an uploaded piano recording. The key rows represent low, middle and high registers. The public display starts muted, so presentation sound requires an explicit enable action.
+
+钢琴面向一名演奏者及其他聆听者。三排七个数字音键提供21个音符，其他已加入玩家开启声音后可以在地图中聆听；音量随距离变化，并提供静音控制。“Start playing”取得乐器使用权，结束和关闭操作释放占用。声音由Web Audio合成，而不是播放上传的钢琴录音。音键三排分别代表低、中、高音区。公共大屏默认静音，演示声音需要明确开启。
+
+Initial checks exposed permission and audio problems. Keys changed colour on an iPhone without producing sound. Database rules needed publication, while audio activation and recovery needed separate handling for mobile browsers. Device feedback later confirmed sound. The sound control was then revised to match the interface visually.
+
+初期检查暴露了权限和音频问题：iPhone按键会变色，却没有声音。数据库规则需要发布，而移动浏览器的音频激活和恢复需要另行处理。后续设备反馈确认能够出声，声音开关随后也调整为与界面一致的样式。
+
+The keyboard changed from a separate activity view to a compact panel over the live map. Its position was raised to reduce accidental exit taps. Selecting an occupied piano shows only the performer’s name, not a listener keyboard or synchronised key highlights. A restrained piano movement and rising notes on the map indicate use.
+
+键盘从独立活动画面改为覆盖实时地图的紧凑面板，并上移以减少误点退出。点击已被占用的钢琴只显示演奏者名字，不向听众显示键盘或同步按键高亮。地图上的轻微钢琴动作和上升音符提示正在使用。
+
+An eight-second interval without a note automatically releases the seat. Only actual notes renew it, preventing an idle player from retaining access. This combined technical ownership with a practical rule for a shared exhibition resource.
+
+八秒没有音符会自动释放座位，只有实际弹奏会更新时限，避免闲置玩家持续占用。这将技术使用权与展览共享资源的实际使用规则结合起来。
+
+## 13. Integration, Deployment and Version Control｜整合检查、部署与版本管理
+
+As activities accumulated, the shared map needed regression checks rather than separate demonstrations of each feature. Checks returned to two-phone visibility, message reception, five-second bubbles, activity entry and exit, matching and shared outcomes. Automated and controlled-browser checks supported this work, while the development conversation recorded phone observations and subsequent revisions.
+
+随着活动增加，共享地图需要回归检查，而不只是分别演示功能。检查回到双手机可见性、消息接收、五秒气泡、活动进出、匹配与共同结果。自动化和受控浏览器检查提供支持，开发对话则记录手机观察及后续修改。
+
+Publishing introduced another distinction. The tree or blessing button sometimes appeared missing after an update, and one fixed-version entry returned a 404. The Pages publishing source and build status were checked. A successful push was not treated as proof that the new site was available; client files, activity panels, database rules and the QR destination also needed to correspond. These observations do not establish caching as the cause of every failure.
+
+发布带来了另一类区别：更新后曾出现许愿树或祝福按钮缺失，一个固定版本入口也返回404。随后检查Pages发布来源与构建状态，不将推送成功等同于新站点已可访问；客户端文件、活动面板、数据库规则及二维码目标也需要对应。这些观察并不能证明每次失败都是缓存造成。
+
+Content-versioned releases and matching QR links supported consistent entry and preserved older files for already-open clients. Approved versions were retained as backups before later promotion. The unused streetlight interaction was removed, while decorative map lamps remained. Release management therefore became part of maintaining the complete experience, not simply uploading the latest interface.
+
+按内容生成版本的发布文件及匹配二维码支持一致入口，也为已经打开的客户端保留旧文件。批准版本在后续正式更新前保留备份。未使用的路灯交互被移除，地图装饰路灯保留。因此，版本管理成为维护完整体验的一部分，而不仅是上传最新界面。
+
+## 14. Reflection Through the Six Social UX Principles｜通过六项Social UX原则反思开发
+
+Sensory Feedback. Visual selection and movement feedback developed into timed chat, recipe changes, progress states and piano sound. The silent iPhone keys showed why the intended output needed direct checking.
+
+感官反馈（Sensory Feedback）。选择和移动的视觉反馈扩展为限时聊天、配方变化、进度状态和琴声。iPhone按键无声说明，需要直接检查预期输出。
+
+Embodied Interaction. The phone became a physical controller for movement, divided fishing input and note selection. This remains touchscreen-mediated interaction rather than full-body tracking.
+
+具身互动（Embodied Interaction）。手机成为移动、分轴钓鱼与音符选择的实体控制器，但仍属于触屏媒介交互，而非全身追踪。
+
+Social Dynamics. Independent avatars establish co-presence; alternating choices and split controls require participants to influence one outcome. These mechanisms relate to the course’s computer-supported cooperative work discussion.
+
+社会动态（Social Dynamics）。独立角色建立共同在场，轮流选择与分工控制要求双方影响同一结果。这些机制对应课堂关于计算机支持协同工作的讨论。
+
+Resilience & Motivation. Gentler fishing, retry and short activities support experimentation. Shared named drinks and fish provide visible completion without requiring competitive ranking.
+
+韧性与动机（Resilience & Motivation）。更宽松的钓鱼、重试及简短活动支持尝试；双方共同获得的有名字的饮品和鱼提供可见完成反馈，无需竞争排名。
+
+Proactivity & Clarity. QR entry, approach cues, previews, turn messages and occupancy notices act as signifiers. They communicate how to enter, discover a contribution or recognise who can act.
+
+主动引导与清晰性（Proactivity & Clarity）。二维码、靠近效果、预览、轮次和占用通知作为signifiers，说明怎样加入、发现贡献或识别操作权。
+
+Ethics & Inclusion. Nicknames and a non-human avatar offer identity choices; mute, exits and inactivity release support control and fair access. Phone ownership, connectivity, language, visual controls and public text remain barriers and responsibilities.
+
+伦理与包容（Ethics & Inclusion）。昵称与非人类角色提供身份选择，静音、退出和闲置释放支持控制与公平使用；手机拥有情况、网络、语言、视觉操作及公开文字仍涉及障碍和责任。
+
+## 15. Final Evaluation and Design Authorship｜最终评估与设计作者贡献
+
+The final version provides a shared setting in which participants can communicate, contribute, cooperate or listen. Development resolved practical conditions for those interactions: entry, independent presence, readable controls, shared decisions and coherent release files. The remaining social question is whether unfamiliar participants respond to one another beyond completing an activity. Device checks cannot establish an improvement in cross-cultural belonging.
+
+最终版本提供了能够交流、贡献、合作和聆听的共享场景。开发处理了这些交互的实际条件：加入、独立在场、可读控制、共同决定及一致发布文件。剩余社会问题是，不熟悉的参与者是否会在完成活动之外回应彼此；设备检查不能证明跨文化归属感得到提升。
+
+The intended exhibition encounter is joining and completing one activity, rather than finishing the whole map. Its approximately two-minute target still requires timed rehearsal, including matching. The actual network, two phones, public display and a visible phone-screen demonstration should be checked together, with a recorded fallback for connection failure.
+
+预期展览参与是加入并完成一个活动，而不是玩完整张地图。约两分钟目标仍需包括匹配时间在内的计时排练。实际网络、两台手机、公共大屏及能看清手机的演示方案应一起检查，并准备录像应对连接故障。
+
+AI assisted code, debugging, artwork refinement and written drafting. My contribution included defining rules, rejecting unsuitable visual options, requesting changes and reviewing their effects through devices. Specific tools, outputs, adaptations and supplied-image sources require attribution, alongside the unit’s required AI declaration and approval. This separates the use of assistance from the design decisions documented throughout the process.
+
+AI辅助了代码、调试、素材修改和文稿初稿。我的贡献包括定义规则、拒绝不合适视觉方案、提出修改，并通过设备检查其影响。具体工具、输出、修改与提供图像的来源需要注明，并按课程要求提供AI声明与批准。这区分了工具辅助与贯穿过程的设计决定。
+
