@@ -1,0 +1,17 @@
+﻿功能组,中文功能,English coverage,正文页
+加入与共享地图,公共大屏与扫码入口；浏览器加入；昵称；男性/女性/购物袋三角色；同房间独立玩家；多人可见与位置同步,QR entry;browser joining;nickname;three avatars;independent players;shared-room presence and positions,"2,3"
+状态与恢复,连接状态和人数；独立连接；重新连接后发布最近位置,Connection/player count;independent connections;latest-position republishing after reconnect,3
+手机操作,竖屏跟随；地图铺满；35%视角放大；20%减速；摇杆；头顶昵称；聊天入口,Portrait follow camera;full map viewport;35% zoom;20% slower movement;joystick;overhead nicknames;chat control,4
+活动入口,许愿树/饮品/钓鱼/钢琴图标；靠近效果；点击进入；退出/返回地图,Four activity icons;proximity cues;clickable entries;exit/return routes,5
+聊天,输入文字；其他玩家接收；发送者头顶气泡；5秒消失,Typed messages;other-player reception;sender head bubbles;five-second expiry,6
+许愿树,中央树入口；昵称保留；写愿望；Hang wish；共享纸条；愿望总数与翻页,Central tree;retained nickname;write/hang;shared notes;wish count and pagination,6
+愿望阅读与祝福,短预览；轻微摆动；完整内容/昵称/日期；May it come true；共享祝福数；同一玩家一次祝福,Short preview;sway;full text/nickname/date;blessing button;shared count;one blessing per player per wish,6
+饮品匹配与轮次,双人匹配；昵称头像；四阶段轮流；每阶段三选一；Your turn,Two-player matching;names/portraits;four alternating stages;three options each;turn notification,7
+饮品选择,气泡水/奶茶/冰沙；草莓/抹茶/芒果；珍珠/椰果/红豆；奶盖/冰激凌/柠檬片；81组合,"Three bases,flavours,toppings and finishes;81 combinations",7
+饮品反馈与结算,选择改变外观；同一结果；命名；成品放大；Back to map；去掉重复选择清单,Visible ingredient changes;shared named result;enlarged drink;return;no repeated choice list,7
+钓鱼匹配与操作,双人匹配昵称头像；倒计时；上下/左右分工；共享浮标；半浸浮标和换位涟漪,Matching names/portraits;countdown;split axes;shared submerged float;moving ripple target,8
+钓鱼进度,初始20%；对准+10%/秒；偏离−4%/秒；0失败/100%成功；范围扩大10%；3.5秒换位,Start20%;gain10%/s;loss4%/s;zero failure/full success;10% larger tolerance;3.5s target interval,8
+钓鱼结果,双方相同随机捕获；四鱼图像与名称；Smug Finn失败图；鱼逃走了；重试与返回,Shared random catch;four named fish;static escape fish;failure text;retry/return,8
+钢琴操作与声音,地图内21键三排；Start playing；单演奏者；全地图听众开启声音后聆听；距离音量；静音开关,On-map21-key panel;claim;one performer;enabled map-wide listening;distance volume;mute control,9
+钢琴占用与让位,演奏者昵称提示；听众不显示键盘与按键同步；演奏中图标/音符；8秒无音符释放；弹奏刷新计时；主动结束/关闭,Busy nickname notice;no listener keyboard/highlights;playing icon/notes;eight-second idle release;renewal;manual finish/close,9
+维护与验证,多人/消息/共同结果/声音检查；手机视角反馈；活动返回；稳定性与展览检查边界,Presence/message/shared result/audio checks;layout feedback;return paths;limits of verification,"10,12"

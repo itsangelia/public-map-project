@@ -12,7 +12,7 @@ A2 therefore concentrated on realising this proposed experience across separate 
 
 A1’s technical exploration tested a single-user interaction flow: entering a nickname, selecting one of three avatars, confirming entry and moving through the map with arrow keys. This established the local interaction before the multiplayer system was developed. A2 retained the p5.js foundation while extending input and shared data across devices.
 
-The phone now follows its own character, while the public display provides an overview of the campus. Firebase Realtime Database synchronises player positions and activity data, and GitHub Pages provides the web entry point used by the QR code. This implements the public-screen and personal-phone arrangement proposed in A1, informed by its analysis of MMM Ball’s browser-based participation.
+The phone now follows its own character, while the public display provides an overview of the campus. Firebase Realtime Database synchronises player positions and activity data, and GitHub Pages provides the web entry point used by the QR code. This implements the public-screen and personal-phone arrangement proposed in A1, informed by its analysis of MMM Ball’s browser-based participation. The join page accepts a nickname and one of three avatars: male, female or shopping bag. Players enter the same room without creating a permanent account.
 
 Activities introduced further synchronisation requirements. Drink-making needs a common turn sequence and recipe; fishing combines separate directional inputs; the piano requires a single performer state. Messages and wishes must also reach other participants. The technical development therefore extended beyond map navigation to maintaining agreement between individual controls and shared outcomes.
 
@@ -22,13 +22,13 @@ Multi-device checks revealed a recurring problem: a second phone could enter the
 
 These failures affected the distinction established in A1 between occupying the same space and responding to other participants. Participants needed to recognise one another before they could communicate or cooperate. Development consequently returned to the joining process, room state and independent player connections. The resulting implementation maintains distinct player identities and connection records so that separate phones can control separate characters.
 
-Checks compared movement and player visibility across two phones and the public display. Later feedback confirmed successful shared presence, although similar problems had reappeared after earlier checks. This made repeated verification necessary when reviewing subsequent versions. The criterion for a working map became more specific: each player needed to join, retain independent control and remain visible on another device. This was more meaningful than relying on a successful page load or connection label.
+Checks compared movement and player visibility across two phones and the public display. Later feedback confirmed successful shared presence, although similar problems had reappeared after earlier checks. This made repeated verification necessary when reviewing subsequent versions. The criterion for a working map became more specific: each player needed to join, retain independent control and remain visible on another device. This was more meaningful than relying on a successful page load or connection label. Connection and player-count information assist these checks. Reconnection logic republishes the player’s latest known position rather than treating a network return as a new shared character.
 
 ## 04. Mobile Viewport and Movement Refinement
 
 Moving beyond A1’s keyboard-based prototype required a usable portrait phone view. Early mobile layouts allocated insufficient space to the map. A substantial blank area remained below the scene, the character appeared small, and the map did not extend behind the virtual controls. This reduced the usable presentation area on a portrait screen.
 
-The layout was revised so that the map fills the available view and the joystick overlays the scene. The phone view was enlarged by 35%, followed by a 20% reduction in movement speed. These adjustments responded to the small character scale and the perceived speed of movement within the closer view. The public display retained its overview, allowing the two screen types to serve different purposes.
+The layout was revised so that the map fills the available view and the joystick overlays the scene. The phone view was enlarged by 35%, followed by a 20% reduction in movement speed. These adjustments responded to the small character scale and the perceived speed of movement within the closer view. The public display retained its overview, allowing the two screen types to serve different purposes. A virtual joystick supports touch movement, the camera follows the local character and overhead nicknames identify players. Chat remains accessible from a separate phone control.
 
 The revision involved a trade-off between local detail and surrounding context. A closer view improves character visibility but displays less of the campus at once. The selected scale reflects development trials and feedback rather than a measured optimum. This stage demonstrated the importance of checking the complete phone layout, including controls and unused space, rather than evaluating the map image independently.
 
@@ -38,39 +38,47 @@ A1 established a soft fantasy-game direction through pastel colours, chibi chara
 
 Several early generated options appeared overly saturated or detailed, leading to revisions towards softer colours, simpler forms and clearer outlines. Evaluation also considered each image within the map. The drink shop was enlarged, widened and repositioned; the fishing entrance used two rods and a lighter water surface without visible fish; the piano entrance was developed without a wooden sign.
 
-These decisions developed the proposed visual direction through actual assets and placement. The campus functions as a setting for exploration rather than a fixed storyline. Familiar locations give activities context, while consistent proximity effects indicate opportunities to interact. The environment, responsive entrances and piano sound connect separate activities within one shared place, helping participants recognise both the setting and the actions available within it.
+These decisions developed the proposed visual direction through actual assets and placement. The campus functions as a setting for exploration rather than a fixed storyline. Familiar locations give activities context, while consistent proximity effects indicate opportunities to interact. The environment, responsive entrances and piano sound connect separate activities within one shared place, helping participants recognise both the setting and the actions available within it. The wishing tree, drink shop, fishing pond and piano each use approach cues, clickable entrances and a route back to the map.
 
 ## 06. Communication Through Chat and Shared Wishes
 
-Chat and the wishing tree provide different forms of expression within the map. Typed messages appear above characters and disappear after five seconds, supporting immediate communication without leaving persistent speech bubbles over the scene.
+Chat supports immediate communication in the shared map. Players open the phone chat control and type a message, which is received by other players and appears above the sender’s character. The bubble disappears after five seconds, preventing old messages from remaining over the scene.
 
-The wishing tree retains a message for later discovery. Participants can write and hang a wish, then open notes contributed by others. The full note displays the message, nickname and date within a framed-paper layout developed from a game message-board reference. A blessing button provides a response without requiring another written message.
+The central wishing tree offers a persistent contribution. Its proximity cue invites players to open the tree interface, write a wish and select “Hang wish”. The composer retains the player’s nickname. The shared tree displays hanging notes, the total number of wishes and page navigation for browsing additional notes.
 
-A further revision addressed the visibility of other people’s wishes. Gentle movement and a short text preview were added to encourage exploration. The initial preview revealed too much of the message, so it was shortened to approximately four or five English words. The resulting interaction separates discovery from reading: the tree offers a hint, while opening the note reveals the full contribution. This creates a clearer reason to select a note and respond to its author.
+Opening a note reveals the full wish, nickname and date within the framed-paper layout. Short previews and gentle movement encourage discovery. Earlier previews exposed too much text, so they were shortened to a brief opening of up to approximately five English words, leaving the complete message inside the note.
+
+The “May it come true” button adds a blessing and updates the shared count. Each player can bless a particular wish once. This provides acknowledgement without requiring another written message. Closing the note or leaving the tree returns participants to browsing or the map.
 
 ## 07. Collaborative Drink-Making and Visible Choices
 
-The drink activity develops A1’s proposal for short shared play by distributing four decisions between two participants. After matching, players alternate through the base, flavour, topping and decoration stages. Each stage offers three options, producing 81 possible recipe combinations. Both players contribute to the same named result rather than completing separate recipes.
+The drink activity develops A1’s proposal for short shared play through a two-player matching interface with nicknames and avatar portraits. The pair alternate across four stages: base, flavour, topping and decoration. Each stage has three options, producing 81 possible recipe combinations.
 
-The interface was refined to make this contribution visible. Early feedback indicated that ingredient selections did not produce sufficiently distinct changes in the drink. Revisions therefore focused on clearer visual differences while retaining the selected colour palette and upright choice cards. A “Your turn” notification identifies the active participant and supports the handover between decisions.
+The bases are sparkling water, milk tea and slush; flavours are strawberry, matcha and mango; toppings are pearls, coconut jelly and red bean; decorations are milk foam, ice cream and a lemon slice. Each selection changes the drink, and a “Your turn” notification identifies who can act next.
 
-The completion screen was simplified by enlarging the finished drink, retaining its name and providing a direct return to the map. Cup logos, straws and the bottom shadow were removed from the visual treatment. The shared result gives both participants a visible record of their combined decisions. The activity creates a reason for cooperation without requiring competition or a predefined conversation.
+Early feedback indicated that ingredient changes were not visually distinct enough. Revisions strengthened these differences while retaining the selected colour palette and upright cards. Cup logos, straws and the bottom shadow were removed from the visual treatment.
+
+Both players receive the same completed drink. The result screen enlarges it, displays its name and provides “Back to map”, without repeating the full selection list. The shared outcome records contributions from both participants and creates a reason to cooperate without competition.
 
 ## 08. Cooperative Fishing: Responsiveness and Difficulty
 
-Fishing requires continuous coordination through divided controls. One participant controls vertical movement and the other horizontal movement. Both influence one float, which must align with moving ripples to increase shared progress. Neither participant controls both axes independently.
+Fishing begins with two-player matching, nickname and avatar identification, followed by a countdown. One participant controls vertical movement and the other horizontal movement. Both influence one float, which must align with moving ripples to increase shared progress. Neither controls both axes independently.
 
-Development feedback identified two separate issues: jerky movement and excessive difficulty. Movement was refined to improve visual continuity. The challenge settings were then adjusted by increasing the target range by 10%, extending target changes to 3.5-second intervals and reducing progress loss to 4% per second. Progress begins at 20%, increases by 10% per second when aligned and ends in failure if it reaches zero.
+Development feedback identified jerky movement and excessive difficulty as separate issues. Movement was refined for visual continuity. The target range was increased by 10%, target changes extended to 3.5-second intervals and progress loss reduced to 4% per second. Progress starts at 20%, increases by 10% per second when aligned and ends in failure at zero; reaching 100% completes the catch.
 
-The visual presentation was also revised. Ripples replaced the visible fish, and the float was shown partly submerged. Successful completion reveals one of four named fish, while failure presents a static escape result. These choices preserve the catch as a shared reveal. Separating responsiveness from difficulty was important: a more forgiving challenge could reduce frustration, but could not resolve synchronisation or rendering problems by itself.
+Ripples replaced the visible fish, and the float appears partly submerged. Successful completion gives both players the same randomly revealed catch, with its image and name: Lotus Fish, Goofy Toothy, Bigmouth or Purrmaid. Failure shows Smug Finn with “The fish got away!”, without an additional escape animation. Retry and return controls support another attempt or a return to the map.
+
+These revisions retain continuous cooperation while making the task more forgiving. Difficulty adjustment remains distinct from synchronisation work: easier settings cannot resolve network or rendering problems by themselves.
 
 ## 09. Shared Piano: Audio, Occupancy and Access
 
-The piano extends participation to both performance and listening. One player occupies the instrument and uses a 21-key interface arranged in three rows. Other players can listen after enabling sound. An occupancy notice identifies the performer, while the activity icon responds visually during use.
+The piano is opened as an on-map panel with 21 numbered keys arranged in three rows. “Start playing” claims the instrument for one performer. Other players can listen across the map after enabling sound, with volume responding to distance from the piano. A sound control enables playback or mutes it.
 
-Technical checks exposed a difference between visual and auditory feedback. On an iPhone, keys changed colour without producing sound. Database permissions and browser audio activation required separate attention. Following these changes, device feedback confirmed audible playback. The issue demonstrated why a visible response could not establish that the complete interaction was working.
+Selecting an occupied piano shows the performer’s nickname rather than a duplicate keyboard. Listeners do not receive synchronised key highlights. The map entrance responds during performance with movement and musical-note effects, making the activity visible to others.
 
-The piano was subsequently presented as a panel within the map, retaining the surrounding shared environment. The keyboard was moved further from the exit control to reduce accidental selection. Other players receive an occupied notice rather than a duplicate keyboard. An eight-second inactivity release also prevents an idle session from holding the instrument indefinitely. Together, these revisions clarify the performer’s role and improve access to a shared resource.
+An eight-second period without a note releases the seat; further notes refresh that period. Players can also finish playing or close the panel. The controls remain separated from the exit to reduce accidental selection. These mechanisms clarify occupancy and prevent an idle session from retaining the shared instrument.
+
+Technical checks exposed a separate audio problem: on an iPhone, keys changed colour without producing sound. Database permissions and browser audio activation required separate attention. Following these changes, device feedback confirmed audible playback. The issue demonstrated why a visible response could not establish that the full interaction was functioning.
 
 ## 10. Testing Evidence and Responses to Feedback
 
