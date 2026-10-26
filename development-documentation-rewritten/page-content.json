@@ -1,0 +1,106 @@
+[
+  {
+    "page": 1,
+    "title": "From the Proposal to Shared Campus",
+    "en": "In my initial proposal, I wanted to give international students a reason to approach someone outside their usual social circle. The idea was to join a shared campus map through a phone, choose a character and take part in something together. QR entry, free exploration and cooperative activities were already part of this proposal.\n\nDuring development, these ideas became specific places on the map: a wishing tree, a drink shop, a fishing pond and a piano. Players can also see and message each other while exploring. The public screen shows the shared campus, while each phone follows its own player.\n\nSome parts of the proposal changed. I did not develop the token system, and the original cultural prompts became less central. The finished activities give people a shared task or something to respond to, rather than directly asking them to describe their culture. The aim is still to make first contact easier, although the way I approach it has changed.",
+    "zh": "这页只用来接回初始概念。二维码、自由探索与合作不是A2新增想法；真正发展出来的是具体活动与能运行的联机体验。文化提示变得间接，是需要承认的变化。",
+    "figure": "初始概念第5/7页与最终地图并排；分别标注保留、发展、未实现。",
+    "caption": "From the initial proposal to the working map. The shared-campus idea remained, while the activities and form of participation developed."
+  },
+  {
+    "page": 2,
+    "title": "Building on the Existing Map",
+    "en": "I started with the existing p5.js project and kept its illustrated map and three characters. My task was to turn this setting into a space that people could enter and use together. This meant adding shared player data, adapting the phone view and connecting activities to the map.\n\nEach device has a different role. A phone controls one player and shows the area around that character. The public display shows the wider map. Both need to use the same player positions, even though their views look different. Firebase Realtime Database synchronises this information, and GitHub Pages hosts the site so that visitors can open it from a QR code.\n\nAs the project grew, the shared data included more than position. Drink-making needed a common turn sequence; fishing needed two inputs for one float; the piano needed to identify its current performer. These interactions depended on devices agreeing on the same state. Getting one screen to look right was only the beginning.",
+    "zh": "介绍实际实现与设备分工。用一张结构图说明共享坐标和不同视角，不把这页写成Firebase安装教程。",
+    "figure": "两台手机、Firebase、公共大屏的结构图；下方放地图到联机功能的简短开发阶段线，不编日期。",
+    "caption": "Phones provide individual controls, while the display presents the shared map. Firebase keeps their player and activity data connected."
+  },
+  {
+    "page": 3,
+    "title": "When Players Could Not See Each Other",
+    "en": "One of the most persistent problems was that a second phone could enter the map without seeing the first player. Sometimes the public display also showed only one player. The screen could say “Connected” while the shared experience was still missing.\n\nThis became a priority because every activity depended on players being present together. I wanted to add chat and games, but those additions had little value if someone appeared to be alone. Work returned to the joining process, room data and separate player connections. The implementation keeps distinct player identities so that each phone controls its own character.\n\nI checked the result with two phones and the display, moving the characters separately and looking for both on the other screens. Some problems returned after earlier checks had seemed successful. That changed what I looked for when reviewing a version: opening the map was not enough. Players also needed to remain independent and visible to one another.",
+    "zh": "保留问题反复出现这一真实过程。没有证实唯一根因，不写成某次修复就永久解决。这里的“检查”是你的设备操作，不是招募用户研究。",
+    "figure": "早期players:1或缺失角色截图＋后期两角色画面；没有旧图就用保留的真实反馈。",
+    "caption": "A connected screen did not always show all players. The check needed to include independent movement and visibility across devices."
+  },
+  {
+    "page": 4,
+    "title": "Making the Phone View Easier to Use",
+    "en": "The early phone layout showed too much empty space below the map. My character looked small, and the map ended before it could properly sit behind the joystick. On a phone, this made the part I was using feel smaller than the available screen.\n\nI asked for the map to fill the view and for the character to appear larger. After trying the scale, I settled on a 35% increase in the phone view. Movement was then reduced by 20%, because a larger view also made quick movement feel more noticeable. The joystick sits over the map, with the chat control beside it.\n\nThese adjustments were small compared with adding a game, but they changed how the whole map felt on a phone. The display could keep its overview, while the phone gave the player a closer view. Enlarging it also meant seeing less of the surroundings at once, so I treated the scale as a balance rather than simply making everything as large as possible.",
+    "zh": "这一页可以直接用你原先提出的手机问题。写个人观察与调整，不声称35%是研究得出的最优值。",
+    "figure": "同尺寸手机截图前后对比；圈出地图底边、角色比例与摇杆。",
+    "caption": "The revised phone view uses the space behind the controls and gives the player a closer view of their character."
+  },
+  {
+    "page": 5,
+    "title": "Choosing Artwork That Belonged on the Map",
+    "en": "The map and characters already had an illustrated style, so I used them to judge the new activity images. Several early options looked too detailed or too saturated beside the existing artwork. I asked for simpler shapes, softer colours and clearer outlines.\n\nI also changed individual details rather than treating each image as finished. The drink shop needed to be larger, slightly wider and further left. For fishing, I chose two rods and a lighter pond surface, then removed the fish from the water. For the piano, I did not want a wooden sign. These choices helped each entrance read clearly without giving every activity the same decoration.\n\nAn image that looked good on its own could still be the wrong size on the map. I reviewed the entrances in place and adjusted their scale and position. I also kept a similar proximity effect across them, so players could recognise that approaching these objects offered something to do.",
+    "zh": "写你具体怎样判断画面，不写“通过视觉语言赋能沉浸体验”。地图和角色来源单独列，不能与AI活动素材混同。",
+    "figure": "选2–3组真实早期与最终图；再放地图中的比例检查。",
+    "caption": "Selected revisions to the activity entrances. Colour, detail, scale and position were adjusted against the existing map."
+  },
+  {
+    "page": 6,
+    "title": "Giving Players Something to Say and Read",
+    "en": "Chat was the first way for players to speak to each other inside the map. A typed message appears above the character and disappears after five seconds. This keeps the conversation close to the player without leaving old bubbles over the scene.\n\nThe wishing tree gives messages a different place. Players can write a wish, hang it on the tree and open other people’s notes. I wanted each opened note to show the nickname and date, with a framed-paper appearance inspired by the game reference I supplied.\n\nOnce the notes worked, I wondered why someone would choose to open another person’s wish. I added a short preview and gentle movement. At first, too much of the sentence was visible, so I shortened it to around four or five English words. The preview gives a hint, while the full message remains inside the note. The blessing button then offers a way to respond without having to write a reply.",
+    "zh": "纸条参考你发来的小花仙留言板画面，但不把参考图当作自己设计。说明预览过长这个真实修改点，以及祝福为什么合适。",
+    "figure": "聊天气泡、短预览、完整纸条与祝福三个局部；参考图如使用须注明原始来源尚待补齐。",
+    "caption": "A short preview invites players to open a wish. The full note keeps the nickname, date and blessing response together."
+  },
+  {
+    "page": 7,
+    "title": "Making a Drink Together",
+    "en": "For the drink shop, I wanted both players to contribute to the same result. They match with nicknames and character portraits, then take turns across four stages: base, flavour, topping and decoration. Each stage has three options. One person chooses the base, the other chooses the flavour, and they continue alternating until the drink is complete.\n\nA problem appeared in the visual feedback. I liked the general style, but changing an ingredient did not make enough difference to the drink. I asked for those changes to be more noticeable while keeping the softer colours and upright selection cards. A “Your turn” message helps make the handover clear.\n\nI also simplified the result. The finished drink becomes larger, keeps its name and has a “Back to map” button. I removed the cup logo, straws and bottom shadow. The page gives both players one finished drink to look at, rather than presenting another list of everything they selected.",
+    "zh": "把“共同选择”与“点击后变化不明显”联系起来。避免把三选一规则写成长清单；各选项可通过图例表达。",
+    "figure": "匹配、Your turn、两种配料变化、放大成品。",
+    "caption": "Players alternate decisions and receive one shared result. Visible ingredient changes make each choice easier to recognise."
+  },
+  {
+    "page": 8,
+    "title": "Adjusting the Fishing Game",
+    "en": "Fishing asks the pair to coordinate continuously. One player controls up and down, and the other controls left and right. They move one float towards ripples on the pond. Neither player controls both directions alone.\n\nThe first versions felt jerky and difficult. I treated these as two problems: movement needed to feel smoother, and the challenge needed more room for error. After movement refinements, I asked for the target range to increase by 10%, the target to move every 3.5 seconds and missed alignment to reduce progress by 4% per second. Progress starts at 20% and rises by 10% per second while aligned. Reaching zero ends the attempt.\n\nI also changed what players see in the pond. Ripples replaced the visible fish, and the float was made to look partly submerged. A successful catch reveals one of four named fish. Failure shows the escaped fish without an extra animation. This keeps the identity of the catch for the result screen and gives both players a shared surprise.",
+    "zh": "卡顿处理与难度调整分开写，不能说降低难度修复网络。成功四种鱼、失败表情鱼用实际素材配图。",
+    "figure": "两种控制角色、浮标涟漪、参数变化、成功与逃走图。",
+    "caption": "The fishing revisions addressed movement and challenge separately. Ripples keep the catch hidden until the shared result."
+  },
+  {
+    "page": 9,
+    "title": "Keeping the Piano in the Shared Space",
+    "en": "The piano began with a simple rule: one person plays and the others listen. The keyboard has 21 numbered keys in three rows. Other players can hear it after enabling sound, and a notice identifies who is using the instrument.\n\nGetting the sound to work took more than making the keys respond. On my iPhone, the buttons changed colour but produced no sound. Database permissions also needed attention. After changes to the permissions and audio activation, I could hear the notes during the device check.\n\nI then changed how the activity opened. I wanted the keyboard to sit over the map instead of feeling like a separate destination. I moved it further from the exit button to reduce accidental taps. If someone else selects an occupied piano, they see the performer’s name rather than another keyboard. The map icon also responds during use. Finally, eight seconds without a note releases the seat, so an idle player does not keep it occupied.",
+    "zh": "这里用实际iPhone检查，不能扩大到所有浏览器。地图内面板、退出误触与8秒让位有明确动机。",
+    "figure": "最终地图内面板、他人弹奏提示、演奏中图标；旧错误图可作小图。",
+    "caption": "The piano stays within the map. Occupancy feedback and an eight-second inactivity release make its shared use clearer."
+  },
+  {
+    "page": 10,
+    "title": "What I Checked Between Versions",
+    "en": "Most of my feedback came from using the project on phones and reporting what happened during development. I checked whether both players appeared, whether a message reached another device and whether the activity responded as expected. These checks often revealed things that were not obvious from one screenshot.\n\nFor example, the piano keys could change colour without sound. A player could enter the map without appearing on the display. A drink could change internally while still looking almost the same. Each needed a different response: checking audio, checking shared presence or making the visual change clearer.\n\nI also found that a feature working once did not mean it would keep working after later changes. I returned to the basic checks as the activities developed. The table on this page connects reported problems with the changes made and the evidence available. These are development checks; I have not carried out a separate study with recruited participants. The next check should use the exhibition setup, including the network, two phones and public display.",
+    "zh": "用表格作为主要视觉证据，正文讲检查方法的变化。保留“没有正式参与者研究”一句即可，不必每页重复免责声明。",
+    "figure": "问题—修改—复测记录表；没有复测证据的栏明确标未记录，不填Pass。",
+    "caption": "Development checks compared what appeared on individual devices with what another player or the public display received."
+  },
+  {
+    "page": 11,
+    "title": "Looking Back Through the Six Social UX Principles",
+    "en": "Sensory Feedback — The piano gives an audible response as well as a changing key. The iPhone issue showed why both needed checking.\n\nEmbodied Interaction — Touch controls connect hand movements to the avatar and activity controls. This is a limited form of embodiment through a screen, rather than a full-body installation.\n\nSocial Dynamics — The drink choices and split fishing controls let both players affect one outcome. Fishing makes the need for coordination especially clear. This relates to the course’s discussion of computer-supported cooperative work.\n\nResilience & Motivation — I made fishing more forgiving and kept another attempt available. Players can learn the coordination without having to succeed immediately.\n\nProactivity & Clarity — Glowing entrances and “Your turn” messages act as signifiers. They indicate where an action is available and who should act next.\n\nEthics & Inclusion — Mute, exits and piano release give players control over participation and access. There are still barriers: the experience needs a phone, a network connection and readable visual controls. Public messages also need consideration of privacy and moderation.",
+    "zh": "六个名称保留老师原名。用你自己的例子解释，不把普通触屏夸大为全身具身装置。理论引文在该页加课程来源，格式按unit outline统一。",
+    "figure": "六格排版，每格一小张真实界面或图标及对应文字；页脚列课堂引用。",
+    "caption": "The six principles offer a way to review both the working interactions and the barriers that remain."
+  },
+  {
+    "page": 12,
+    "title": "Reviewing the Finished Map",
+    "en": "The finished map gives people several ways to join in. They can write, respond to a wish, make something with a partner or listen to music. I kept these as choices, so everyone does not have to complete the same sequence.\n\nLooking back at the proposal, the biggest change is the place of cultural sharing. The original prompts asked directly about everyday experiences. The final activities give people a reason to interact, but do not necessarily lead them to discuss their backgrounds. I would need to observe unfamiliar participants to find out whether the interaction continues beyond completing a task. Device checks cannot answer that question.\n\nFor the exhibition, the intended short route is to join and take part in one activity. The approximately two-minute target still needs timing, including matching. I also need a reliable QR link, suitable network and a way for viewers to see the phone screens during the demonstration. A backup recording will help if the live connection fails.",
+    "zh": "反思要具体：初次互动和跨文化交流不是同一个已经证实的结果。此处展览安排是计划，不写成已经完成现场展览。",
+    "figure": "最终地图加展场设备布置图；约两分钟标设计目标，另留实际计时记录位置。",
+    "caption": "The exhibition route focuses on one short encounter. Whether this develops into cultural exchange remains a question for participant observation."
+  },
+  {
+    "page": 13,
+    "title": "How I Used AI",
+    "en": "I used ChatGPT/Codex to help with code, debugging, development planning and written drafts. Image-generation tools also helped produce or refine selected activity images. The existing map and character assets were kept as separate supplied artwork.\n\nMy decisions were most visible in the revisions. I rejected images that looked too saturated or did not fit the map. I specified how the drink choices should alternate, asked for clearer changes between ingredients, adjusted the fishing difficulty and changed the piano into an on-map interaction. I used the phone checks to decide what needed further work.\n\nThis document was also drafted with AI assistance. I am responsible for checking its descriptions against the project and choosing the evidence that supports them. The final submission needs an accurate record of the tools and assets used, the changes I made and the original sources of supplied artwork. Tutor approval and the unit’s required declaration also need to be confirmed before submission.",
+    "zh": "这页必须保留真实AI使用，不把“去AI味”解释为隐藏协助。正文如实写文稿也有辅助。最后提交时，依据实际批准和素材登记更新末段。",
+    "figure": "一个真实AI输出→你的反馈→最终版本例子，以及工具/用途/修改方式登记。",
+    "caption": "AI assistance was used during production; design decisions and revisions are documented through the development record."
+  }
+]
